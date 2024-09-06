@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <cassert>
 
+#include "vec3.h"
 #include "vec4.h"
 
 /// <summary>
@@ -190,18 +191,18 @@ public:
 	/// <summary>
 	/// mat4 at operator
 	/// </summary>
-	/// <param name="i">const uint</param>
+	/// <param name="i">const std::size_t</param>
 	/// <returns>vec4&</returns>
-	vec4& operator[](const unsigned i) {
+	vec4& operator[](const std::size_t i) {
 		return this->m[i];
 	}
 
 	/// <summary>
 	/// mat4 const at operator
 	/// </summary>
-	/// <param name="i">const uint</param>
+	/// <param name="i">const std::size_t</param>
 	/// <returns>const vec4&</returns>
-	const vec4& operator[](const unsigned i) const {
+	const vec4& operator[](const std::size_t i) const {
 		return this->m[i];
 	}
 };

@@ -146,9 +146,9 @@ public:
 	/// <summary>
 	/// vec4 at operator
 	/// </summary>
-	/// <param name="i">const uint</param>
+	/// <param name="i">const std::size_t</param>
 	/// <returns>float&</returns>
-	float& operator[](const unsigned i) {
+	float& operator[](const std::size_t i) {
 		switch (i) {
 		case 0: return this->x;
 		case 1: return this->y;
@@ -161,9 +161,9 @@ public:
 	/// <summary>
 	/// vec4 const at operator
 	/// </summary>
-	/// <param name="i">const uint</param>
+	/// <param name="i">const std::size_t</param>
 	/// <returns>const float</returns>
-	const float operator[](const unsigned i) const {
+	const float operator[](const std::size_t i) const {
 		switch (i) {
 		case 0: return this->x;
 		case 1: return this->y;

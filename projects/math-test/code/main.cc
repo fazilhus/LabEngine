@@ -2,11 +2,8 @@
 #include <vector>
 #include <string>
 
-#include "math/vec3.h"
-#include "math/vec4.h"
+#include "config.h"
 
-#define USE_LH
-#include "math/mat4.h"
 #include "util.h"
 
 const char* programName = "Math library";
