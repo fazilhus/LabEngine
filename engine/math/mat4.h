@@ -7,25 +7,14 @@
 #include "vec3.h"
 #include "vec4.h"
 
-/// <summary>
-/// 4x4 matrix class
-/// </summary>
 class mat4;
 
-/// <summary>
-/// mat4 transposition
-/// </summary>
-/// <param name="m">const mat4&</param>
-/// <returns>mat4</returns>
 mat4 transpose(const mat4& m);
 
 class mat4 {
 public:
 	vec4 m[4];
 
-	/// <summary>
-	/// identity mat4 constructor
-	/// </summary>
 	mat4() {
 		m[0] = vec4{ 1, 0, 0, 0 };
 		m[1] = vec4{ 0, 1, 0, 0 };
@@ -33,31 +22,16 @@ public:
 		m[3] = vec4{ 0, 0, 0, 1 };
 	}
 
-	/// <summary>
-	/// mat4 constructor
-	/// </summary>
-	/// <param name="r0">const vec4&</param>
-	/// <param name="r1">const vec4&</param>
-	/// <param name="r2">const vec4&</param>
-	/// <param name="r3">const vec4&</param>
 	mat4(const vec4& r0, const vec4& r1, const vec4& r2, const vec4& r3) {
 		m[0] = r0; m[1] = r1; m[2] = r2; m[3] = r3;
 	}
 
-	/// <summary>
-	/// mat4 copy constructor
-	/// </summary>
-	/// <param name="other">const mat4&</param>
 	mat4(const mat4& other) {
 		for (std::size_t i = 0; i < 4; ++i) {
 			m[i] = other[i];
 		}
 	}
 
-	/// <summary>
-	/// static method that returns zero mat4
-	/// </summary>
-	/// <returns>mat4</returns>
 	static mat4 zero() {
 		return mat4{
 			vec4{},
@@ -67,10 +41,6 @@ public:
 		};
 	}
 
-	/// <summary>
-	/// static method that returns identity mat4
-	/// </summary>
-	/// <returns>mat4</returns>
 	static mat4 identity() {
 		return mat4{
 			vec4{ 1, 0, 0, 0 },
@@ -80,11 +50,6 @@ public:
 		};
 	}
 
-	/// <summary>
-	/// mat4 assign operator
-	/// </summary>
-	/// <param name="other">const mat4&</param>
-	/// <returns>mat4&</returns>
 	mat4& operator=(const mat4& other) {
 		for (std::size_t i = 0; i < 4; ++i) {
 			m[i] = other[i];
@@ -92,11 +57,6 @@ public:
 		return *this;
 	}
 
-	/// <summary>
-	/// mat4 binary plus operator
-	/// </summary>
-	/// <param name="rhs">const mat4&</param>
-	/// <returns>const mat4</returns>
 	const mat4 operator+(const mat4& rhs) const {
 		mat4 res = mat4::zero();
 		for (std::size_t i = 0; i < 4; ++i) {
@@ -107,11 +67,6 @@ public:
 		return res;
 	}
 
-	/// <summary>
-	/// mat4 binary minus operator
-	/// </summary>
-	/// <param name="rhs">const mat4&</param>
-	/// <returns>const mat4</returns>
 	const mat4 operator-(const mat4& rhs) const {
 		mat4 res = mat4::zero();
 		for (std::size_t i = 0; i < 4; ++i) {
@@ -122,11 +77,6 @@ public:
 		return res;
 	}
 
-	/// <summary>
-	/// mat4 binary mult operator
-	/// </summary>
-	/// <param name="rhs">const mat4&</param>
-	/// <returns>const mat4</returns>
 	const mat4 operator*(const mat4& rhs) const {
 		mat4 res = mat4::zero();
 		mat4 thisT = transpose(*this);
@@ -138,11 +88,6 @@ public:
 		return res;
 	}
 
-	/// <summary>
-	/// mat4 binary mult operator (scale)
-	/// </summary>
-	/// <param name="rhs">const float</param>
-	/// <returns>const mat4</returns>
 	const mat4 operator*(const float rhs) const {
 		mat4 res = mat4::zero();
 		for (std::size_t i = 0; i < 4; ++i) {
@@ -153,11 +98,6 @@ public:
 		return res;
 	}
 
-	/// <summary>
-	/// mat4 binary mult operator
-	/// </summary>
-	/// <param name="rhs">const vec4&</param>
-	/// <returns>const mat4</returns>
 	const vec4 operator*(const vec4& rhs) const {
 		vec4 res{};
 		mat4 thisT = transpose(*this);
@@ -167,11 +107,6 @@ public:
 		return res;
 	}
 
-	/// <summary>
-	/// mat4 equal operator
-	/// </summary>
-	/// <param name="rhs">const mat4&</param>
-	/// <returns>const bool</returns>
 	const bool operator==(const mat4& rhs) const {
 		for (std::size_t i = 0; i < 4; ++i) {
 			if (this->m[i] != rhs[i]) return false;
@@ -179,38 +114,19 @@ public:
 		return true;
 	}
 
-	/// <summary>
-	/// mat4 not-equal operator
-	/// </summary>
-	/// <param name="rhs">const mat4&</param>
-	/// <returns>const bool</returns>
 	const bool operator!=(const mat4& rhs) const {
 		return !(*this == rhs);
 	}
 
-	/// <summary>
-	/// mat4 at operator
-	/// </summary>
-	/// <param name="i">const std::size_t</param>
-	/// <returns>vec4&</returns>
 	vec4& operator[](const std::size_t i) {
 		return this->m[i];
 	}
 
-	/// <summary>
-	/// mat4 const at operator
-	/// </summary>
-	/// <param name="i">const std::size_t</param>
-	/// <returns>const vec4&</returns>
 	const vec4& operator[](const std::size_t i) const {
 		return this->m[i];
 	}
 };
 
-/// <summary>
-/// print mat4 to stdout
-/// </summary>
-/// <param name="m">const mat4&</param>
 inline void mat4print(const mat4& m) {
 	for (std::size_t i = 0; i < 4; ++i) {
 		vec4print(m[i]);
@@ -218,11 +134,6 @@ inline void mat4print(const mat4& m) {
 	printf("\n");
 }
 
-/// <summary>
-/// determinant of a mat4
-/// </summary>
-/// <param name="m">const mat4&</param>
-/// <returns>float</returns>
 inline float determinant(const mat4& m) {
 	// calculation of needed 2x2 and 3x3 determinants
 	float det2233 = m[2][2] * m[3][3] - m[2][3] * m[3][2];
@@ -242,11 +153,6 @@ inline float determinant(const mat4& m) {
 	return det;
 }
 
-/// <summary>
-/// inverse of a mat4
-/// </summary>
-/// <param name="m">const mat4&</param>
-/// <returns>mat4</returns>
 inline mat4 inverse(const mat4& m) {
 	mat4 adj = mat4::zero();
 
@@ -391,11 +297,6 @@ inline mat4 inverse(const mat4& m) {
 	return adj;
 }
 
-/// <summary>
-/// transposition of a mat4
-/// </summary>
-/// <param name="m">const mat4&</param>
-/// <returns>mat4</returns>
 inline mat4 transpose(const mat4& m) {
 	mat4 res = mat4::zero();
 	for (std::size_t i = 0; i < 4; ++i) {
@@ -406,11 +307,6 @@ inline mat4 transpose(const mat4& m) {
 	return res;
 }
 
-/// <summary>
-/// mat4 rotation matrix around x-axis
-/// </summary>
-/// <param name="rad">float</param>
-/// <returns>mat4</returns>
 inline mat4 rotationx(const float rad) {
 	mat4 res = mat4::zero();
 	float cosine = cosf(rad);
@@ -422,11 +318,6 @@ inline mat4 rotationx(const float rad) {
 	return res;
 }
 
-/// <summary>
-/// mat4 rotation matrix around y-axis
-/// </summary>
-/// <param name="rad">float</param>
-/// <returns>mat4</returns>
 inline mat4 rotationy(const float rad) {
 	mat4 res = mat4::zero();
 	float cosine = cosf(rad);
@@ -438,11 +329,6 @@ inline mat4 rotationy(const float rad) {
 	return res;
 }
 
-/// <summary>
-/// mat4 rotation matrix around z-axis
-/// </summary>
-/// <param name="rad">float</param>
-/// <returns>mat4</returns>
 inline mat4 rotationz(const float rad) {
 	mat4 res = mat4::zero();
 	float cosine = cosf(rad);
@@ -454,12 +340,6 @@ inline mat4 rotationz(const float rad) {
 	return res;
 }
 
-/// <summary>
-/// mat4 rotation matrix around arbitrary axis
-/// </summary>
-/// <param name="v">const vec3&</param>
-/// <param name="rad">const float</param>
-/// <returns></returns>
 inline mat4 rotationaxis(const vec3& v, const float rad) {
 	mat4 res = mat4::zero();
 	mat4 id = mat4::identity();
