@@ -211,7 +211,7 @@ public:
 /// print mat4 to stdout
 /// </summary>
 /// <param name="m">const mat4&</param>
-void mat4print(const mat4& m) {
+inline void mat4print(const mat4& m) {
 	for (std::size_t i = 0; i < 4; ++i) {
 		vec4print(m[i]);
 	}
@@ -223,7 +223,7 @@ void mat4print(const mat4& m) {
 /// </summary>
 /// <param name="m">const mat4&</param>
 /// <returns>float</returns>
-float determinant(const mat4& m) {
+inline float determinant(const mat4& m) {
 	// calculation of needed 2x2 and 3x3 determinants
 	float det2233 = m[2][2] * m[3][3] - m[2][3] * m[3][2];
 	float det2133 = m[2][1] * m[3][3] - m[2][3] * m[3][1];
@@ -247,7 +247,7 @@ float determinant(const mat4& m) {
 /// </summary>
 /// <param name="m">const mat4&</param>
 /// <returns>mat4</returns>
-mat4 inverse(const mat4& m) {
+inline mat4 inverse(const mat4& m) {
 	mat4 adj = mat4::zero();
 
 	// calculation of an adjugative
@@ -396,7 +396,7 @@ mat4 inverse(const mat4& m) {
 /// </summary>
 /// <param name="m">const mat4&</param>
 /// <returns>mat4</returns>
-mat4 transpose(const mat4& m) {
+inline mat4 transpose(const mat4& m) {
 	mat4 res = mat4::zero();
 	for (std::size_t i = 0; i < 4; ++i) {
 		for (std::size_t j = 0; j < 4; ++j) {
@@ -411,7 +411,7 @@ mat4 transpose(const mat4& m) {
 /// </summary>
 /// <param name="rad">float</param>
 /// <returns>mat4</returns>
-mat4 rotationx(const float rad) {
+inline mat4 rotationx(const float rad) {
 	mat4 res = mat4::zero();
 	float cosine = cosf(rad);
 	float sine = sinf(rad);
@@ -427,7 +427,7 @@ mat4 rotationx(const float rad) {
 /// </summary>
 /// <param name="rad">float</param>
 /// <returns>mat4</returns>
-mat4 rotationy(const float rad) {
+inline mat4 rotationy(const float rad) {
 	mat4 res = mat4::zero();
 	float cosine = cosf(rad);
 	float sine = sinf(rad);
@@ -443,7 +443,7 @@ mat4 rotationy(const float rad) {
 /// </summary>
 /// <param name="rad">float</param>
 /// <returns>mat4</returns>
-mat4 rotationz(const float rad) {
+inline mat4 rotationz(const float rad) {
 	mat4 res = mat4::zero();
 	float cosine = cosf(rad);
 	float sine = sinf(rad);
@@ -460,7 +460,7 @@ mat4 rotationz(const float rad) {
 /// <param name="v">const vec3&</param>
 /// <param name="rad">const float</param>
 /// <returns></returns>
-mat4 rotationaxis(const vec3& v, const float rad) {
+inline mat4 rotationaxis(const vec3& v, const float rad) {
 	mat4 res = mat4::zero();
 	mat4 id = mat4::identity();
 	float cosine = cosf(rad);
@@ -494,7 +494,7 @@ mat4 rotationaxis(const vec3& v, const float rad) {
 	return res;
 }
 
-mat4 perspective(const float fovy, const float aspect, const float near, const float far) {
+inline mat4 perspective(const float fovy, const float aspect, const float near, const float far) {
 	float scaley = 1 / tanf(fovy / 2);
 	float scalex = scaley / aspect;
 	float diff = far - near;
@@ -512,7 +512,7 @@ mat4 perspective(const float fovy, const float aspect, const float near, const f
 	return proj;
 }
 
-mat4 lookat(const vec3& eye, const vec3& at, const vec3& up) {
+inline mat4 lookat(const vec3& eye, const vec3& at, const vec3& up) {
 #ifdef USE_LH
 	vec3 f = normalize(at - eye); // camera forward
 #else

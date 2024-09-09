@@ -180,7 +180,7 @@ public:
 /// <param name="a">const vec4&</param>
 /// <param name="b">const vec4&</param>
 /// <returns>float</returns>
-float dot(const vec4& a, const vec4& b) {
+inline float dot(const vec4& a, const vec4& b) {
 	return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
 }
 
@@ -189,7 +189,7 @@ float dot(const vec4& a, const vec4& b) {
 /// </summary>
 /// <param name="a">const vec4&</param>
 /// <returns>float</returns>
-float length(const vec4& a) {
+inline float length(const vec4& a) {
 	return sqrtf(a.x * a.x + a.y * a.y + a.z * a.z + a.w * a.w);
 }
 
@@ -198,7 +198,7 @@ float length(const vec4& a) {
 /// </summary>
 /// <param name="a">const vec4&</param>
 /// <returns>vec4</returns>
-vec4 normalize(const vec4& a) {
+inline vec4 normalize(const vec4& a) {
 	vec4 res{ a };
 	float len = length(a);
 	return res *= (1 / len);
@@ -208,6 +208,6 @@ vec4 normalize(const vec4& a) {
 /// print vec4 to stdout
 /// </summary>
 /// <param name="v">const vec4&</param>
-void vec4print(const vec4& v) {
+inline void vec4print(const vec4& v) {
 	printf("%5.2f %5.2f %5.2f %5.2f\n", v.x, v.y, v.z, v.w);
 }

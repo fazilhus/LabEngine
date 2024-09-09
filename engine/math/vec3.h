@@ -173,7 +173,7 @@ public:
 /// <param name="a">vec3</param>
 /// <param name="b">vec3</param>
 /// <returns>float</returns>
-float dot(const vec3& a, const vec3& b) {
+inline float dot(const vec3& a, const vec3& b) {
 	return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
@@ -182,7 +182,7 @@ float dot(const vec3& a, const vec3& b) {
 /// </summary>
 /// <param name="a">vec3</param>
 /// <returns>float</returns>
-float length(const vec3& a) {
+inline float length(const vec3& a) {
 	return sqrtf(a.x * a.x + a.y * a.y + a.z * a.z);
 }
 
@@ -192,7 +192,7 @@ float length(const vec3& a) {
 /// <param name="a">vec3</param>
 /// <param name="b">vec3</param>
 /// <returns>vec3</returns>
-vec3 cross(const vec3& a, const vec3& b) {
+inline vec3 cross(const vec3& a, const vec3& b) {
 	vec3 res{};
 	res.x = a.y * b.z - a.z * b.y;
 	res.y = a.z * b.x - a.x * b.z;
@@ -205,7 +205,7 @@ vec3 cross(const vec3& a, const vec3& b) {
 /// </summary>
 /// <param name="a">const vec3&</param>
 /// <returns>vec3</returns>
-vec3 normalize(const vec3& a) {
+inline vec3 normalize(const vec3& a) {
 	vec3 res{a};
 	float len = length(a);
 	return res *= (1 / len);
@@ -215,6 +215,6 @@ vec3 normalize(const vec3& a) {
 /// print vec3 to stdout
 /// </summary>
 /// <param name="v">const vec3&</param>
-void vec3print(const vec3& v) {
+inline void vec3print(const vec3& v) {
 	printf("%5.2f %5.2f %5.2f\n", v.x, v.y, v.z);
 }
