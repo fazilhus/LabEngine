@@ -8,7 +8,8 @@
 //------------------------------------------------------------------------------
 #include "core/app.h"
 #include "render/window.h"
-//#include "render/mesh.h"
+#include "render/mesh.h"
+
 
 namespace Example
 {
@@ -37,10 +38,7 @@ private:
 	GLuint program;
 	GLuint vertexShader;
 	GLuint pixelShader;
-	//Mesh mesh;
-	GLuint vao;
-	GLuint vbo;
-	GLuint ebo;
+	Mesh mesh;
 	Display::Window* window;
 	GLchar *vsBuffer;
 	GLchar *fsBuffer;

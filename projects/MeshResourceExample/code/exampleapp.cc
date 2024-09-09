@@ -7,6 +7,7 @@
 #include <cstring>
 #include "imgui.h"
 
+#include "render/mesh.h"
 #include "math/mat4.h"
 
 #define STRING_BUFFER_SIZE 8192
@@ -112,28 +113,7 @@ ImGuiExampleApp::Open()
 		// compile the shaders in the buffers
 		this->CompileShaders();
 
-		glGenVertexArrays(1, &this->vao);
-		glBindVertexArray(this->vao);
-
-		glGenBuffers(1, &this->vbo);
-		glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vb), vb, GL_STATIC_DRAW);
-
-		glGenBuffers(1, &this->ebo);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ebo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(ib), ib, GL_STATIC_DRAW);
-
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 7, (GLvoid*)0);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 7, (GLvoid*)(sizeof(GLfloat) * 3));
-		glEnableVertexAttribArray(1);
-
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-		glBindVertexArray(0);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		
-		//this->mesh.Init(vbuf, ibuf, sizes, offsets, 2);
+		this->mesh.Init(vb, ib, sizes, offsets, 4, 2, 2);
 
 		// set ui rendering function
 		this->window->SetUiRender([this]()
@@ -169,11 +149,9 @@ ImGuiExampleApp::Run()
 		GLuint uniLoc = glGetUniformLocation(this->program, "transform");
 		glUniformMatrix4fv(uniLoc, 1, GL_FALSE, &transform[0][0]);
 
-		//this->mesh.BindVAO();
-		glBindVertexArray(this->vao);
+		this->mesh.BindVAO();
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-		//this->mesh.UnBindVAO();
-		glBindVertexArray(0);
+		this->mesh.UnBindVAO();
 
 		// transfer new frame to window
 		this->window->SwapBuffers();

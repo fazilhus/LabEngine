@@ -7,6 +7,8 @@ SET(files_render_display
 	window.cc
 	grid.h
 	grid.cc
+	mesh.h
+	mesh.cc
 	)
 SOURCE_GROUP("display" FILES ${files_render_display})
 
