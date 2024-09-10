@@ -18,9 +18,10 @@ const GLchar* vs =
 "layout(location=1) in vec4 color;\n"
 "layout(location=0) out vec4 Color;\n"
 "uniform mat4 transform;\n"
+"uniform mat4 persp;\n"
 "void main()\n"
 "{\n"
-"	gl_Position = transform * vec4(pos, 1);\n"
+"	gl_Position = persp * transform * vec4(pos, 1);\n"
 "	Color = color;\n"
 "}\n";
 
@@ -142,19 +143,19 @@ ImGuiExampleApp::Run()
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		this->window->Update();
-
-		mat4 transform = mat4::identity();
-		transform = rotationx((float)glfwGetTime()) * transform;
+		
+		mat4 transform = rotationx((float)glfwGetTime());
 		transform = rotationy((float)glfwGetTime()) * transform;
 		transform = rotationz((float)glfwGetTime()) * transform;
-		//transform = scale({0.5f, 0.5f, 0.5f}) * transform;
 		transform = translate({ cosf((float)glfwGetTime()), sinf((float)glfwGetTime()), -10}) * transform;
-		transform = perspective(0.5, 4.0f / 3.0f, 0.1f, 100.0f) * transform;
+		mat4 persp = perspective(0.5, 4.0f / 3.0f, 0.1f, 100.0f);
 
 		glUseProgram(this->program);
 
-		GLuint uniLoc = glGetUniformLocation(this->program, "transform");
-		glUniformMatrix4fv(uniLoc, 1, GL_FALSE, &transform[0][0]);
+		GLuint tfLoc = glGetUniformLocation(this->program, "transform");
+		glUniformMatrix4fv(tfLoc, 1, GL_FALSE, &transform[0][0]);
+		GLuint perspLoc = glGetUniformLocation(this->program, "persp");
+		glUniformMatrix4fv(perspLoc, 1, GL_FALSE, &persp[0][0]);
 
 		this->mesh.BindVAO();
 		glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
