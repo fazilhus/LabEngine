@@ -297,6 +297,22 @@ inline mat4 inverse(const mat4& m) {
 	return adj;
 }
 
+inline mat4 translate(const vec3& v) {
+	mat4 res = mat4::identity();
+	for (std::size_t i = 0; i < 3; ++i) {
+		res[3][i] = v[i];
+	}
+	return res;
+}
+
+inline mat4 scale(const vec3& v) {
+	mat4 res = mat4::identity();
+	for (std::size_t i = 0; i < 3; ++i) {
+		res[i][i] = v[i];
+	}
+	return res;
+}
+
 inline mat4 transpose(const mat4& m) {
 	mat4 res = mat4::zero();
 	for (std::size_t i = 0; i < 4; ++i) {
@@ -312,8 +328,8 @@ inline mat4 rotationx(const float rad) {
 	float cosine = cosf(rad);
 	float sine = sinf(rad);
 	res[0] = vec4{ 1, 0, 0, 0 };
-	res[1] = vec4{ 0, cosine, sine, 0 };
-	res[2] = vec4{ 0, -sine, cosine, 0 };
+	res[1] = vec4{ 0, cosine, -sine, 0 };
+	res[2] = vec4{ 0, sine, cosine, 0 };
 	res[3] = vec4{ 0, 0, 0, 1 };
 	return res;
 }
@@ -333,8 +349,8 @@ inline mat4 rotationz(const float rad) {
 	mat4 res = mat4::zero();
 	float cosine = cosf(rad);
 	float sine = sinf(rad);
-	res[0] = vec4{ cosine, sine, 0, 0 };
-	res[1] = vec4{ -sine, cosine, 0, 0 };
+	res[0] = vec4{ cosine, -sine, 0, 0 };
+	res[1] = vec4{ sine, cosine, 0, 0 };
 	res[2] = vec4{ 0, 0, 1, 0 };
 	res[3] = vec4{ 0, 0, 0, 1 };
 	return res;

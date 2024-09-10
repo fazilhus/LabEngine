@@ -78,21 +78,21 @@ ImGuiExampleApp::Open()
 		this->window->Close();
 	});
 
-	GLfloat vb[] =
-	{
-		-0.5f,	-0.5f,	-1,			// pos 0
-		1,		0,		0,		1,	// color 0
-		-0.5f,	0.5f,	-1,			// pos 1
-		0,		1,		0,		1,	// color 1
-		0.5f,	0.5f,	-1,			// pos 2
-		0,		0,		1,		1,  // color 2
-		0.5f,	-0.5f,	-1,			// pos 3
-		0,		0,		0,		1,	// color 3
+	GLfloat vb[] = {
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  0.0f,  0.0f, 1.0f,
+		-1.0f,  1.0f, -1.0f,
+		 0.0f,  1.0f,  0.0f, 1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 0.0f,  0.0f,  1.0f, 1.0f,
+		-1.0f, -1.0f,  1.0f,
+		 0.0f,  0.0f,  0.0f, 1.0f
 	};
-
 	GLuint ib[] = {
-		0, 1, 2,
-		0, 2, 3,
+		1, 2, 3,
+		0, 3, 2,
+		0, 1, 3,
+		0, 2, 1
 	};
 	std::size_t sizes[] = { 3, 4 };
 	std::size_t offsets[] = { 0, 3 };
@@ -113,7 +113,7 @@ ImGuiExampleApp::Open()
 		// compile the shaders in the buffers
 		this->CompileShaders();
 
-		this->mesh.Init(vb, ib, sizes, offsets, 4, 2, 2);
+		this->mesh.Init(vb, ib, sizes, offsets, 4, 4, 2);
 
 		// set ui rendering function
 		this->window->SetUiRender([this]()
@@ -136,13 +136,20 @@ ImGuiExampleApp::Open()
 void
 ImGuiExampleApp::Run()
 {
+	glEnable(GL_DEPTH_TEST);
+
 	while (this->window->IsOpen())
 	{
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		this->window->Update();
 
 		mat4 transform = mat4::identity();
-		transform = transform * rotationz((float)glfwGetTime());
+		transform = rotationx((float)glfwGetTime()) * transform;
+		transform = rotationy((float)glfwGetTime()) * transform;
+		transform = rotationz((float)glfwGetTime()) * transform;
+		//transform = scale({0.5f, 0.5f, 0.5f}) * transform;
+		transform = translate({ cosf((float)glfwGetTime()), sinf((float)glfwGetTime()), -10}) * transform;
+		transform = perspective(0.5, 4.0f / 3.0f, 0.1f, 100.0f) * transform;
 
 		glUseProgram(this->program);
 
@@ -150,7 +157,7 @@ ImGuiExampleApp::Run()
 		glUniformMatrix4fv(uniLoc, 1, GL_FALSE, &transform[0][0]);
 
 		this->mesh.BindVAO();
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
 		this->mesh.UnBindVAO();
 
 		// transfer new frame to window

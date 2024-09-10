@@ -228,6 +228,7 @@ Window::Open()
 		return false;
 	}
 	glfwMakeContextCurrent(this->window);
+	glfwSwapInterval(0);
 
 	if (nullptr != this->window && WindowCount == 0)
 	{

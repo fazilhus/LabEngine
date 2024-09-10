@@ -2,13 +2,10 @@
 #include "mesh.h"
 
 Mesh::Mesh()
-	: vb(nullptr), ib(nullptr), vao(0), vbo(0), ebo(0) {}
+	: vao(0), vbo(0), ebo(0) {}
 
 void Mesh::Init(GLfloat* vb, GLuint* ib, const std::size_t* sizes, const std::size_t* offsets, 
 	const std::size_t verticies, const std::size_t triangles, const std::size_t count) {
-	this->vb = vb;
-	this->ib = ib;
-
 	glGenVertexArrays(1, &this->vao);
 	glBindVertexArray(this->vao);
 
@@ -17,11 +14,11 @@ void Mesh::Init(GLfloat* vb, GLuint* ib, const std::size_t* sizes, const std::si
 
 	glGenBuffers(1, &this->vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * stride * verticies, this->vb, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * stride * verticies, vb, GL_STATIC_DRAW);
 
 	glGenBuffers(1, &this->ebo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * 3 * triangles, this->ib, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * 3 * triangles, ib, GL_STATIC_DRAW);
 
 	for (std::size_t i = 0; i < count; ++i) {
 		glVertexAttribPointer(i, sizes[i], GL_FLOAT, GL_FALSE, sizeof(GLfloat) * stride, (GLvoid*)(sizeof(GLfloat) * offsets[i]));

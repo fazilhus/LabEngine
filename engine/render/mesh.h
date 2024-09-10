@@ -6,9 +6,6 @@
 
 class Mesh {
 private:
-	GLfloat *vb;
-	GLuint* ib;
-
 	GLuint vao;
 	GLuint vbo;
 	GLuint ebo;
