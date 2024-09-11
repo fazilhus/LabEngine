@@ -28,3 +28,8 @@ TARGET_INCLUDE_DIRECTORIES(imgui PUBLIC imgui imgui/examples/opengl3_example)
 SET_TARGET_PROPERTIES(imgui PROPERTIES FOLDER "exts/imgui")
 
 TARGET_LINK_LIBRARIES(exts INTERFACE imgui)
+
+ADD_LIBRARY(stb_image STATIC stb/stb_image.h)
+TARGET_LINK_LIBRARIES(stb_image PUBLIC exts)
+TARGET_INCLUDE_DIRECTORIES(stb_image PUBLIC stb_image stb)
+SET_TARGET_PROPERTIES(stb_image PROPERTIES FOLDER "exts/stb")
