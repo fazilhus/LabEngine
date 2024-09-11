@@ -100,7 +100,7 @@ ImGuiExampleApp::Open()
 
 		this->camera = Math::lookat({0, 0, 10}, {0, 0, 0}, {0, 1, 0});
 
-		this->mesh = Mesh::CreateQubeMesh();
+		this->mesh = Resource::Mesh::CreateQubeMesh();
 		this->grid = new Render::Grid();
 
 		// set ui rendering function

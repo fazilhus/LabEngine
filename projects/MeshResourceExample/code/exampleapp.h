@@ -39,7 +39,7 @@ private:
 	GLuint program;
 	GLuint vertexShader;
 	GLuint pixelShader;
-	Mesh mesh;
+	Resource::Mesh mesh;
 	Display::Window* window;
 	GLchar *vsBuffer;
 	GLchar *fsBuffer;

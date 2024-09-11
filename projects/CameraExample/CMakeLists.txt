@@ -1,14 +1,14 @@
 #--------------------------------------------------------------------------
-# MeshResourceExample project
+# CameraExample project
 #--------------------------------------------------------------------------
 
-PROJECT(MeshResourceExample)
+PROJECT(CameraExample)
 FILE(GLOB example_headers code/*.h)
 FILE(GLOB example_sources code/*.cc)
 
 SET(files_example ${example_headers} ${example_sources})
-SOURCE_GROUP("MeshResourceExample" FILES ${files_example})
+SOURCE_GROUP("CameraExample" FILES ${files_example})
 
-ADD_EXECUTABLE(MeshResourceExample ${files_example})
-TARGET_LINK_LIBRARIES(MeshResourceExample core render)
-ADD_DEPENDENCIES(MeshResourceExample core render)
+ADD_EXECUTABLE(CameraExample ${files_example})
+TARGET_LINK_LIBRARIES(CameraExample core render)
+ADD_DEPENDENCIES(CameraExample core render)

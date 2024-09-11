@@ -39,7 +39,7 @@ private:
 	GLuint program;
 	GLuint vertexShader;
 	GLuint pixelShader;
-	Mesh mesh;
+	Resource::Mesh mesh;
 	Render::Grid* grid;
 	Math::mat4 camera;
 	Display::Window* window;

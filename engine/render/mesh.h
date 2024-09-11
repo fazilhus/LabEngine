@@ -5,40 +5,44 @@
 #include <vector>
 #include "math/vec4.h"
 
-struct PrimitiveGroup {
-	std::size_t indices;
-	std::size_t offset;
-	Math::vec4 color;
-};
+namespace Resource {
 
-class Mesh {
-private:
-	GLuint vao;
-	GLuint vbo;
-	GLuint ebo;
+	struct PrimitiveGroup {
+		std::size_t indices;
+		std::size_t offset;
+		Math::vec4 color;
+	};
 
-	std::vector<PrimitiveGroup> groups;
+	class Mesh {
+	private:
+		GLuint vao;
+		GLuint vbo;
+		GLuint ebo;
 
-public:
-	Mesh();
-	Mesh(const Mesh& other);
-	~Mesh() = default;
+		std::vector<PrimitiveGroup> groups;
 
-	Mesh& operator=(const Mesh& other);
+	public:
+		Mesh();
+		Mesh(const Mesh& other);
+		~Mesh() = default;
 
-	void Init(GLfloat* vb, GLuint* ib, const std::size_t* sizes, const std::size_t* offsets, 
-		const std::size_t verticies, const std::size_t triangles, const std::size_t count);
-	void DeInit();
+		Mesh& operator=(const Mesh& other);
 
-	void Draw(const GLuint programHandle) const;
-	void Draw(std::size_t i) const;
+		void Init(GLfloat* vb, GLuint* ib, const std::size_t* sizes, const std::size_t* offsets, 
+			const std::size_t verticies, const std::size_t triangles, const std::size_t count);
+		void DeInit();
 
-	void PushPrimitive(PrimitiveGroup group);
+		void Draw(const GLuint programHandle) const;
+		void Draw(std::size_t i) const;
 
-	static Mesh CreateQuadMesh(const float width = 1.0f, const float height = 1.0f);
-	static Mesh CreateQubeMesh(const float width = 1.0f, const float height = 1.0f, const float depth = 1.0f);
+		void PushPrimitive(PrimitiveGroup group);
 
-private:
-	void Bind() const;
-	void UnBind() const;
-};
+		static Mesh CreateQuadMesh(const float width = 1.0f, const float height = 1.0f);
+		static Mesh CreateQubeMesh(const float width = 1.0f, const float height = 1.0f, const float depth = 1.0f);
+
+	private:
+		void Bind() const;
+		void UnBind() const;
+	};
+
+} // Render

@@ -97,7 +97,7 @@ ImGuiExampleApp::Open()
 		// compile the shaders in the buffers
 		this->CompileShaders();
 
-		this->mesh = Mesh::CreateQubeMesh();
+		this->mesh = Resource::Mesh::CreateQubeMesh();
 
 		// set ui rendering function
 		this->window->SetUiRender([this]()
