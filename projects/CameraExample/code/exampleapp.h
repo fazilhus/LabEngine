@@ -40,6 +40,8 @@ private:
 	GLuint vertexShader;
 	GLuint pixelShader;
 	Mesh mesh;
+	Render::Grid* grid;
+	Math::mat4 camera;
 	Display::Window* window;
 	GLchar *vsBuffer;
 	GLchar *fsBuffer;

@@ -66,6 +66,7 @@ ImGuiExampleApp::Close()
 
 	Core::App::Close();
 	this->mesh.DeInit();
+	delete this->grid;
 }
 
 //------------------------------------------------------------------------------
@@ -97,7 +98,10 @@ ImGuiExampleApp::Open()
 		// compile the shaders in the buffers
 		this->CompileShaders();
 
+		this->camera = Math::lookat({0, 0, 10}, {0, 0, 0}, {0, 1, 0});
+
 		this->mesh = Mesh::CreateQubeMesh();
+		this->grid = new Render::Grid();
 
 		// set ui rendering function
 		this->window->SetUiRender([this]()
@@ -129,20 +133,23 @@ ImGuiExampleApp::Run()
 		this->window->Update();
 		
 		float angle = (float)glfwGetTime();
-		Math::mat4 view = Math::rotationx(angle);
-		view = Math::rotationy(angle) * view;
-		view = Math::rotationz(angle) * view;
-		view = Math::translate({0, 0, -10}) * view;
+		Math::vec3 eye{cosf(angle) * 10, 10, sinf(angle) * 10};
+		this->camera = Math::lookat(
+			eye,
+			{0, 0, 0},
+			{0, 1, 0}
+		);
 		Math::mat4 persp = Math::perspective(0.5, 4.0f / 3.0f, 0.1f, 100.0f);
 
 		glUseProgram(this->program);
 
 		GLuint viewLoc = glGetUniformLocation(this->program, "view");
-		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
+		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &camera[0][0]);
 		GLuint perspLoc = glGetUniformLocation(this->program, "persp");
 		glUniformMatrix4fv(perspLoc, 1, GL_FALSE, &persp[0][0]);
 
 		this->mesh.Draw(this->program);
+		this->grid->Draw(&this->camera[0][0], &persp[0][0]);
 
 		// transfer new frame to window
 		this->window->SwapBuffers();
