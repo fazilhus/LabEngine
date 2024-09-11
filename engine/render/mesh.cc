@@ -49,21 +49,28 @@ namespace Resource {
 		glDeleteVertexArrays(1, &vao);
 		glDeleteBuffers(1, &vbo);
 		glDeleteBuffers(1, &ebo);
+		for (auto el : groups) {
+			el.tex.Unload();
+		}
 	}
 
 	void Mesh::Draw(const GLuint programHandle) const {
 		Bind();
 		for (auto el : groups) {
-			GLuint loc = glGetUniformLocation(programHandle, "face_col");
-			glUniform4fv(loc, 1, &el.color[0]);
+			//GLuint loc = glGetUniformLocation(programHandle, "face_col");
+			//glUniform4fv(loc, 1, &el.color[0]);
+			el.tex.Bind();
 			glDrawElements(GL_TRIANGLES, el.indices, GL_UNSIGNED_INT, (GLvoid*)(sizeof(GLuint) * el.offset));
+			el.tex.UnBind();
 		}
 		UnBind();
 	}
 
 	void Mesh::Draw(std::size_t i) const {
 		Bind();
+		groups[i].tex.Bind();
 		glDrawElements(GL_TRIANGLES, groups[i].indices, GL_UNSIGNED_INT, (GLvoid*)(sizeof(GLuint) * groups[i].offset));
+		groups[i].tex.UnBind();
 		UnBind();
 	}
 
@@ -83,27 +90,26 @@ namespace Resource {
 		Mesh mesh{};
 		GLfloat vb[] =
 		{
-			-0.5f * width,	-0.5f * height,	-1,		
-			1,		0,		0,		1,
-			-0.5f * width,	0.5f * height,	-1,		
-			0,		1,		0,		1,
-			0.5f * width,	0.5f * height,	-1,		
-			0,		0,		1,		1, 
-			0.5f * width,	-0.5f * height,	-1,		
-			0,		0,		0,		1,
+			-0.5f * width, 0.01f, -0.5f * height,	1.0f, 0.0f, 0.0f, 1.0f,		1.0f, 0.0f,
+			-0.5f * width, 0.01f,  0.5f * height,	0.0f, 1.0f, 0.0f, 1.0f,		0.0f, 0.0f,
+			 0.5f * width, 0.01f,  0.5f * height,	0.0f, 0.0f, 1.0f, 1.0f,		0.0f, 1.0f,
+			 0.5f * width, 0.01f, -0.5f * height,	0.0f, 0.0f, 0.0f, 1.0f,		1.0f, 1.0f
 		};
 
 		GLuint ib[] = {
-			0, 1, 2,
 			0, 2, 3,
+			0, 1, 2,
 		};
-		std::size_t sizes[] = { 3, 4 };
-		std::size_t offsets[] = { 0, 3 };
-		mesh.Init(vb, ib, sizes, offsets, 4, 2, 2);
+		std::size_t sizes[] = { 3, 4, 2 };
+		std::size_t offsets[] = { 0, 3, 7 };
+		mesh.Init(vb, ib, sizes, offsets, 4, 2, 3);
+		Texture tex{};
+		tex.LoadFromFile("../res/img.png");
+		mesh.PushPrimitive({ 6, 0, tex });
 		return mesh;
 	}
 
-	Mesh Mesh::CreateQubeMesh(const float width, const float height, const float depth)
+	Mesh Mesh::CreateCubeMesh(const float width, const float height, const float depth)
 	{
 		Mesh mesh{};
 		GLfloat vb[] =
@@ -143,13 +149,15 @@ namespace Resource {
 		std::size_t sizes[] = { 3, 4 };
 		std::size_t offsets[] = { 0, 3 };
 		mesh.Init(vb, ib, sizes, offsets, 8, 12, 2);
-		mesh.PushPrimitive({ 6, 0,  Math::vec4{1, 0, 0, 1} });
-		mesh.PushPrimitive({ 6, 6,  Math::vec4{0, 1, 0, 1} });
-		mesh.PushPrimitive({ 6, 12, Math::vec4{0, 0, 1, 1} });
-		mesh.PushPrimitive({ 6, 18, Math::vec4{1, 0, 1, 1} });
-		mesh.PushPrimitive({ 6, 24, Math::vec4{0, 1, 1, 1} });
-		mesh.PushPrimitive({ 6, 30, Math::vec4{1, 1, 0, 1} });
+		Texture tex{};
+		tex.LoadFromFile("../res/img.png");
+		mesh.PushPrimitive({ 36, 0, tex });
+		//mesh.PushPrimitive({ 6, 6,  Math::vec4{0, 1, 0, 1} });
+		//mesh.PushPrimitive({ 6, 12, Math::vec4{0, 0, 1, 1} });
+		//mesh.PushPrimitive({ 6, 18, Math::vec4{1, 0, 1, 1} });
+		//mesh.PushPrimitive({ 6, 24, Math::vec4{0, 1, 1, 1} });
+		//mesh.PushPrimitive({ 6, 30, Math::vec4{1, 1, 0, 1} });
 		return mesh;
 	}
 
-} // Render
+} // Resource

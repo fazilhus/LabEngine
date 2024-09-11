@@ -10,6 +10,7 @@
 #include "render/window.h"
 #include "render/mesh.h"
 #include "render/grid.h"
+#include "render/camera.h"
 #include "math/mat4.h"
 
 namespace Example
@@ -41,7 +42,7 @@ private:
 	GLuint pixelShader;
 	Resource::Mesh mesh;
 	Render::Grid* grid;
-	Math::mat4 camera;
+	Render::Camera* camera;
 	Display::Window* window;
 	GLchar *vsBuffer;
 	GLchar *fsBuffer;

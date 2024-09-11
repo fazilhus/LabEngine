@@ -4,13 +4,15 @@
 
 #include <vector>
 #include "math/vec4.h"
+#include "texture.h"
 
 namespace Resource {
 
 	struct PrimitiveGroup {
 		std::size_t indices;
 		std::size_t offset;
-		Math::vec4 color;
+		//Math::vec4 color;
+		Texture tex;
 	};
 
 	class Mesh {
@@ -38,11 +40,11 @@ namespace Resource {
 		void PushPrimitive(PrimitiveGroup group);
 
 		static Mesh CreateQuadMesh(const float width = 1.0f, const float height = 1.0f);
-		static Mesh CreateQubeMesh(const float width = 1.0f, const float height = 1.0f, const float depth = 1.0f);
+		static Mesh CreateCubeMesh(const float width = 1.0f, const float height = 1.0f, const float depth = 1.0f);
 
 	private:
 		void Bind() const;
 		void UnBind() const;
 	};
 
-} // Render
+} // Resource

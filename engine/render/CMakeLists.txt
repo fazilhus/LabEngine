@@ -9,6 +9,10 @@ SET(files_render_display
 	grid.cc
 	mesh.h
 	mesh.cc
+	texture.h
+	texture.cc
+	camera.h
+	camera.cc
 	)
 SOURCE_GROUP("display" FILES ${files_render_display})
 
