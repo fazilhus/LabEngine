@@ -104,12 +104,12 @@ ImGuiExampleApp::Open()
 		this->CompileShaders();
 
 		this->camera = new Render::Camera(0.5f, 4.0f / 3.0f, 0.01f, 100.0f);
-		this->camera->SetCameraPosition({ 0, 2, 2 });
+		this->camera->SetCameraPosition({ 0, 5, 5 });
 		this->camera->SetLookatPosition({ 0, 0, 0 });
 		this->camera->SetUpDirection({ 0, 1, 0 });
 
-		//this->mesh = Resource::Mesh::CreateCubeMesh();
-		this->mesh = Resource::Mesh::CreateQuadMesh();
+		this->mesh = Resource::Mesh::CreateCubeMesh();
+		//this->mesh = Resource::Mesh::CreateQuadMesh();
 		this->grid = new Render::Grid();
 
 		// set ui rendering function
@@ -142,7 +142,7 @@ ImGuiExampleApp::Run()
 		this->window->Update();
 		
 		float angle = (float)glfwGetTime();
-		//this->camera->SetCameraPosition({cosf(angle) * 10, 10, sinf(angle) * 10});
+		this->camera->SetCameraPosition({cosf(angle) * 10, 10, sinf(angle) * 10});
 
 		glUseProgram(this->program);
 

@@ -114,22 +114,14 @@ namespace Resource {
 		Mesh mesh{};
 		GLfloat vb[] =
 		{
-			-0.5f * width,	-0.5f * height,	-0.5f * depth, // 0
-			1,		0,		0,		1,
-			-0.5f * width,	 0.5f * height,	-0.5f * depth, // 1
-			0,		1,		0,		1,
-			0.5f * width,	 0.5f * height,	-0.5f * depth, // 2
-			0,		0,		0,		1,
-			0.5f * width,	-0.5f * height,	-0.5f * depth, // 3
-			0,		0,		1,		1,
-			-0.5f * width,	-0.5f * height,	 0.5f * depth, // 4
-			1,		0,		0,		1,		 
-			-0.5f * width,	 0.5f * height,	 0.5f * depth, // 5
-			0,		1,		0,		1,		 
-			0.5f * width,	 0.5f * height,	 0.5f * depth, // 6
-			0,		0,		0,		1,
-			0.5f * width,	-0.5f * height,	 0.5f * depth, // 7
-			0,		0,		1,		1,		 
+			-0.5f * width,	-0.5f * height,	-0.5f * depth,	1, 0, 0, 1,		1.0f, 0.0f,
+			-0.5f * width,	 0.5f * height,	-0.5f * depth,	0, 1, 0, 1,		0.0f, 0.0f,
+			0.5f * width,	 0.5f * height,	-0.5f * depth,	0, 0, 0, 1,		0.0f, 1.0f,
+			0.5f * width,	-0.5f * height,	-0.5f * depth,	0, 0, 1, 1,		1.0f, 1.0f,
+			-0.5f * width,	-0.5f * height,	 0.5f * depth,	1, 0, 0, 1,		1.0f, 1.0f,
+			-0.5f * width,	 0.5f * height,	 0.5f * depth,	0, 1, 0, 1,		0.0f, 1.0f,
+			0.5f * width,	 0.5f * height,	 0.5f * depth,	0, 0, 0, 1,		0.0f, 0.0f,
+			0.5f * width,	-0.5f * height,	 0.5f * depth,	0, 0, 1, 1,		1.0f, 0.0f,
 		};
 
 		GLuint ib[] = {
@@ -146,17 +138,18 @@ namespace Resource {
 			4, 6, 5,
 			4, 7, 6
 		};
-		std::size_t sizes[] = { 3, 4 };
-		std::size_t offsets[] = { 0, 3 };
-		mesh.Init(vb, ib, sizes, offsets, 8, 12, 2);
+		std::size_t sizes[] = { 3, 4, 2 };
+		std::size_t offsets[] = { 0, 3, 7 };
+		mesh.Init(vb, ib, sizes, offsets, 8, 12, 3);
 		Texture tex{};
 		tex.LoadFromFile("../res/img.png");
 		mesh.PushPrimitive({ 36, 0, tex });
-		//mesh.PushPrimitive({ 6, 6,  Math::vec4{0, 1, 0, 1} });
-		//mesh.PushPrimitive({ 6, 12, Math::vec4{0, 0, 1, 1} });
-		//mesh.PushPrimitive({ 6, 18, Math::vec4{1, 0, 1, 1} });
-		//mesh.PushPrimitive({ 6, 24, Math::vec4{0, 1, 1, 1} });
-		//mesh.PushPrimitive({ 6, 30, Math::vec4{1, 1, 0, 1} });
+		/*mesh.PushPrimitive({ 6, 0,  tex });
+		mesh.PushPrimitive({ 6, 6,  tex});
+		mesh.PushPrimitive({ 6, 12, tex});
+		mesh.PushPrimitive({ 6, 18, tex});
+		mesh.PushPrimitive({ 6, 24, tex});
+		mesh.PushPrimitive({ 6, 30, tex});*/
 		return mesh;
 	}
 
