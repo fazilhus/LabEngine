@@ -9,7 +9,8 @@
 #include "core/app.h"
 #include "render/window.h"
 #include "render/mesh.h"
-
+#include "render/grid.h"
+#include "math/mat4.h"
 
 namespace Example
 {
@@ -39,6 +40,8 @@ private:
 	GLuint vertexShader;
 	GLuint pixelShader;
 	Mesh mesh;
+	Render::Grid* grid;
+	Math::mat4 camera;
 	Display::Window* window;
 	GLchar *vsBuffer;
 	GLchar *fsBuffer;

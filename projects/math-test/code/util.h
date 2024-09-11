@@ -10,9 +10,9 @@
 /// <param name="a">const vec3&</param>
 /// <param name="b">const vec3&</param>
 /// <returns>vec3</returns>
-inline vec3 max(const vec3& a, const vec3& b)
+inline Math::vec3 max(const Math::vec3& a, const Math::vec3& b)
 {
-    return vec3(fmax(a.x, b.x), fmax(a.y, b.y), fmax(a.z, b.z));
+    return Math::vec3(fmax(a.x, b.x), fmax(a.y, b.y), fmax(a.z, b.z));
 }
 
 /// <summary>
@@ -21,9 +21,9 @@ inline vec3 max(const vec3& a, const vec3& b)
 /// <param name="a">const vec4&</param>
 /// <param name="b">const vec4&</param>
 /// <returns>vec4</returns>
-inline vec4 max(const vec4& a, const vec4& b)
+inline Math::vec4 max(const Math::vec4& a, const Math::vec4& b)
 {
-    return vec4(fmax(a.x, b.x), fmax(a.y, b.y), fmax(a.z, b.z), fmax(a.w, b.w));
+    return Math::vec4(fmax(a.x, b.x), fmax(a.y, b.y), fmax(a.z, b.z), fmax(a.w, b.w));
 }
 
 /// <summary>
@@ -32,7 +32,7 @@ inline vec4 max(const vec4& a, const vec4& b)
 /// <param name="a">const vec3&</param>
 /// <param name="b">const vec3&</param>
 /// <returns>bool</returns>
-inline bool cmple(const vec3& a, const vec3& b)
+inline bool cmple(const Math::vec3& a, const Math::vec3& b)
 {
     return a.x <= b.x && a.y <= b.y && a.z <= b.z;
 }
@@ -43,7 +43,7 @@ inline bool cmple(const vec3& a, const vec3& b)
 /// <param name="a">const vec4&</param>
 /// <param name="b">const vec4&</param>
 /// <returns>bool</returns>
-inline bool cmple(const vec4& a, const vec4& b)
+inline bool cmple(const Math::vec4& a, const Math::vec4& b)
 {
     return a.x <= b.x && a.y <= b.y && a.z <= b.z && a.w <= b.w;
 }
@@ -68,10 +68,10 @@ inline bool n_fequal(float f0, float f1, float tol)
 /// <param name="v1">const vec3&</param>
 /// <param name="epsilon">const vec3&</param>
 /// <returns>bool</returns>
-inline bool nearequal(const vec3& v0, const vec3& v1, const vec3& epsilon)
+inline bool nearequal(const Math::vec3& v0, const Math::vec3& v1, const Math::vec3& epsilon)
 {
-	vec3 delta = v0 - v1;
-	vec3 temp = vec3(0,0,0);
+	Math::vec3 delta = v0 - v1;
+	Math::vec3 temp = Math::vec3(0,0,0);
 	temp = temp - delta;
 	temp = max(temp, delta);
 	return cmple(temp, epsilon);
@@ -84,10 +84,10 @@ inline bool nearequal(const vec3& v0, const vec3& v1, const vec3& epsilon)
 /// <param name="v1">const vec4&</param>
 /// <param name="epsilon">const vec4&</param>
 /// <returns>bool</returns>
-inline bool nearequal(const vec4& v0, const vec4& v1, const vec4& epsilon)
+inline bool nearequal(const Math::vec4& v0, const Math::vec4& v1, const Math::vec4& epsilon)
 {
-	vec4 delta = v0 - v1;
-	vec4 temp = vec4(0,0,0,0);
+	Math::vec4 delta = v0 - v1;
+	Math::vec4 temp = Math::vec4(0,0,0,0);
 	temp = temp - delta;
 	temp = max(temp, delta);
 	return cmple(temp, epsilon);
@@ -99,9 +99,10 @@ inline bool nearequal(const vec4& v0, const vec4& v1, const vec4& epsilon)
 /// <param name="lhs">const mat4&</param>
 /// <param name="rhs">const mat4&</param>
 /// <returns>bool</returns>
-inline bool matnearequal(const mat4& lhs, const mat4& rhs)
+inline bool matnearequal(const Math::mat4& lhs, const Math::mat4& rhs)
 {
 	const float E = 0.00001f;
-    const vec4 E4(E, E, E, E);
-	return nearequal(lhs[0], rhs[0], E4) && nearequal(lhs[1], rhs[1], E4) && nearequal(lhs[2], rhs[2], E4) && nearequal(lhs[3], rhs[3], E4);
+    const Math::vec4 E4(E, E, E, E);
+	return nearequal(lhs[0], rhs[0], E4) && nearequal(lhs[1], rhs[1], E4)
+		&& nearequal(lhs[2], rhs[2], E4) && nearequal(lhs[3], rhs[3], E4);
 }

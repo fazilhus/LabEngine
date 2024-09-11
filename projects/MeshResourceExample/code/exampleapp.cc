@@ -17,12 +17,12 @@ const GLchar* vs =
 "layout(location=0) in vec3 pos;\n"
 "layout(location=1) in vec4 color;\n"
 "layout(location=0) out vec4 Color;\n"
-"uniform mat4 transform;\n"
+"uniform mat4 view;\n"
 "uniform mat4 persp;\n"
 "uniform vec4 face_col;\n"
 "void main()\n"
 "{\n"
-"	gl_Position = persp * transform * vec4(pos, 1);\n"
+"	gl_Position = persp * view * vec4(pos, 1);\n"
 "	Color = face_col;\n"
 "}\n";
 
@@ -66,6 +66,7 @@ ImGuiExampleApp::Close()
 
 	Core::App::Close();
 	this->mesh.DeInit();
+	delete this->grid;
 }
 
 //------------------------------------------------------------------------------
@@ -77,14 +78,14 @@ ImGuiExampleApp::Open()
 	App::Open();
 	this->window = new Display::Window;
 	window->SetKeyPressFunction([this](int32, int32, int32, int32)
-	{
-		this->window->Close();
-	});
+		{
+			//this->window->Close();
+		});
 
 	if (this->window->Open())
 	{
 		// set clear color to gray
-		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 		// create buffer for shader strings
 		this->vsBuffer = new GLchar[STRING_BUFFER_SIZE];
@@ -97,8 +98,10 @@ ImGuiExampleApp::Open()
 		// compile the shaders in the buffers
 		this->CompileShaders();
 
-		//this->mesh = Mesh::CreateQuadMesh(1.5f, 0.5f);
+		this->camera = Math::lookat({0, 0, 10}, {0, 0, 0}, {0, 1, 0});
+
 		this->mesh = Mesh::CreateQubeMesh();
+		this->grid = new Render::Grid();
 
 		// set ui rendering function
 		this->window->SetUiRender([this]()
@@ -129,20 +132,24 @@ ImGuiExampleApp::Run()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		this->window->Update();
 		
-		mat4 transform = rotationx((float)glfwGetTime());
-		transform = rotationy((float)glfwGetTime()) * transform;
-		transform = rotationz((float)glfwGetTime()) * transform;
-		transform = translate({ cosf((float)glfwGetTime()), sinf((float)glfwGetTime()), -10}) * transform;
-		mat4 persp = perspective(0.5, 4.0f / 3.0f, 0.1f, 100.0f);
+		float angle = (float)glfwGetTime();
+		Math::vec3 eye{cosf(angle) * 10, 10, sinf(angle) * 10};
+		this->camera = Math::lookat(
+			eye,
+			{0, 0, 0},
+			{0, 1, 0}
+		);
+		Math::mat4 persp = Math::perspective(0.5, 4.0f / 3.0f, 0.1f, 100.0f);
 
 		glUseProgram(this->program);
 
-		GLuint tfLoc = glGetUniformLocation(this->program, "transform");
-		glUniformMatrix4fv(tfLoc, 1, GL_FALSE, &transform[0][0]);
+		GLuint viewLoc = glGetUniformLocation(this->program, "view");
+		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &camera[0][0]);
 		GLuint perspLoc = glGetUniformLocation(this->program, "persp");
 		glUniformMatrix4fv(perspLoc, 1, GL_FALSE, &persp[0][0]);
 
 		this->mesh.Draw(this->program);
+		this->grid->Draw(&this->camera[0][0], &persp[0][0]);
 
 		// transfer new frame to window
 		this->window->SwapBuffers();

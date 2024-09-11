@@ -126,7 +126,7 @@ Mesh Mesh::CreateQubeMesh(const float width, const float height, const float dep
 
 	GLuint ib[] = {
 		0, 2, 3,
-		0, 1, 3,
+		0, 1, 2,
 		0, 5, 1,
 		0, 4, 5,
 		2, 6, 3,
@@ -141,11 +141,11 @@ Mesh Mesh::CreateQubeMesh(const float width, const float height, const float dep
 	std::size_t sizes[] = { 3, 4 };
 	std::size_t offsets[] = { 0, 3 };
 	mesh.Init(vb, ib, sizes, offsets, 8, 12, 2);
-	mesh.PushPrimitive({ 6, 0,  {1, 0, 0, 1} });
-	mesh.PushPrimitive({ 6, 6,  {0, 1, 0, 1} });
-	mesh.PushPrimitive({ 6, 12, {0, 0, 1, 1} });
-	mesh.PushPrimitive({ 6, 18, {1, 0, 1, 1} });
-	mesh.PushPrimitive({ 6, 24, {0, 1, 1, 1} });
-	mesh.PushPrimitive({ 6, 30, {1, 1, 0, 1} });
+	mesh.PushPrimitive({ 6, 0,  Math::vec4{1, 0, 0, 1} });
+	mesh.PushPrimitive({ 6, 6,  Math::vec4{0, 1, 0, 1} });
+	mesh.PushPrimitive({ 6, 12, Math::vec4{0, 0, 1, 1} });
+	mesh.PushPrimitive({ 6, 18, Math::vec4{1, 0, 1, 1} });
+	mesh.PushPrimitive({ 6, 24, Math::vec4{0, 1, 1, 1} });
+	mesh.PushPrimitive({ 6, 30, Math::vec4{1, 1, 0, 1} });
 	return mesh;
 }

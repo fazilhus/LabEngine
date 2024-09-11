@@ -8,7 +8,7 @@
 struct PrimitiveGroup {
 	std::size_t indices;
 	std::size_t offset;
-	vec4 color;
+	Math::vec4 color;
 };
 
 class Mesh {

@@ -12,10 +12,11 @@ namespace Render
 static const GLchar* vs =
     "#version 430\n"
     "layout(location = 0) in vec3 pos;\n"
-    "layout(location = 0) uniform mat4 ViewProjection;\n"
+    "layout(location = 0) uniform mat4 view;\n"
+	"layout(location = 1) uniform mat4 perspective;\n"
     "void main()\n"
     "{\n"
-    "	gl_Position = ViewProjection * vec4(pos, 1);\n"
+    "	gl_Position = perspective * view * vec4(pos, 1);\n"
     "}\n";
 
 static const GLchar* ps =
@@ -123,11 +124,12 @@ Grid::~Grid()
 /**
 */
 void
-Grid::Draw(float const* const viewProjection)
+Grid::Draw(float const* const view, float const* const perspective)
 {
 	glUseProgram(this->program);
 	glBindVertexArray(this->vao);
-	glUniformMatrix4fv(0, 1, false, viewProjection);
+	glUniformMatrix4fv(0, 1, false, view);
+	glUniformMatrix4fv(1, 1, false, perspective);
 	glDrawArrays(GL_LINES, 0, gridSize * 2 * 2);
 	glBindVertexArray(0);
 

@@ -19,7 +19,7 @@ public:
     Grid();
     ~Grid();
     
-    void Draw(float const* const viewProjection);
+    void Draw(float const* const view, float const* const perspective);
     
 private:
     GLuint program;
