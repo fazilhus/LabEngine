@@ -5,6 +5,7 @@
 SET(files-math-lib
 	vec4.h
 	vec3.h
+	vec2.h
 	mat4.h)
 SOURCE_GROUP("math-lib" FILES ${files-math-lib})
 	
