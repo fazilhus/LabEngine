@@ -16,27 +16,28 @@ const GLchar* vs =
 "#version 460 core\n"
 "layout(location=0) in vec3 iPos;\n"
 "layout(location=1) in vec4 iColor;\n"
-"layout(location=2) in vec2 iTexCoord;\n"
+"layout(location=2) in vec2 iUV;\n"
 "layout(location=0) out vec4 oColor;\n"
-"layout(location=1) out vec2 oTexCoord;\n"
+"layout(location=1) out vec2 oUV;\n"
 "uniform mat4 view;\n"
 "uniform mat4 persp;\n"
 "void main()\n"
 "{\n"
 "	gl_Position = persp * view * vec4(iPos, 1);\n"
 "	oColor = iColor;\n"
-"	oTexCoord = iTexCoord;\n"
+"	oUV = iUV;\n"
 "}\n";
 
 const GLchar* ps =
 "#version 460 core\n"
 "layout(location=0) in vec4 iColor;\n"
-"layout(location=1) in vec2 iTexCoord;\n"
-"uniform sampler2D tex;\n" 
+"layout(location=1) in vec2 iUV;\n"
+"layout(location=0) uniform sampler2D tex;\n" 
 "out vec4 oColor;\n"
 "void main()\n"
 "{\n"
-"	oColor = texture(tex, iTexCoord);\n"
+"	oColor = texture(tex, iUV);\n"
+"	oColor = iColor;\n"
 "}\n";
 
 using namespace Display;
@@ -108,9 +109,11 @@ ImGuiExampleApp::Open()
 		this->camera->SetLookatPosition({ 0, 0, 0 });
 		this->camera->SetUpDirection({ 0, 1, 0 });
 
-		this->mesh = Resource::Mesh::CreateCubeMesh();
+		//this->mesh = Resource::Mesh::CreateCubeMesh();
 		//this->mesh = Resource::Mesh::CreateQuadMesh();
 		this->grid = new Render::Grid();
+		Resource::MeshBuilder mb{"../projects/CameraExample/res/cube.obj"};
+		this->mesh = mb.CreateMesh();
 
 		// set ui rendering function
 		this->window->SetUiRender([this]()
