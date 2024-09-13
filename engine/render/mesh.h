@@ -68,13 +68,6 @@ namespace Resource {
 
 		void ReadMeshData(const std::string& path);
 		Mesh CreateMesh() const;
-
-	private:
-		std::string FirstToken(const std::string& line) const;
-		std::string Tail(const std::string& line) const;
-		void Split(const std::string& line, std::vector<std::string>& out) const;
-		void ParseOBJ(std::ifstream& in, std::vector<Math::vec3>& positions, std::vector<Math::vec2>& uvs,
-			std::vector<unsigned int>& pos_idx, std::vector<unsigned int>& uv_idx);
 	};
 
 } // Resource

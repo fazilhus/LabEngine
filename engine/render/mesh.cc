@@ -4,6 +4,8 @@
 #include <cassert>
 #include <iostream>
 
+#include "util/meshDataParser.h"
+
 namespace Resource {
 
 	Mesh::Mesh()
@@ -59,7 +61,7 @@ namespace Resource {
 
 	void Mesh::Draw(const GLuint programHandle) const {
 		Bind();
-		for (auto el : groups) {
+		for (auto& el : groups) {
 			//GLuint loc = glGetUniformLocation(programHandle, "face_col");
 			//glUniform4fv(loc, 1, &el.color[0]);
 			el.tex.Bind();
@@ -161,29 +163,12 @@ namespace Resource {
 	}
 
 	void MeshBuilder::ReadMeshData(const std::string& path) {
-		if (path.substr(path.size() - 4, 4) != ".obj") {
-			std::cerr << "[ERROR] wrong file type\n";
-			return;
-		}
-
-		std::ifstream in{ path };
-		if (!in.is_open()) {
-			std::cerr << "[ERROR] could not open .obj file: " << path << '\n';
-			return;
-		}
-
-		std::vector<Math::vec3> positions;
-		std::vector<Math::vec2> uvs;
-		std::vector<unsigned int> pos_idx;
-		std::vector<unsigned int> uv_idx;
-
-		ParseOBJ(in, positions, uvs, pos_idx, uv_idx);
-		in.close();
-
-		for (std::size_t i = 0; i <= pos_idx.size() - 3; i += 3) {
-			vertexes.push_back(VertexData{positions[pos_idx[i]],     uvs[uv_idx[i]]});
-			vertexes.push_back(VertexData{positions[pos_idx[i + 1]], uvs[uv_idx[i + 1]]});
-			vertexes.push_back(VertexData{positions[pos_idx[i + 2]], uvs[uv_idx[i + 2]]});
+		Utils::OBJMeshData data = Utils::MeshDataParser::ParseOBJ(path);
+	
+		for (std::size_t i = 0; i <= data.pos_idx.size() - 3; i += 3) {
+			vertexes.push_back(VertexData{data.positions[data.pos_idx[i]],     data.uvs[data.uv_idx[i]]});
+			vertexes.push_back(VertexData{data.positions[data.pos_idx[i + 1]], data.uvs[data.uv_idx[i + 1]]});
+			vertexes.push_back(VertexData{data.positions[data.pos_idx[i + 2]], data.uvs[data.uv_idx[i + 2]]});
 			indices.push_back(i);indices.push_back(i + 1);indices.push_back(i + 2);
 		}
 	}
@@ -197,109 +182,6 @@ namespace Resource {
 		tex.LoadFromFile("../projects/CameraExample/res/img.png");
 		mesh.PushPrimitive({ indices.size(), 0, tex });
 		return mesh;
-	}
-
-	std::string MeshBuilder::FirstToken(const std::string& line) const {
-		if (line.empty()) return "";
-
-		std::size_t start = line.find_first_not_of(" \t");
-		std::size_t end = line.find_first_of(" \t", start);
-		if (start != std::string::npos && end != std::string::npos) {
-			return line.substr(start, end - start);
-		}
-		else if (start != std::string::npos) {
-			return line.substr(start);
-		}
-
-		return "";
-	}
-
-	std::string MeshBuilder::Tail(const std::string& line) const {
-		size_t token_start = line.find_first_not_of(" \t");
-		size_t space_start = line.find_first_of(" \t", token_start);
-		size_t tail_start = line.find_first_not_of(" \t", space_start);
-		size_t tail_end = line.find_last_not_of(" \t");
-		if (tail_start != std::string::npos && tail_end != std::string::npos) {
-			return line.substr(tail_start, tail_end - tail_start + 1);
-		} else if (tail_start != std::string::npos) {
-			return line.substr(tail_start);
-		}
-		return "";
-	}
-
-	void MeshBuilder::Split(const std::string& line, std::vector<std::string>& out) const {
-		out.clear();
-		std::string temp{};
-		for (char c : line) {
-			if (std::isspace(c)) {
-				out.push_back(temp);
-				temp.clear();
-			} else {
-				temp.push_back(c);
-			}
-		}
-		if (!temp.empty()) out.push_back(temp);
-	}
-
-	void MeshBuilder::ParseOBJ(std::ifstream& in, std::vector<Math::vec3>& positions, std::vector<Math::vec2>& uvs, 
-	std::vector<unsigned int>& pos_idx, std::vector<unsigned int>& uv_idx) {
-		std::vector<std::string> buff;
-
-		std::string line;
-		while (std::getline(in, line)) {
-			auto token = FirstToken(line);
-			if (token == "#" || token == "o" || token == "s") {
-				continue;
-			}
-
-			if (token == "v") {
-				buff.clear();
-				Split(Tail(line), buff);
-				if (buff.size() != 3) {
-					std::cerr << "[ERROR] corrupted OBJ file: vertex should have 2 values\n";
-					return;
-				}
-				positions.push_back({});
-				positions.back()[0] = std::stof(buff[0]);
-				positions.back()[1] = std::stof(buff[1]);
-				positions.back()[2] = std::stof(buff[2]);
-			}
-
-			if (token == "vt") {
-				buff.clear();
-				Split(Tail(line), buff);
-				if (buff.size() != 2) {
-					std::cerr << "[ERROR] corrupted OBJ file: uv should have 2 values\n";
-					return;
-				}
-				uvs.push_back({});
-				uvs.back()[0] = std::stof(buff[0]);
-				uvs.back()[1] = std::stof(buff[1]);
-			}
-
-			if (token == "f") {
-				buff.clear();
-				Split(Tail(line), buff);
-				if (buff.size() != 3) {
-					std::cerr << "[ERROR] corrupted OBJ file: face should have 3 values\n";
-					return;
-				}
-				
-				for (std::size_t i = 0; i < 3; ++i) {
-					std::size_t delimeter = buff[i].find_first_of('/');
-					if (delimeter == std::string::npos) {
-						std::cerr << "[ERROR] corrupted OBJ file\n";
-						return;
-					}
-					auto spos_idx = buff[i].substr(0, delimeter);
-					auto suv_idx = buff[i].substr(delimeter + 1);
-					//std::cout << "string pos idx " << spos_idx << " string uv idx " << suv_idx << '\n';
-					pos_idx.push_back(std::stoi(spos_idx) - 1);
-					uv_idx.push_back(std::stoi(suv_idx) - 1);
-					//std::cout << "pos idx " << std::stoi(spos_idx) - 1 << " uv idx " << std::stoi(suv_idx) - 1 << '\n';
-				}
-			}
-		}
 	}
 
 } // Resource
