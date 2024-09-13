@@ -15,8 +15,7 @@
 const GLchar* vs =
 "#version 460 core\n"
 "layout(location=0) in vec3 iPos;\n"
-"layout(location=1) in vec4 iColor;\n"
-"layout(location=2) in vec2 iUV;\n"
+"layout(location=1) in vec2 iUV;\n"
 "layout(location=0) out vec4 oColor;\n"
 "layout(location=1) out vec2 oUV;\n"
 "uniform mat4 view;\n"
@@ -24,7 +23,7 @@ const GLchar* vs =
 "void main()\n"
 "{\n"
 "	gl_Position = persp * view * vec4(iPos, 1);\n"
-"	oColor = iColor;\n"
+"	oColor = vec4(0.0);\n"
 "	oUV = iUV;\n"
 "}\n";
 
@@ -37,7 +36,6 @@ const GLchar* ps =
 "void main()\n"
 "{\n"
 "	oColor = texture(tex, iUV);\n"
-"	oColor = iColor;\n"
 "}\n";
 
 using namespace Display;
