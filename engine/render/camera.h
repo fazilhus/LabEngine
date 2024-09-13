@@ -18,9 +18,9 @@ namespace Render {
         Camera(const float fovy, const float aspect, const float near, const float far);
         ~Camera() = default;
 
-        void SetCameraPosition(const Math::vec3& v);
-        void SetLookatPosition(const Math::vec3& v);
-        void SetUpDirection(const Math::vec3& v);
+        void SetCameraPosition(const Math::vec3& v, bool update = true);
+        void SetLookatPosition(const Math::vec3& v, bool update = true);
+        void SetUpDirection(const Math::vec3& v, bool update = true);
 
         inline Math::mat4 GetPerspective() const { return perspective; }
         inline Math::mat4 GetView() const { return view; }

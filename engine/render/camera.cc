@@ -9,19 +9,19 @@ namespace Render {
 		UpdateView();
 	}
 
-	void Camera::SetCameraPosition(const Math::vec3& v) {
+	void Camera::SetCameraPosition(const Math::vec3& v, bool update) {
 		pos = v;
-		UpdateView();
+		if (update) UpdateView();
 	}
 
-	void Camera::SetLookatPosition(const Math::vec3& v) {
+	void Camera::SetLookatPosition(const Math::vec3& v, bool update) {
 		at = v;
-		UpdateView();
+		if (update) UpdateView();
 	}
 
-	void Camera::SetUpDirection(const Math::vec3& v) {
+	void Camera::SetUpDirection(const Math::vec3& v, bool update) {
 		up = v;
-		UpdateView();
+		if (update) UpdateView();
 	}
 
 	void Camera::UpdateView() {
