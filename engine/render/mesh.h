@@ -67,7 +67,7 @@ namespace Resource {
 		~MeshBuilder() = default;
 
 		void ReadMeshData(const std::string& path);
-		Mesh CreateMesh() const;
+		Mesh CreateMesh(const std::string& texPath) const;
 	};
 
 } // Resource

@@ -110,8 +110,8 @@ ImGuiExampleApp::Open()
 		//this->mesh = Resource::Mesh::CreateCubeMesh();
 		//this->mesh = Resource::Mesh::CreateQuadMesh();
 		this->grid = new Render::Grid();
-		Resource::MeshBuilder mb{"../projects/CameraExample/res/cube.obj"};
-		this->mesh = mb.CreateMesh();
+		Resource::MeshBuilder mb{"../projects/CameraExample/res/sphere.obj"};
+		this->mesh = mb.CreateMesh("../projects/CameraExample/res/img.png");
 
 		// set ui rendering function
 		this->window->SetUiRender([this]()

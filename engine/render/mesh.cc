@@ -173,13 +173,13 @@ namespace Resource {
 		}
 	}
 
-	Mesh MeshBuilder::CreateMesh() const {
+	Mesh MeshBuilder::CreateMesh(const std::string& texPath) const {
 		Mesh mesh{};
 		std::size_t sizes[] = {3, 2};
 		std::size_t offsets[] = {0, 3};
 		mesh.Init((GLfloat*)vertexes.data(), (GLuint*)indices.data(), sizes, offsets, vertexes.size(), indices.size() / 3, 2);
 		Texture tex{};
-		tex.LoadFromFile("../projects/CameraExample/res/img.png");
+		tex.LoadFromFile(texPath.c_str());
 		mesh.PushPrimitive({ indices.size(), 0, tex });
 		return mesh;
 	}
