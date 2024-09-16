@@ -18,11 +18,12 @@ const GLchar* vs =
 "layout(location=1) in vec2 iUV;\n"
 "layout(location=0) out vec4 oColor;\n"
 "layout(location=1) out vec2 oUV;\n"
+"uniform mat4 t;\n"
 "uniform mat4 view;\n"
 "uniform mat4 persp;\n"
 "void main()\n"
 "{\n"
-"	gl_Position = persp * view * vec4(iPos, 1);\n"
+"	gl_Position = persp * view * t * vec4(iPos, 1);\n"
 "	oColor = vec4(0.0);\n"
 "	oUV = iUV;\n"
 "}\n";
@@ -111,7 +112,7 @@ ImGuiExampleApp::Open()
 		//this->mesh = Resource::Mesh::CreateQuadMesh();
 		this->grid = new Render::Grid();
 		Resource::MeshBuilder mb{"../projects/CameraExample/res/sphere.obj"};
-		this->mesh = mb.CreateMesh("../projects/CameraExample/res/img.png");
+		this->mesh = mb.CreateMesh("../projects/CameraExample/res/ball.png");
 
 		// set ui rendering function
 		this->window->SetUiRender([this]()
@@ -139,26 +140,32 @@ ImGuiExampleApp::Run()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	Math::mat4 gridT{};
+	Math::mat4 meshT{};
+
 	while (this->window->IsOpen())
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		this->window->Update();
 		
 		float angle = (float)glfwGetTime();
-		this->camera->SetCameraPosition({cosf(angle) * 10, 10, sinf(angle) * 10});
+
+		this->camera->SetCameraPosition({cosf(angle) * 10, 5, sinf(angle) * 10});
 
 		glUseProgram(this->program);
 
 		auto v = this->camera->GetView();
 		auto p = this->camera->GetPerspective();
-
+		
+		GLuint tLoc = glGetUniformLocation(this->program, "t");
+		glUniformMatrix4fv(tLoc, 1, GL_FALSE, &meshT[0][0]);
 		GLuint viewLoc = glGetUniformLocation(this->program, "view");
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &v[0][0]);
 		GLuint perspLoc = glGetUniformLocation(this->program, "persp");
 		glUniformMatrix4fv(perspLoc, 1, GL_FALSE, &p[0][0]);
 
 		this->mesh.Draw(this->program);
-		this->grid->Draw(&v[0][0], &p[0][0]);
+		this->grid->Draw(&gridT[0][0], &v[0][0], &p[0][0]);
 
 		// transfer new frame to window
 		this->window->SwapBuffers();
