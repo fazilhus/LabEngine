@@ -14,6 +14,8 @@ namespace Math {
 
 		vec2() : vec2(0, 0) {}
 
+		vec2(float v) : vec2(v, v) {}
+
 		vec2(const vec2& src) : vec2(src.x, src.y) {}
 
 		vec2& operator=(const vec2& rhs) {

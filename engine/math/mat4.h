@@ -90,6 +90,17 @@ namespace Math {
 			return res;
 		}
 
+		mat4& operator*=(const mat4& rhs) {
+			mat4 res = mat4::zero();
+			mat4 thisT = transpose(*this);
+			for (std::size_t i = 0; i < 4; ++i) {
+				for (std::size_t j = 0; j < 4; ++j) {
+					this->m[i][j] = dot(thisT[j], rhs[i]);
+				}
+			}
+			return *this;
+		}
+
 		const mat4 operator*(const float rhs) const {
 			mat4 res = mat4::zero();
 			for (std::size_t i = 0; i < 4; ++i) {
@@ -303,6 +314,15 @@ namespace Math {
 		mat4 res = mat4::identity();
 		for (std::size_t i = 0; i < 3; ++i) {
 			res[3][i] = v[i];
+		}
+		return res;
+	}
+
+	inline mat4 scale(const float scale) {
+		mat4 res = mat4::identity();
+		vec3 v = vec3(scale);
+		for (std::size_t i = 0; i < 3; ++i) {
+			res[i][i] = v[i];
 		}
 		return res;
 	}

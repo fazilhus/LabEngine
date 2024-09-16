@@ -12,6 +12,8 @@ namespace Math {
 
 		vec4() : vec4(0, 0, 0, 0) {}
 
+		vec4(float v) : vec4(v, v, v, v) {}
+
 		vec4(const vec4& other) : vec4(other.x, other.y, other.z, other.w) {}
 
 		vec4& operator=(const vec4& rhs) {
