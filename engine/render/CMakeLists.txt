@@ -13,6 +13,8 @@ SET(files_render_display
 	texture.cc
 	camera.h
 	camera.cc
+	shader.h
+	shader.cc
 	)
 SOURCE_GROUP("display" FILES ${files_render_display})
 
