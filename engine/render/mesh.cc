@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <iostream>
+#include <unordered_map>
 
 #include "util/meshDataParser.h"
 
@@ -54,7 +55,7 @@ namespace Resource {
 		glDeleteVertexArrays(1, &vao);
 		glDeleteBuffers(1, &vbo);
 		glDeleteBuffers(1, &ebo);
-		for (auto el : groups) {
+		for (auto& el : groups) {
 			el.tex->Unload();
 		}
 	}
@@ -161,7 +162,9 @@ namespace Resource {
 	}
 
 	void MeshBuilder::ReadMeshData(const std::string& path) {
-		Utils::OBJMeshData data = Utils::MeshDataParser::ParseOBJ(path);
+		Utils::MeshDataParser parser{};
+		Utils::OBJMeshData data = parser.ParseOBJ(path);
+		std::unordered_map<std::uint64_t, std::size_t> map{};
 	
 		for (std::size_t i = 0; i <= data.pos_idx.size() - 3; i += 3) {
 			vertexes.push_back(VertexData{data.positions[data.pos_idx[i]],     data.uvs[data.uv_idx[i]]});

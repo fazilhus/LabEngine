@@ -11,4 +11,4 @@ SOURCE_GROUP("CameraExample" FILES ${files_example})
 
 ADD_EXECUTABLE(CameraExample ${files_example})
 TARGET_LINK_LIBRARIES(CameraExample core render)
-ADD_DEPENDENCIES(CameraExample core render math-lib)
+ADD_DEPENDENCIES(CameraExample core render math)

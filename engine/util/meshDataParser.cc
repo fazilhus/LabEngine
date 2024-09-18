@@ -80,7 +80,7 @@ namespace Utils {
         return data;
     }
 
-    std::string MeshDataParser::FirstToken(const std::string& line) {
+	std::string MeshDataParser::FirstToken(const std::string& line) {
         if (line.empty()) return "";
 
 		std::size_t start = line.find_first_not_of(" \t");
@@ -95,7 +95,7 @@ namespace Utils {
 		return "";
     }
 
-    std::string MeshDataParser::Tail(const std::string& line) {
+	std::string MeshDataParser::Tail(const std::string& line) {
         size_t token_start = line.find_first_not_of(" \t");
 		size_t space_start = line.find_first_of(" \t", token_start);
 		size_t tail_start = line.find_first_not_of(" \t", space_start);

@@ -3,7 +3,8 @@
 #--------------------------------------------------------------------------
 
 SET(files_util
-	meshDataParser.h)
+	meshDataParser.h
+	meshDataParser.cc)
 SOURCE_GROUP("util" FILES ${files_util})
 	
 SET(files_pch ../config.h ../config.cc)

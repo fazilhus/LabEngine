@@ -10,34 +10,7 @@
 #include "render/mesh.h"
 #include "math/mat4.h"
 
-#define STRING_BUFFER_SIZE 8192
-
-const GLchar* vs =
-"#version 460 core\n"
-"layout(location=0) in vec3 iPos;\n"
-"layout(location=1) in vec2 iUV;\n"
-"layout(location=0) out vec4 oColor;\n"
-"layout(location=1) out vec2 oUV;\n"
-"uniform mat4 t;\n"
-"uniform mat4 view;\n"
-"uniform mat4 persp;\n"
-"void main()\n"
-"{\n"
-"	gl_Position = persp * view * t * vec4(iPos, 1);\n"
-"	oColor = vec4(0.0);\n"
-"	oUV = iUV;\n"
-"}\n";
-
-const GLchar* ps =
-"#version 460 core\n"
-"layout(location=0) in vec4 iColor;\n"
-"layout(location=1) in vec2 iUV;\n"
-"layout(location=0) uniform sampler2D tex;\n" 
-"out vec4 oColor;\n"
-"void main()\n"
-"{\n"
-"	oColor = texture(tex, iUV);\n"
-"}\n";
+constexpr int STRING_BUFFER_SIZE = 8192;
 
 using namespace Display;
 namespace Example {
@@ -77,8 +50,10 @@ namespace Example {
 	bool ImGuiExampleApp::Open() {
 		App::Open();
 		this->window = new Display::Window;
-		window->SetKeyPressFunction([this](int32, int32, int32, int32) {
-				//this->window->Close();
+		window->SetKeyPressFunction([this](int32 key, int32 scancode, int32 action, int32 mods) {
+				if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
+					this->window->Close();
+				}
 			});
 
 		if (this->window->Open()) {
@@ -137,11 +112,11 @@ namespace Example {
 			// transfer new frame to window
 			this->window->SwapBuffers();
 
-	#ifdef CI_TEST
+#ifdef CI_TEST
 			// if we're running CI, we want to return and exit the application after one frame
 			// break the loop and hopefully exit gracefully
 			break;
-	#endif
+#endif
 		}
 	}
 

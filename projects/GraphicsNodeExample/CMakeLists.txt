@@ -11,4 +11,4 @@ SOURCE_GROUP("GraphicsNodeExample" FILES ${files_example})
 
 ADD_EXECUTABLE(GraphicsNodeExample ${files_example})
 TARGET_LINK_LIBRARIES(GraphicsNodeExample core render)
-ADD_DEPENDENCIES(GraphicsNodeExample core render math-lib)
+ADD_DEPENDENCIES(GraphicsNodeExample core render math)
