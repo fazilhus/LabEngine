@@ -4,4 +4,4 @@ Fredrik Lindahl (fredrik.lindahl@ltu.se)
     core, engine
 
 Fazil Khusnutdinov (khusnutdinov.fazil@gmail.com)
-    math
+    math, render, util
