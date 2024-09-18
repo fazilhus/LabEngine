@@ -1,0 +1,129 @@
+#include "config.h"
+#include "input.h"
+
+#include <GLFW/glfw3.h>
+
+#include <cassert>
+#include <iostream>
+
+namespace Input {
+	
+	struct InputDevices {
+		Keyboard keyboard;
+		Mouse mouse;
+	};
+
+	static InputDevices* inputDevices = nullptr;
+
+	void InputManager::Create() {
+		if (!inputDevices)
+			inputDevices = new InputDevices;
+	}
+
+	void InputManager::Destroy() {
+		if (inputDevices) {
+			delete inputDevices;
+			inputDevices = nullptr;
+		}
+	}
+
+	void InputManager::Flush() {
+		auto& k = inputDevices->keyboard;
+		for (std::size_t i = 0; i < Key::NumOfKeys; ++i) {
+			if (k.released[i]) {
+				k.held[i] = false;
+			} else {
+				k.held[i] = true;
+			}
+			k.pressed[i] = false;
+			k.released[i] = false;
+		}
+
+		auto& m = inputDevices->mouse;
+		for (std::size_t i = 0; i < MouseKey::NumOfMouseKeys; ++i) {
+			if (m.released[i]) {
+				m.held[i] = false;
+			} else {
+				m.held[i] = true;
+			}
+			m.pressed[i] = false;
+			m.released[i] = false;
+		}
+		
+		m.prev_pos = m.pos;
+		m.delta = Math::vec2(0);
+	}
+
+	void InputManager::KeyCallback(int32 key, int32 scancode, int32 action, int32 mods) {
+		auto& k = inputDevices->keyboard;
+		auto code = (KeyCode)key;
+		switch (action) {
+		case GLFW_PRESS:
+			k.pressed[code] = true;
+			break;
+		case GLFW_RELEASE:
+			k.released[code] = true;
+			break;
+		//default:
+			//assert(false && "unsupported keyboard action\n");
+		}
+	}
+
+	void InputManager::MouseKeyCallback(int32 button, int32 action, int32 mods) {
+		auto& m = inputDevices->mouse;
+		auto code = (MouseKeyCode)button;
+		switch (action) {
+		case GLFW_PRESS:
+			m.pressed[code] = true;
+			break;
+		case GLFW_RELEASE:
+			m.released[code] = true;
+			break;
+		//default:
+			//assert(false && "unsupported keyboard action\n");
+		}
+	}
+
+	void InputManager::MouseMoveCallback(float32 x, float32 y) {
+		auto& m = inputDevices->mouse;
+		m.pos = Math::vec2(x, y);
+		m.delta = m.pos - m.prev_pos;
+	}
+
+	bool InputManager::IsKeyPressed(KeyCode code) {
+		return inputDevices->keyboard.pressed[code];
+	}
+
+	bool InputManager::IsKeyReleased(KeyCode code) {
+		return inputDevices->keyboard.released[code];
+	}
+
+	bool InputManager::IsKeyHeld(KeyCode code) {
+		return inputDevices->keyboard.held[code];
+	}
+
+	bool InputManager::IsMouseButtonPressed(MouseKeyCode code) {
+		return inputDevices->mouse.pressed[code];
+	}
+
+	bool InputManager::IsMouseButtonReleased(MouseKeyCode code) {
+		return inputDevices->mouse.pressed[code];
+	}
+
+	bool InputManager::IsMouseButtonHeld(MouseKeyCode code) {
+		return inputDevices->mouse.pressed[code];
+	}
+
+	Math::vec2 InputManager::GetMousePos() {
+		return inputDevices->mouse.pos;
+	}
+
+	float InputManager::GetMousePosX() {
+		return inputDevices->mouse.pos.x;
+	}
+
+	float InputManager::GetMousePosY() {
+		return inputDevices->mouse.pos.y;
+	}
+
+} // Input
