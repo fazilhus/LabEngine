@@ -24,6 +24,8 @@ namespace Resource {
 		Shader(const std::string& vsPath, const std::string& fsPath);
 		~Shader();
 
+		void Cleanup();
+
 		void Use() const;
 		inline GLuint GetHandle() const { return handle; }
 		inline std::string& GetVSSrc() { return vsSrc; }
@@ -36,7 +38,7 @@ namespace Resource {
 	private:
 		void ReadSource(const std::string& path, std::string& dst);
 		void CompileAndLink();
-		void Cleanup();
+		
 
 		GLuint GetOrUpdateUniformLoc(const std::string& name);
 	};

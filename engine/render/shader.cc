@@ -15,7 +15,21 @@ namespace Resource {
 	}
 
 	Shader::~Shader() {
-		Cleanup();
+	}
+
+	void Shader::Cleanup() {
+		if (handle) {
+			glDeleteProgram(handle);
+			handle = 0;
+		}
+		if (vHandle) {
+			glDeleteShader(vHandle);
+			vHandle = 0;
+		}
+		if (fHandle) {
+			glDeleteShader(fHandle);
+			fHandle = 0;
+		}
 	}
 
 	void Shader::Use() const {
@@ -106,21 +120,6 @@ namespace Resource {
 			compilerLog.append(buf);
 			printf("[PROGRAM LINK ERROR]: %s", buf);
 			delete[] buf;
-		}
-	}
-
-	void Shader::Cleanup() {
-		if (handle) {
-			glDeleteProgram(handle);
-			handle = 0;
-		}
-		if (vHandle) {
-			glDeleteShader(vHandle);
-			vHandle = 0;
-		}
-		if (fHandle) {
-			glDeleteShader(fHandle);
-			fHandle = 0;
 		}
 	}
 

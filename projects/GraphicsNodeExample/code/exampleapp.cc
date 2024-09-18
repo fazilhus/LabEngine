@@ -64,8 +64,9 @@ namespace Example {
 			this->window->Close();
 
 		Core::App::Close();
-		this->mesh.DeInit();
-		this->shader.reset();
+		//this->mesh.DeInit();
+		//this->shader.reset();
+		this->cube.DeInit();
 		delete this->grid;
 		delete this->camera;
 	}
@@ -84,7 +85,9 @@ namespace Example {
 			// set clear color to gray
 			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-			this->shader = std::make_shared<Resource::Shader>(
+			cube = Resource::GraphicsNode(
+				"../projects/GraphicsNodeExample/res/meshes/cube.obj",
+				"../projects/GraphicsNodeExample/res/textures/minecraft-dirt.png",
 				"../projects/GraphicsNodeExample/res/shaders/vertex.glsl",
 				"../projects/GraphicsNodeExample/res/shaders/fragment.glsl"
 			);
@@ -95,8 +98,6 @@ namespace Example {
 			this->camera->SetUpDirection({ 0, 1, 0 });
 
 			this->grid = new Render::Grid();
-			Resource::MeshBuilder mb{"../projects/GraphicsNodeExample/res/meshes/cube.obj"};
-			this->mesh = mb.CreateMesh("../projects/GraphicsNodeExample/res/textures/minecraft-dirt.png");
 
 			return true;
 		}
@@ -130,12 +131,7 @@ namespace Example {
 			auto v = this->camera->GetView();
 			auto p = this->camera->GetPerspective();
 
-			this->shader->Use();
-			this->shader->UploadUniformMat4fv("t", meshT);
-			this->shader->UploadUniformMat4fv("view", v);
-			this->shader->UploadUniformMat4fv("persp", p);
-
-			this->mesh.Draw(this->shader->GetHandle());
+			this->cube.Draw(*camera);
 			this->grid->Draw(&gridT[0][0], &v[0][0], &p[0][0]);
 
 			// transfer new frame to window

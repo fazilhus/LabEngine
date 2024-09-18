@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <fstream>
+#include <memory>
 
 #include "math/vec2.h"
 #include "math/vec3.h"
@@ -16,7 +17,7 @@ namespace Resource {
 	struct PrimitiveGroup {
 		std::size_t indices;
 		std::size_t offset;
-		Texture tex;
+		std::shared_ptr<Texture> tex;
 	};
 
 	class Mesh {
@@ -38,7 +39,7 @@ namespace Resource {
 			const std::size_t verticies, const std::size_t triangles, const std::size_t count);
 		void DeInit();
 
-		void Draw(const GLuint programHandle) const;
+		void Draw() const;
 		void Draw(std::size_t i) const;
 
 		void PushPrimitive(PrimitiveGroup group);
@@ -68,6 +69,7 @@ namespace Resource {
 
 		void ReadMeshData(const std::string& path);
 		Mesh CreateMesh(const std::string& texPath) const;
+		Mesh CreateMesh(const std::shared_ptr<Texture> tex) const;
 	};
 
 } // Resource

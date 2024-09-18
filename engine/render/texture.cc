@@ -6,6 +6,10 @@
 
 namespace Resource {
 
+	Texture::Texture(const std::string& path) {
+		LoadFromFile(path);
+	}
+	
 	Texture::Texture(const Texture& other)
 		: handle(other.handle) {
 	}
@@ -14,9 +18,9 @@ namespace Resource {
 		this->handle = other.handle;
 		return *this;
 	}
-	void Texture::LoadFromFile(const char* path) {
+	void Texture::LoadFromFile(const std::string& path) {
 		int w, h, comp;
-		uchar* image = stbi_load(path, &w, &h, &comp, STBI_rgb_alpha);
+		uchar* image = stbi_load(path.c_str(), &w, &h, &comp, STBI_rgb_alpha);
 
 		if (image == nullptr) {
 			return;
@@ -49,7 +53,7 @@ namespace Resource {
 	void Texture::Bind() const {
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, handle);
-		glUniform1i(0, 0);
+		//glUniform1i(GL_TEXTURE0, 0);
 	}
 
 	void Texture::UnBind() const {

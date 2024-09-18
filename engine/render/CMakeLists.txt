@@ -15,6 +15,8 @@ SET(files_render_display
 	camera.cc
 	shader.h
 	shader.cc
+	node.h
+	node.cc
 	)
 SOURCE_GROUP("display" FILES ${files_render_display})
 

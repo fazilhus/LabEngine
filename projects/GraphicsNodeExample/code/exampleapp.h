@@ -13,6 +13,7 @@
 #include "render/grid.h"
 #include "render/camera.h"
 #include "math/mat4.h"
+#include "render/node.h"
 
 #include <memory>
 
@@ -34,7 +35,8 @@ namespace Example {
 
 	private:
 		std::shared_ptr<Resource::Shader> shader;
-		Resource::Mesh mesh;
+		//Resource::Mesh mesh;
+		Resource::GraphicsNode cube;
 		Render::Grid* grid;
 		Render::Camera* camera;
 		Display::Window* window;

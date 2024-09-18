@@ -1,14 +1,12 @@
 #version 460 core
 layout(location=0) in vec3 iPos;
 layout(location=1) in vec2 iUV;
-layout(location=0) out vec4 oColor;
-layout(location=1) out vec2 oUV;
-uniform mat4 t;
+layout(location=0) out vec2 oUV;
+uniform mat4 transform;
 uniform mat4 view;
-uniform mat4 persp;
+uniform mat4 perspective;
 void main()
 {
-	gl_Position = persp * view * t * vec4(iPos, 1);
-	oColor = vec4(0.0);
+	gl_Position = perspective * view * transform * vec4(iPos, 1);
 	oUV = iUV;
 }
