@@ -32,6 +32,7 @@ namespace Example {
 		void Close();
 		/// run app
 		void Run();
+		void HandleInput();
 
 	private:
 		std::shared_ptr<Resource::Shader> shader;

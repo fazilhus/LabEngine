@@ -9,6 +9,7 @@
 
 #include "render/mesh.h"
 #include "math/mat4.h"
+#include "input/input.h"
 
 constexpr int STRING_BUFFER_SIZE = 8192;
 
@@ -33,9 +34,11 @@ namespace Example {
 	/**
 	*/
 	void ImGuiExampleApp::Close() {
-		if (this->window->IsOpen())
+		if (this->window->IsOpen()) {
 			this->window->Close();
+		}
 
+		Input::InputManager::Destroy();
 		Core::App::Close();
 		//this->mesh.DeInit();
 		//this->shader.reset();
@@ -48,13 +51,12 @@ namespace Example {
 	/**
 	*/
 	bool ImGuiExampleApp::Open() {
+		Input::InputManager::Create();
 		App::Open();
 		this->window = new Display::Window;
-		window->SetKeyPressFunction([this](int32 key, int32 scancode, int32 action, int32 mods) {
-				if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
-					this->window->Close();
-				}
-			});
+		window->SetKeyPressFunction(&Input::InputManager::KeyCallback);
+		window->SetMousePressFunction(&Input::InputManager::MouseKeyCallback);
+		window->SetMouseMoveFunction(&Input::InputManager::MouseMoveCallback);
 
 		if (this->window->Open()) {
 			// set clear color to gray
@@ -98,6 +100,7 @@ namespace Example {
 		while (this->window->IsOpen()) {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			this->window->Update();
+			HandleInput();
 		
 			float angle = (float)glfwGetTime();
 
@@ -111,12 +114,19 @@ namespace Example {
 
 			// transfer new frame to window
 			this->window->SwapBuffers();
+			Input::InputManager::Flush();
 
 #ifdef CI_TEST
 			// if we're running CI, we want to return and exit the application after one frame
 			// break the loop and hopefully exit gracefully
 			break;
 #endif
+		}
+	}
+
+	void ImGuiExampleApp::HandleInput() {
+		if (Input::InputManager::IsKeyPressed(Input::Key::Escape)) {
+			this->window->Close();
 		}
 	}
 
