@@ -25,7 +25,7 @@ namespace Render {
         Camera(const float fovy, const float aspect, const float near, const float far);
         ~Camera() = default;
 
-        void UpdateCamera(float dt, Display::Window& win);
+        void UpdateCamera(float dt);
 
         void SetCameraPosition(const Math::vec3& v, bool update = true);
         void SetLookatPosition(const Math::vec3& v, bool update = true);
