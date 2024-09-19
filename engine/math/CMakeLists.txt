@@ -6,7 +6,9 @@ SET(files-math
 	vec4.h
 	vec3.h
 	vec2.h
-	mat4.h)
+	mat4.h
+	math.h
+)
 SOURCE_GROUP("math" FILES ${files-math})
 	
 SET(files_pch ../config.h ../config.cc)

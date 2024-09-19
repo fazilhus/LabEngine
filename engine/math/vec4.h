@@ -116,8 +116,8 @@ namespace Math {
 		return res *= (1 / len);
 	}
 
-	inline void vec4print(const vec4& v) {
-		printf("%5.2f %5.2f %5.2f %5.2f\n", v.x, v.y, v.z, v.w);
-	}
-
 } // Math
+
+inline void vec4print(const Math::vec4& v) {
+	printf("%5.2f %5.2f %5.2f %5.2f\n", v.x, v.y, v.z, v.w);
+}

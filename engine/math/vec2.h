@@ -103,8 +103,8 @@ namespace Math {
 		return res *= (1 / len);
 	}
 
-	inline void vec2print(const vec2& v) {
-		printf("%5.2f %5.2f\n", v.x, v.y);
-	}
-
 } // Math
+
+inline void vec2print(const Math::vec2& v) {
+	printf("%5.2f %5.2f\n", v.x, v.y);
+}

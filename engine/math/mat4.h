@@ -140,11 +140,23 @@ namespace Math {
 		}
 	};
 
-	inline void mat4print(const mat4& m) {
+	inline mat4 operator*(const float lhs, const mat4& rhs) {
+		mat4 res = mat4::zero();
 		for (std::size_t i = 0; i < 4; ++i) {
-			vec4print(m[i]);
+			for (std::size_t j = 0; j < 4; ++j) {
+				res[i][j] = rhs[i][j] * lhs;
+			}
 		}
-		printf("\n");
+		return res;
+	}
+
+	inline vec4 operator*(const vec4& lhs, const mat4& rhs) {
+		vec4 res{};
+		mat4 rhsT = transpose(rhs);
+		for (std::size_t i = 0; i < 4; ++i) {
+			res[i] = dot(lhs, rhsT[i]);
+		}
+		return res;
 	}
 
 	inline float determinant(const mat4& m) {
@@ -448,3 +460,10 @@ namespace Math {
 	}
 
 } // Math
+
+inline void mat4print(const Math::mat4& m) {
+	for (std::size_t i = 0; i < 4; ++i) {
+		vec4print(m[i]);
+	}
+	printf("\n");
+}
