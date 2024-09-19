@@ -11,6 +11,8 @@
 #include "math/mat4.h"
 #include "input/input.h"
 
+#include <iostream>
+
 constexpr int STRING_BUFFER_SIZE = 8192;
 
 using namespace Display;
@@ -59,20 +61,26 @@ namespace Example {
 		window->SetMouseMoveFunction(&Input::InputManager::MouseMoveCallback);
 
 		if (this->window->Open()) {
+			glfwSwapInterval(1);
 			// set clear color to gray
 			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+			time = (float)glfwGetTime();
+			prev_time = 0;
 
-			cube = Resource::GraphicsNode(
+			this->cube = Resource::GraphicsNode(
 				"../projects/GraphicsNodeExample/res/meshes/cube.obj",
 				"../projects/GraphicsNodeExample/res/textures/minecraft-dirt.png",
 				"../projects/GraphicsNodeExample/res/shaders/vertex.glsl",
 				"../projects/GraphicsNodeExample/res/shaders/fragment.glsl"
 			);
+			this->cube.transform *= Math::translate({5, 0, 5});
 
-			this->camera = new Render::Camera(0.5f, 4.0f / 3.0f, 0.01f, 100.0f);
-			this->camera->SetCameraPosition({ 0, 5, 5 });
-			this->camera->SetLookatPosition({ 0, 0, 0 });
+			this->camera = new Render::Camera(1.0f, 4.0f / 3.0f, 0.01f, 100.0f);
+			this->camera->SetCameraPosition({ 0, 0, 0 });
+			//this->camera->SetLookatPosition({ 0, 0, 0 });
 			this->camera->SetUpDirection({ 0, 1, 0 });
+			this->camera->SetSpeed(25.0f);
+			this->camera->SetSens(0.1f);
 
 			this->grid = new Render::Grid();
 
@@ -104,7 +112,7 @@ namespace Example {
 		
 			float angle = (float)glfwGetTime();
 
-			this->camera->SetCameraPosition({cosf(angle) * 10, 5, sinf(angle) * 10});
+			//this->camera->SetCameraPosition({cosf(angle) * 10, 5, sinf(angle) * 10});
 
 			auto v = this->camera->GetView();
 			auto p = this->camera->GetPerspective();
@@ -114,6 +122,12 @@ namespace Example {
 
 			// transfer new frame to window
 			this->window->SwapBuffers();
+
+			// delta time
+			prev_time = time;
+			time = (float)glfwGetTime();
+			dt = time - prev_time;
+
 			Input::InputManager::Flush();
 
 #ifdef CI_TEST
@@ -125,9 +139,12 @@ namespace Example {
 	}
 
 	void ImGuiExampleApp::HandleInput() {
-		if (Input::InputManager::IsKeyPressed(Input::Key::Escape)) {
+		using namespace Input;
+		if (InputManager::IsKeyPressed(Key::Escape)) {
 			this->window->Close();
 		}
+
+		this->camera->UpdateCamera(dt, *this->window);
 	}
 
 } // namespace Example

@@ -41,6 +41,9 @@ namespace Example {
 		Render::Grid* grid;
 		Render::Camera* camera;
 		Display::Window* window;
+		float time;
+		float prev_time;
+		float dt;
 	};
 
 } // namespace Example

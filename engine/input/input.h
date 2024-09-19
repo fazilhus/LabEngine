@@ -38,17 +38,16 @@ namespace Input {
 		static void MouseKeyCallback(int32 button, int32 action, int32 mods);
 		static void MouseMoveCallback(float32 x, float32 y);
 
+		static bool IsKeyJustPressed(KeyCode code);
 		static bool IsKeyPressed(KeyCode code);
 		static bool IsKeyReleased(KeyCode code);
-		static bool IsKeyHeld(KeyCode code);
 
+		static bool IsMouseButtonJustPressed(MouseKeyCode code);
 		static bool IsMouseButtonPressed(MouseKeyCode code);
 		static bool IsMouseButtonReleased(MouseKeyCode code);
-		static bool IsMouseButtonHeld(MouseKeyCode code);
 
 		static Math::vec2 GetMousePos();
-		static float GetMousePosX();
-		static float GetMousePosY();
+		static Math::vec2 GetMouseDeltaPos();
 	};
 
 } // Input

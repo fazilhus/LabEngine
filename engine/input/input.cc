@@ -1,3 +1,4 @@
+#include "input.h"
 #include "config.h"
 #include "input.h"
 
@@ -32,8 +33,6 @@ namespace Input {
 		for (std::size_t i = 0; i < Key::NumOfKeys; ++i) {
 			if (k.released[i]) {
 				k.held[i] = false;
-			} else {
-				k.held[i] = true;
 			}
 			k.pressed[i] = false;
 			k.released[i] = false;
@@ -43,8 +42,6 @@ namespace Input {
 		for (std::size_t i = 0; i < MouseKey::NumOfMouseKeys; ++i) {
 			if (m.released[i]) {
 				m.held[i] = false;
-			} else {
-				m.held[i] = true;
 			}
 			m.pressed[i] = false;
 			m.released[i] = false;
@@ -60,12 +57,11 @@ namespace Input {
 		switch (action) {
 		case GLFW_PRESS:
 			k.pressed[code] = true;
+			k.held[code] = true;
 			break;
 		case GLFW_RELEASE:
 			k.released[code] = true;
 			break;
-		//default:
-			//assert(false && "unsupported keyboard action\n");
 		}
 	}
 
@@ -75,12 +71,10 @@ namespace Input {
 		switch (action) {
 		case GLFW_PRESS:
 			m.pressed[code] = true;
+			m.held[code] = true;
 			break;
 		case GLFW_RELEASE:
 			m.released[code] = true;
-			break;
-		//default:
-			//assert(false && "unsupported keyboard action\n");
 		}
 	}
 
@@ -90,27 +84,27 @@ namespace Input {
 		m.delta = m.pos - m.prev_pos;
 	}
 
-	bool InputManager::IsKeyPressed(KeyCode code) {
+	bool InputManager::IsKeyJustPressed(KeyCode code) {
 		return inputDevices->keyboard.pressed[code];
+	}
+
+	bool InputManager::IsKeyPressed(KeyCode code) {
+		return IsKeyJustPressed(code) || inputDevices->keyboard.held[code];
 	}
 
 	bool InputManager::IsKeyReleased(KeyCode code) {
 		return inputDevices->keyboard.released[code];
 	}
 
-	bool InputManager::IsKeyHeld(KeyCode code) {
-		return inputDevices->keyboard.held[code];
+	bool InputManager::IsMouseButtonJustPressed(MouseKeyCode code) {
+		return inputDevices->mouse.pressed[code];
 	}
 
 	bool InputManager::IsMouseButtonPressed(MouseKeyCode code) {
-		return inputDevices->mouse.pressed[code];
+		return IsMouseButtonJustPressed(code) || inputDevices->mouse.held[code];
 	}
 
 	bool InputManager::IsMouseButtonReleased(MouseKeyCode code) {
-		return inputDevices->mouse.pressed[code];
-	}
-
-	bool InputManager::IsMouseButtonHeld(MouseKeyCode code) {
 		return inputDevices->mouse.pressed[code];
 	}
 
@@ -118,12 +112,8 @@ namespace Input {
 		return inputDevices->mouse.pos;
 	}
 
-	float InputManager::GetMousePosX() {
-		return inputDevices->mouse.pos.x;
-	}
-
-	float InputManager::GetMousePosY() {
-		return inputDevices->mouse.pos.y;
+	Math::vec2 InputManager::GetMouseDeltaPos() {
+		return inputDevices->mouse.delta;
 	}
 
 } // Input
