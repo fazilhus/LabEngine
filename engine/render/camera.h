@@ -15,8 +15,8 @@ namespace Render {
         Math::vec3 at;
         Math::vec3 up;
 
-        float yaw = -90.0f;
-        float pitch = 0.0f;
+        float yaw;
+        float pitch;
 
         float speed;
         float sens;
