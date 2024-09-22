@@ -167,18 +167,33 @@ namespace Resource {
 		std::unordered_map<std::uint64_t, std::size_t> map{};
 	
 		for (std::size_t i = 0; i <= data.pos_idx.size() - 3; i += 3) {
-			vertexes.push_back(VertexData{data.positions[data.pos_idx[i]],     data.uvs[data.uv_idx[i]]});
-			vertexes.push_back(VertexData{data.positions[data.pos_idx[i + 1]], data.uvs[data.uv_idx[i + 1]]});
-			vertexes.push_back(VertexData{data.positions[data.pos_idx[i + 2]], data.uvs[data.uv_idx[i + 2]]});
+			vertexes.push_back(VertexData{
+				data.positions[data.pos_idx[i]],
+				data.normals[data.norm_idx[i]],
+				data.uvs[data.uv_idx[i]]
+				});
+
+			vertexes.push_back(VertexData{
+				data.positions[data.pos_idx[i + 1]],
+				data.normals[data.norm_idx[i + 1]],
+				data.uvs[data.uv_idx[i + 1]]
+				});
+
+			vertexes.push_back(VertexData{
+				data.positions[data.pos_idx[i + 2]],
+				data.normals[data.norm_idx[i + 2]],
+				data.uvs[data.uv_idx[i + 2]]
+				});
+
 			indices.push_back(i);indices.push_back(i + 1);indices.push_back(i + 2);
 		}
 	}
 
 	Mesh MeshBuilder::CreateMesh(const std::string& texPath) const {
 		Mesh mesh{};
-		std::size_t sizes[] = {3, 2};
-		std::size_t offsets[] = {0, 3};
-		mesh.Init((GLfloat*)vertexes.data(), (GLuint*)indices.data(), sizes, offsets, vertexes.size(), indices.size() / 3, 2);
+		std::size_t sizes[] = {3, 3, 2};
+		std::size_t offsets[] = {0, 3, 6};
+		mesh.Init((GLfloat*)vertexes.data(), (GLuint*)indices.data(), sizes, offsets, vertexes.size(), indices.size() / 3, 3);
 		auto tex = std::make_shared<Texture>();
 		tex->LoadFromFile(texPath.c_str());
 		mesh.PushPrimitive({ indices.size(), 0, tex });
@@ -187,9 +202,9 @@ namespace Resource {
 
 	Mesh MeshBuilder::CreateMesh(const std::shared_ptr<Texture> tex) const {
 		Mesh mesh{};
-		std::size_t sizes[] = { 3, 2 };
-		std::size_t offsets[] = { 0, 3 };
-		mesh.Init((GLfloat*)vertexes.data(), (GLuint*)indices.data(), sizes, offsets, vertexes.size(), indices.size() / 3, 2);
+		std::size_t sizes[] = { 3, 3, 2 };
+		std::size_t offsets[] = { 0, 3, 6 };
+		mesh.Init((GLfloat*)vertexes.data(), (GLuint*)indices.data(), sizes, offsets, vertexes.size(), indices.size() / 3, 3);
 		mesh.PushPrimitive({ indices.size(), 0, tex });
 		return mesh;
 	}

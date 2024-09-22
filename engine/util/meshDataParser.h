@@ -9,8 +9,10 @@ namespace Utils {
 
     struct OBJMeshData {
         std::vector<Math::vec3> positions;
+        std::vector<Math::vec3> normals;
         std::vector<Math::vec2> uvs;
         std::vector<unsigned int> pos_idx;
+        std::vector<unsigned int> norm_idx;
         std::vector<unsigned int> uv_idx;
     };
 

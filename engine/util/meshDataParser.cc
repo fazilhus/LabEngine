@@ -32,8 +32,8 @@ namespace Utils {
 			if (token == "v") {
 				buff.clear();
 				Split(Tail(line), buff);
-				if (buff.size() != 3) {
-					std::cerr << "[ERROR] corrupted OBJ file: vertex should have 2 values\n";
+				if (buff.size() < 3) {
+					std::cerr << "[ERROR] corrupted OBJ file: vertex should have at least 3 values\n";
 					return OBJMeshData{};
 				}
 				data.positions.push_back({});
@@ -42,11 +42,24 @@ namespace Utils {
 				data.positions.back()[2] = std::stof(buff[2]);
 			}
 
+			if (token == "vn") {
+				buff.clear();
+				Split(Tail(line), buff);
+				if (buff.size() != 3) {
+					std::cerr << "[ERROR] corrupted OBJ file: normal should have 3 values\n";
+					return OBJMeshData{};
+				}
+				data.normals.push_back({});
+				data.normals.back()[0] = std::stof(buff[0]);
+				data.normals.back()[1] = std::stof(buff[1]);
+				data.normals.back()[2] = std::stof(buff[2]);
+			}
+
 			if (token == "vt") {
 				buff.clear();
 				Split(Tail(line), buff);
-				if (buff.size() != 2) {
-					std::cerr << "[ERROR] corrupted OBJ file: uv should have 2 values\n";
+				if (buff.size() < 2) {
+					std::cerr << "[ERROR] corrupted OBJ file: uv should have at least 2 values\n";
 					return OBJMeshData{};
 				}
 				data.uvs.push_back({});
@@ -63,20 +76,23 @@ namespace Utils {
 				}
 				
 				for (std::size_t i = 0; i < 3; ++i) {
-					std::size_t delimeter = buff[i].find_first_of('/');
-					if (delimeter == std::string::npos) {
+					std::size_t del1 = buff[i].find_first_of('/');
+					std::size_t del2 = buff[i].find_last_of('/');
+					if (del1 == std::string::npos || del2 == std::string::npos) {
 						std::cerr << "[ERROR] corrupted OBJ file\n";
 						return OBJMeshData{};
 					}
-					auto spos_idx = buff[i].substr(0, delimeter);
-					auto suv_idx = buff[i].substr(delimeter + 1);
+					auto spos_idx = buff[i].substr(0, del1);
+					auto suv_idx = buff[i].substr(del1 + 1, del2 - del1 - 1);
+					auto snorm_idx = buff[i].substr(del2 + 1);
 					data.pos_idx.push_back(std::stoi(spos_idx) - 1);
 					data.uv_idx.push_back(std::stoi(suv_idx) - 1);
+					data.norm_idx.push_back(std::stoi(snorm_idx) - 1);
 				}
 			}
 		}
 
-        in.close();
+		in.close();
         return data;
     }
 

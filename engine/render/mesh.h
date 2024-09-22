@@ -54,7 +54,7 @@ namespace Resource {
 
 	struct VertexData {
 		Math::vec3 pos;
-		//Math::vec3 norm;
+		Math::vec3 norm;
 		Math::vec2 uv;
 	};
 
