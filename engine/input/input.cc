@@ -105,7 +105,7 @@ namespace Input {
 	}
 
 	bool InputManager::IsMouseButtonReleased(MouseKeyCode code) {
-		return inputDevices->mouse.pressed[code];
+		return inputDevices->mouse.released[code];
 	}
 
 	Math::vec2 InputManager::GetMousePos() {
