@@ -148,12 +148,6 @@ namespace Resource {
 		auto tex = std::make_shared<Texture>();
 		tex->LoadFromFile("../projects/CameraExample/res/img.png");
 		mesh.PushPrimitive({ 36, 0, tex });
-		//mesh.PushPrimitive({ 6, 0,  tex });
-		//mesh.PushPrimitive({ 6, 6,  tex});
-		//mesh.PushPrimitive({ 6, 12, tex});
-		//mesh.PushPrimitive({ 6, 18, tex});
-		//mesh.PushPrimitive({ 6, 24, tex});
-		//mesh.PushPrimitive({ 6, 30, tex});
 		return mesh;
 	}
 
@@ -163,30 +157,7 @@ namespace Resource {
 
 	void MeshBuilder::ReadMeshData(const std::string& path) {
 		Utils::MeshDataParser parser{};
-		Utils::OBJMeshData data = parser.ParseOBJ(path);
-		std::unordered_map<std::uint64_t, std::size_t> map{};
-	
-		for (std::size_t i = 0; i <= data.pos_idx.size() - 3; i += 3) {
-			vertexes.push_back(VertexData{
-				data.positions[data.pos_idx[i]],
-				data.normals[data.norm_idx[i]],
-				data.uvs[data.uv_idx[i]]
-				});
-
-			vertexes.push_back(VertexData{
-				data.positions[data.pos_idx[i + 1]],
-				data.normals[data.norm_idx[i + 1]],
-				data.uvs[data.uv_idx[i + 1]]
-				});
-
-			vertexes.push_back(VertexData{
-				data.positions[data.pos_idx[i + 2]],
-				data.normals[data.norm_idx[i + 2]],
-				data.uvs[data.uv_idx[i + 2]]
-				});
-
-			indices.push_back(i);indices.push_back(i + 1);indices.push_back(i + 2);
-		}
+		parser.ParseOBJ(path, vertexes, indices);
 	}
 
 	Mesh MeshBuilder::CreateMesh(const std::string& texPath) const {

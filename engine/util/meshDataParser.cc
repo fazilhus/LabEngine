@@ -3,97 +3,116 @@
 
 #include <fstream>
 #include <iostream>
+#include <cstdio>
+#include <unordered_map>
 
 namespace Utils {
     
-    OBJMeshData MeshDataParser::ParseOBJ(const std::string& path) {
+    void MeshDataParser::ParseOBJ(
+		const std::string& path,
+		std::vector<Resource::VertexData>& vdata,
+		std::vector<unsigned int>& idata) {
         if (path.substr(path.size() - 4, 4) != ".obj") {
 			std::cerr << "[ERROR] wrong file type\n";
-			return OBJMeshData{};
+			return;
 		}
 
-		std::ifstream in{ path };
+		std::ifstream in{ path, std::ios::in | std::ios::binary };
 		if (!in.is_open()) {
 			std::cerr << "[ERROR] could not open .obj file: " << path << '\n';
-			return OBJMeshData{};
+			return;
 		}
 
 		OBJMeshData data{};
 
-        std::vector<std::string> buff;
+        std::vector<std::string> fbuff;
+		std::vector<std::string> vbuff;
 
 		std::string line;
+
+		std::vector<std::streamoff> pos_lines;
+		std::vector<std::streamoff> norm_lines;
+		std::vector<std::streamoff> uv_lines;
+
+		while (std::getline(in, line)) {
+			if (FirstToken(line) == "o") break;
+		}
+		auto data_pos = in.tellg();
+
+		while (!in.eof()) {
+			auto fpos = in.tellg();
+			std::getline(in, line);
+			auto token = FirstToken(line);
+			if (token == "v") {
+				pos_lines.push_back(fpos);
+			}
+			if (token == "vn") {
+				norm_lines.push_back(fpos);
+			}
+			if (token == "vt") {
+				uv_lines.push_back(fpos);
+			}
+			if (token == "s") break;
+		}
+
+		std::size_t vertex_count = 0;
+		std::unordered_map<std::string, unsigned int> map;
+
 		while (std::getline(in, line)) {
 			auto token = FirstToken(line);
-			if (token == "#" || token == "o" || token == "s") {
-				continue;
-			}
-
-			if (token == "v") {
-				buff.clear();
-				Split(Tail(line), buff);
-				if (buff.size() < 3) {
-					std::cerr << "[ERROR] corrupted OBJ file: vertex should have at least 3 values\n";
-					return OBJMeshData{};
-				}
-				data.positions.push_back({});
-				data.positions.back()[0] = std::stof(buff[0]);
-				data.positions.back()[1] = std::stof(buff[1]);
-				data.positions.back()[2] = std::stof(buff[2]);
-			}
-
-			if (token == "vn") {
-				buff.clear();
-				Split(Tail(line), buff);
-				if (buff.size() != 3) {
-					std::cerr << "[ERROR] corrupted OBJ file: normal should have 3 values\n";
-					return OBJMeshData{};
-				}
-				data.normals.push_back({});
-				data.normals.back()[0] = std::stof(buff[0]);
-				data.normals.back()[1] = std::stof(buff[1]);
-				data.normals.back()[2] = std::stof(buff[2]);
-			}
-
-			if (token == "vt") {
-				buff.clear();
-				Split(Tail(line), buff);
-				if (buff.size() < 2) {
-					std::cerr << "[ERROR] corrupted OBJ file: uv should have at least 2 values\n";
-					return OBJMeshData{};
-				}
-				data.uvs.push_back({});
-				data.uvs.back()[0] = std::stof(buff[0]);
-				data.uvs.back()[1] = std::stof(buff[1]);
-			}
-
 			if (token == "f") {
-				buff.clear();
-				Split(Tail(line), buff);
-				if (buff.size() != 3) {
+				fbuff.clear();
+				Split(Tail(line), fbuff);
+				if (fbuff.size() != 3) {
 					std::cerr << "[ERROR] corrupted OBJ file: face should have 3 values\n";
-					return OBJMeshData{};
+					return;
 				}
 				
-				for (std::size_t i = 0; i < 3; ++i) {
-					std::size_t del1 = buff[i].find_first_of('/');
-					std::size_t del2 = buff[i].find_last_of('/');
-					if (del1 == std::string::npos || del2 == std::string::npos) {
-						std::cerr << "[ERROR] corrupted OBJ file\n";
-						return OBJMeshData{};
+				unsigned int posi[3], normi[3], uvi[3];
+				for (std::size_t i = 0; i < fbuff.size(); ++i) {
+					if (map.find(fbuff[i]) == map.end()) {
+						auto res = std::sscanf(fbuff[i].c_str(), "%u/%u/%u", &posi[i], &uvi[i], &normi[i]);
+						posi[i]--;
+						uvi[i]--;
+						normi[i]--;
+
+						auto curr_pos = in.tellg();
+
+						vdata.push_back({});
+						in.seekg(pos_lines[posi[i]], in.beg);
+						std::getline(in, line);
+						Split(Tail(line), vbuff);
+						for (std::size_t j = 0; j < 3; ++j) {
+							vdata.back().pos[j] = std::stof(vbuff[j]);
+						}
+
+						in.seekg(uv_lines[uvi[i]], in.beg);
+						std::getline(in, line);
+						Split(Tail(line), vbuff);
+						for (std::size_t j = 0; j < 2; ++j) {
+							vdata.back().uv[j] = std::stof(vbuff[j]);
+						}
+
+						in.seekg(norm_lines[normi[i]], in.beg);
+						std::getline(in, line);
+						Split(Tail(line), vbuff);
+						for (std::size_t j = 0; j < 3; ++j) {
+							vdata.back().norm[j] = std::stof(vbuff[j]);
+						}
+						map[fbuff[i]] = vertex_count;
+						idata.push_back(vertex_count);
+						vertex_count++;
+
+						in.seekg(curr_pos, in.beg);
 					}
-					auto spos_idx = buff[i].substr(0, del1);
-					auto suv_idx = buff[i].substr(del1 + 1, del2 - del1 - 1);
-					auto snorm_idx = buff[i].substr(del2 + 1);
-					data.pos_idx.push_back(std::stoi(spos_idx) - 1);
-					data.uv_idx.push_back(std::stoi(suv_idx) - 1);
-					data.norm_idx.push_back(std::stoi(snorm_idx) - 1);
+					else {
+						idata.push_back(map[fbuff[i]]);
+					}
 				}
 			}
 		}
 
 		in.close();
-        return data;
     }
 
 	std::string MeshDataParser::FirstToken(const std::string& line) {

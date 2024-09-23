@@ -2,8 +2,10 @@
 
 #include <string>
 #include <vector>
+
 #include "math/vec2.h"
 #include "math/vec3.h"
+#include "render/mesh.h"
 
 namespace Utils {
 
@@ -18,7 +20,10 @@ namespace Utils {
 
     class MeshDataParser {
     public:
-        OBJMeshData ParseOBJ(const std::string& path);
+        void ParseOBJ(
+            const std::string& path,
+            std::vector<Resource::VertexData>& vdata,
+            std::vector<unsigned int>& idata);
 
     private:
         std::string FirstToken(const std::string& line);
