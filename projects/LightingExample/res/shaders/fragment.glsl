@@ -21,7 +21,7 @@ void main()
 
 	vec3 camdir = normalize(cam_pos - iPos);
 	vec3 halfwaydir = normalize(ldir + camdir);
-	float spec = pow(max(dot(norm, halfwaydir), 0.0), light_int);
+	float spec = pow(max(dot(norm, halfwaydir), diff), light_int);
 	vec4 spec_term = spec * light_col;
 
 	oColor = (ambient_term + diffuse_term + spec_term) * surf_col;

@@ -68,8 +68,8 @@ namespace Example {
 			prev_time = 0;
 
 			this->cube = Resource::GraphicsNode(
-				"../projects/LightingExample/res/meshes/cat.obj",
-				"../projects/LightingExample/res/textures/cat-diff.tga",
+				"../projects/LightingExample/res/meshes/bunny.obj",
+				"../projects/LightingExample/res/textures/minecraft-dirt.png",
 				"../projects/LightingExample/res/shaders/vertex.glsl",
 				"../projects/LightingExample/res/shaders/fragment.glsl"
 			);
