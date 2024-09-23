@@ -33,6 +33,10 @@ namespace Render {
         inline void SetSpeed(float speed) { this->speed = speed; }
         inline void SetSens(float sens) { this->sens = sens; }
 
+        inline const Math::vec3& GetCameraPos() const { return pos; }
+        inline const Math::vec3& GetCameraAt() const { return at; }
+        inline const Math::vec3& GetCameraUp() const { return up; }
+
         inline Math::mat4 GetPerspective() const { return perspective; }
         inline Math::mat4 GetView() const { return view; }
 

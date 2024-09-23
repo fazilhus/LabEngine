@@ -7,7 +7,8 @@
 namespace Resource {
 
 	Shader::Shader(const std::string& vsPath, const std::string& fsPath)
-		: handle(0), vHandle(0), fHandle(0) {
+		: handle(0), vHandle(0), fHandle(0),
+		light({ Math::vec3{0.0f, 2.0f, 2.0f}, Math::vec4{1.0f, 1.0f, 1.0f, 1.0f}, 32.0f }) {
 		ReadSource(vsPath, vsSrc);
 		ReadSource(fsPath, fsSrc);
 
@@ -36,14 +37,30 @@ namespace Resource {
 		glUseProgram(handle);
 	}
 
+	void Shader::SetLight() {
+		UploadUniform3fv("light_pos", light.GetPos());
+		UploadUniform4fv("light_col", light.GetColor());
+		UploadUniform1f("light_int", light.GetIntensity());
+	}
+
 	void Shader::UploadUniform1i(const std::string& name, GLint v) {
 		GLuint loc = GetOrUpdateUniformLoc(name);
 		glUniform1i(loc, v);
 	}
 
+	void Shader::UploadUniform1f(const std::string& name, float32 v) {
+		GLuint loc = GetOrUpdateUniformLoc(name);
+		glUniform1f(loc, v);
+	}
+
+	void Shader::UploadUniform3fv(const std::string& name, const Math::vec3& v) {
+		GLuint loc = GetOrUpdateUniformLoc(name);
+		glUniform3fv(loc, 1, &v.x);
+	}
+
 	void Shader::UploadUniform4fv(const std::string& name, const Math::vec4& v) {
 		GLuint loc = GetOrUpdateUniformLoc(name);
-		glUniform4fv(loc, GL_FALSE, &v.x);
+		glUniform4fv(loc, 1, &v.x);
 	}
 
 	void Shader::UploadUniformMat4fv(const std::string& name, const Math::mat4& m) {

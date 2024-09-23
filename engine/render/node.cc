@@ -43,10 +43,12 @@ namespace Resource {
 
 	void GraphicsNode::Draw(const Render::Camera& cam) const {
 		shader->Use();
+		shader->SetLight();
 
 		shader->UploadUniformMat4fv("transform", transform);
 		shader->UploadUniformMat4fv("view", cam.GetView());
 		shader->UploadUniformMat4fv("perspective", cam.GetPerspective());
+		shader->UploadUniform3fv("cam_pos", cam.GetCameraPos());
 
 		mesh->Draw();
 	}
