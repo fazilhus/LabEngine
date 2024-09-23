@@ -68,16 +68,16 @@ namespace Example {
 			prev_time = 0;
 
 			this->cube = Resource::GraphicsNode(
-				"../projects/GraphicsNodeExample/res/meshes/bunny.obj",
-				"../projects/GraphicsNodeExample/res/textures/minecraft-dirt.png",
-				"../projects/GraphicsNodeExample/res/shaders/vertex.glsl",
-				"../projects/GraphicsNodeExample/res/shaders/fragment.glsl"
+				"../projects/LightingExample/res/meshes/bunny.obj",
+				"../projects/LightingExample/res/textures/minecraft-dirt.png",
+				"../projects/LightingExample/res/shaders/vertex.glsl",
+				"../projects/LightingExample/res/shaders/fragment.glsl"
 			);
 			this->cube.transform *= Math::translate({0, 0, 0});
 
 			this->camera = new Render::Camera(0.5f, 4.0f / 3.0f, 0.01f, 100.0f);
-			this->camera->SetCameraPosition({0.0f, 2.0f, -2.0f});
-			this->camera->SetSpeed(10.0f);
+			this->camera->SetCameraPosition({0.0f, 0.0f, -2.0f});
+			this->camera->SetSpeed(7.5f);
 			this->camera->SetSens(0.05f);
 
 			this->grid = new Render::Grid();
