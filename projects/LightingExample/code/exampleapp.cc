@@ -132,7 +132,7 @@ namespace Example {
 			HandleInput();
 
 			angle += dt;
-			this->obj1.GetShader().GetLight().SetPos({ cosf(angle) * 10.0f, 5.0f, sinf(angle) * 10.0f });
+			this->obj1.GetShader().GetLight().SetPos({ cosf(angle) * 10.0f, 5.0f, sinf(angle) * 5.0f });
 
 			this->obj1.Draw(*camera);
 			this->obj2.Draw(*camera);

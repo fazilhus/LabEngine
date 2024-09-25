@@ -2,12 +2,17 @@
 layout(location=0) in vec3 iPos;
 layout(location=1) in vec3 iNorm;
 layout(location=2) in vec2 iUV;
+
 uniform vec3 light_pos;
 uniform vec4 light_col;
 uniform float light_int;
+uniform vec3 light_att;
+
 uniform vec3 cam_pos;
 uniform sampler2D tex; 
+
 out vec4 oColor;
+
 void main()
 {
 	vec4 ambient_col = vec4(0.1, 0.1, 0.1, 1.0);
@@ -24,5 +29,8 @@ void main()
 	float spec = pow(max(dot(norm, halfwaydir), diff), light_int);
 	vec4 spec_term = spec * light_col;
 
+	float dist = length(light_pos - iPos);
+	float attenuation = 1.0 / (light_att.x + light_att.y * dist + light_att.z * (dist * dist));
 	oColor = (ambient_term + diffuse_term + spec_term) * surf_col;
+	oColor = vec4(oColor.rgb * attenuation, oColor.a);
 }

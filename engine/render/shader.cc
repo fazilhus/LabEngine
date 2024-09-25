@@ -8,7 +8,11 @@ namespace Resource {
 
 	Shader::Shader(const std::string& vsPath, const std::string& fsPath)
 		: handle(0), vHandle(0), fHandle(0),
-		light({ Math::vec3{0.0f, 0.0f, 10.0f}, Math::vec4{1.0f, 1.0f, 1.0f, 1.0f}, 16.0f }) {
+		light({
+			Math::vec3{0.0f, 0.0f, 10.0f},
+			Math::vec4{1.0f, 1.0f, 1.0f, 1.0f},
+			16.0f,
+			Math::vec3{1.0f, 0.022f, 0.019f} }) {
 		ReadSource(vsPath, vsSrc);
 		ReadSource(fsPath, fsSrc);
 
@@ -41,6 +45,7 @@ namespace Resource {
 		UploadUniform3fv("light_pos", light.GetPos());
 		UploadUniform4fv("light_col", light.GetColor());
 		UploadUniform1f("light_int", light.GetIntensity());
+		UploadUniform3fv("light_att", light.GetAttenuation());
 	}
 
 	void Shader::UploadUniform1i(const std::string& name, GLint v) {
