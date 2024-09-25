@@ -11,7 +11,7 @@ namespace Resource {
 		texture = std::make_shared<Texture>(texPath);
 
 		MeshBuilder mb{ meshPath };
-		mesh = std::make_shared<Mesh>(mb.CreateMesh(texture));
+		mesh = std::make_shared<Mesh>(mb.CreateMesh());
 
 		shader = std::make_shared<Shader>(Shader(vsPath, fsPath));
 	}
@@ -50,7 +50,7 @@ namespace Resource {
 		shader->UploadUniformMat4fv("perspective", cam.GetPerspective());
 		shader->UploadUniform3fv("cam_pos", cam.GetCameraPos());
 
-		mesh->Draw();
+		mesh->Draw(*texture.get());
 	}
 
 } // Resource

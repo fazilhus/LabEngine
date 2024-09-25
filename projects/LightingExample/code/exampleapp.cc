@@ -44,8 +44,7 @@ namespace Example {
 		Core::App::Close();
 		//this->mesh.DeInit();
 		//this->shader.reset();
-		this->cube.DeInit();
-		delete this->grid;
+		this->obj1.DeInit();
 		delete this->camera;
 	}
 
@@ -67,20 +66,45 @@ namespace Example {
 			time = (float)glfwGetTime();
 			prev_time = 0;
 
-			this->cube = Resource::GraphicsNode(
-				"../projects/LightingExample/res/meshes/bunny.obj",
-				"../projects/LightingExample/res/textures/minecraft-dirt.png",
+			auto dirtTex = std::make_shared<Resource::Texture>("../projects/LightingExample/res/textures/minecraft-dirt.png");
+			auto ballTex = std::make_shared<Resource::Texture>("../projects/LightingExample/res/textures/ball.png");
+
+			Resource::MeshBuilder meshBuilder{ "../projects/LightingExample/res/meshes/bunny.obj" };
+			auto bunnyMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh());
+
+			meshBuilder.ReadMeshData("../projects/LightingExample/res/meshes/sphere.obj");
+			auto sphereMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh());
+
+			meshBuilder.ReadMeshData("../projects/LightingExample/res/meshes/cube.obj");
+			auto cubeMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh());
+
+			auto shader = std::make_shared<Resource::Shader>(
 				"../projects/LightingExample/res/shaders/vertex.glsl",
-				"../projects/LightingExample/res/shaders/fragment.glsl"
-			);
-			this->cube.transform *= Math::translate({0, 0, 0});
+				"../projects/LightingExample/res/shaders/fragment.glsl");
+
+			this->obj1 = Resource::GraphicsNode();
+			this->obj1.SetTexture(dirtTex);
+			this->obj1.SetMesh(bunnyMesh);
+			this->obj1.SetShader(shader);
+			this->obj1.transform *= Math::translate({1, 0, 1});
+
+			this->obj2 = Resource::GraphicsNode();
+			this->obj2.SetTexture(ballTex);
+			this->obj2.SetMesh(sphereMesh);
+			this->obj2.SetShader(shader);
+			this->obj2.transform *= Math::translate({ -1, 0, -1 });
+
+			this->obj3 = Resource::GraphicsNode();
+			this->obj3.SetTexture(ballTex);
+			this->obj3.SetMesh(cubeMesh);
+			this->obj3.SetShader(shader);
+			this->obj3.transform *= Math::translate({ 0, 2, 2 });
+			this->obj3.transform *= Math::scale(0.5f);
 
 			this->camera = new Render::Camera(0.5f, 4.0f / 3.0f, 0.01f, 100.0f);
-			this->camera->SetCameraPosition({0.0f, 0.0f, -2.0f});
+			this->camera->SetCameraPosition({ 0.0f, 0.0f, 10.0f });
 			this->camera->SetSpeed(7.5f);
 			this->camera->SetSens(0.05f);
-
-			this->grid = new Render::Grid();
 
 			return true;
 		}
@@ -100,21 +124,19 @@ namespace Example {
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		Math::mat4 gridT{};
-		Math::mat4 meshT = Math::scale(0.5f);
+		float angle = 0.0f;
 
 		while (this->window->IsOpen()) {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			this->window->Update();
 			HandleInput();
-		
-			float angle = (float)glfwGetTime();
 
-			auto v = this->camera->GetView();
-			auto p = this->camera->GetPerspective();
+			angle += dt;
+			this->obj1.GetShader().GetLight().SetPos({ cosf(angle) * 10.0f, 5.0f, sinf(angle) * 10.0f });
 
-			this->cube.Draw(*camera);
-			this->grid->Draw(&gridT[0][0], &v[0][0], &p[0][0]);
+			this->obj1.Draw(*camera);
+			this->obj2.Draw(*camera);
+			this->obj3.Draw(*camera);
 
 			// transfer new frame to window
 			this->window->SwapBuffers();

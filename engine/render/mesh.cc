@@ -55,26 +55,26 @@ namespace Resource {
 		glDeleteVertexArrays(1, &vao);
 		glDeleteBuffers(1, &vbo);
 		glDeleteBuffers(1, &ebo);
-		for (auto& el : groups) {
+		/*for (auto& el : groups) {
 			el.tex->Unload();
-		}
+		}*/
 	}
 
-	void Mesh::Draw() const {
+	void Mesh::Draw(const Texture& tex) const {
 		Bind();
 		for (const auto& el : groups) {
-			el.tex->Bind();
+			tex.Bind();
 			glDrawElements(GL_TRIANGLES, el.indices, GL_UNSIGNED_INT, (GLvoid*)(sizeof(GLuint) * el.offset));
-			el.tex->UnBind();
+			tex.UnBind();
 		}
 		UnBind();
 	}
 
-	void Mesh::Draw(std::size_t i) const {
+	void Mesh::Draw(const Texture& tex, std::size_t i) const {
 		Bind();
-		groups[i].tex->Bind();
+		tex.Bind();
 		glDrawElements(GL_TRIANGLES, groups[i].indices, GL_UNSIGNED_INT, (GLvoid*)(sizeof(GLuint) * groups[i].offset));
-		groups[i].tex->UnBind();
+		tex.UnBind();
 		UnBind();
 	}
 
@@ -107,9 +107,7 @@ namespace Resource {
 		std::size_t sizes[] = { 3, 4, 2 };
 		std::size_t offsets[] = { 0, 3, 7 };
 		mesh.Init(vb, ib, sizes, offsets, 4, 2, 3);
-		auto tex = std::make_shared<Texture>();
-		tex->LoadFromFile("../projects/CameraExample/res/img.png");
-		mesh.PushPrimitive({ 6, 0, tex });
+		mesh.PushPrimitive({ 6, 0 });
 		return mesh;
 	}
 
@@ -145,9 +143,7 @@ namespace Resource {
 		std::size_t sizes[] = { 3, 4, 2 };
 		std::size_t offsets[] = { 0, 3, 7 };
 		mesh.Init(vb, ib, sizes, offsets, 8, 12, 3);
-		auto tex = std::make_shared<Texture>();
-		tex->LoadFromFile("../projects/CameraExample/res/img.png");
-		mesh.PushPrimitive({ 36, 0, tex });
+		mesh.PushPrimitive({ 36, 0 });
 		return mesh;
 	}
 
@@ -157,26 +153,17 @@ namespace Resource {
 
 	void MeshBuilder::ReadMeshData(const std::string& path) {
 		Utils::MeshDataParser parser{};
+		vertexes.clear();
+		indices.clear();
 		parser.ParseOBJ(path, vertexes, indices);
 	}
 
-	Mesh MeshBuilder::CreateMesh(const std::string& texPath) const {
+	Mesh MeshBuilder::CreateMesh() const {
 		Mesh mesh{};
 		std::size_t sizes[] = {3, 3, 2};
 		std::size_t offsets[] = {0, 3, 6};
 		mesh.Init((GLfloat*)vertexes.data(), (GLuint*)indices.data(), sizes, offsets, vertexes.size(), indices.size() / 3, 3);
-		auto tex = std::make_shared<Texture>();
-		tex->LoadFromFile(texPath.c_str());
-		mesh.PushPrimitive({ indices.size(), 0, tex });
-		return mesh;
-	}
-
-	Mesh MeshBuilder::CreateMesh(const std::shared_ptr<Texture> tex) const {
-		Mesh mesh{};
-		std::size_t sizes[] = { 3, 3, 2 };
-		std::size_t offsets[] = { 0, 3, 6 };
-		mesh.Init((GLfloat*)vertexes.data(), (GLuint*)indices.data(), sizes, offsets, vertexes.size(), indices.size() / 3, 3);
-		mesh.PushPrimitive({ indices.size(), 0, tex });
+		mesh.PushPrimitive({ indices.size(), 0 });
 		return mesh;
 	}
 

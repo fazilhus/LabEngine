@@ -8,7 +8,7 @@ namespace Resource {
 
 	Shader::Shader(const std::string& vsPath, const std::string& fsPath)
 		: handle(0), vHandle(0), fHandle(0),
-		light({ Math::vec3{0.0f, 2.0f, 2.0f}, Math::vec4{1.0f, 1.0f, 1.0f, 1.0f}, 16.0f }) {
+		light({ Math::vec3{0.0f, 0.0f, 10.0f}, Math::vec4{1.0f, 1.0f, 1.0f, 1.0f}, 16.0f }) {
 		ReadSource(vsPath, vsSrc);
 		ReadSource(fsPath, fsSrc);
 

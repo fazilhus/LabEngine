@@ -17,7 +17,7 @@ namespace Resource {
 	struct PrimitiveGroup {
 		std::size_t indices;
 		std::size_t offset;
-		std::shared_ptr<Texture> tex;
+		//std::shared_ptr<Texture> tex;
 	};
 
 	class Mesh {
@@ -39,8 +39,8 @@ namespace Resource {
 			const std::size_t verticies, const std::size_t triangles, const std::size_t count);
 		void DeInit();
 
-		void Draw() const;
-		void Draw(std::size_t i) const;
+		void Draw(const Texture& tex) const;
+		void Draw(const Texture& tex, std::size_t i) const;
 
 		void PushPrimitive(PrimitiveGroup group);
 
@@ -68,8 +68,7 @@ namespace Resource {
 		~MeshBuilder() = default;
 
 		void ReadMeshData(const std::string& path);
-		Mesh CreateMesh(const std::string& texPath) const;
-		Mesh CreateMesh(const std::shared_ptr<Texture> tex) const;
+		Mesh CreateMesh() const;
 	};
 
 } // Resource

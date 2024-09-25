@@ -33,12 +33,12 @@ namespace Resource {
 		void SetTexture(std::shared_ptr<Texture> texPtr);
 		void SetShader(std::shared_ptr<Shader> shaderPtr);
 
-		inline const Mesh* GetMesh() const { return mesh.get(); };
-		inline const Texture* GetTexture() const { return texture.get(); };
-		inline const Shader* GetShader() const { return shader.get(); };
-		inline Mesh* GetMesh() { return mesh.get(); };
-		inline Texture* GetTexture() { return texture.get(); };
-		inline Shader* GetShader() { return shader.get(); };
+		inline const Mesh& GetMesh() const { return *mesh.get(); };
+		inline const Texture& GetTexture() const { return *texture.get(); };
+		inline const Shader& GetShader() const { return *shader.get(); };
+		inline Mesh& GetMesh() { return *mesh.get(); };
+		inline Texture& GetTexture() { return *texture.get(); };
+		inline Shader& GetShader() { return *shader.get(); };
 
 		void Draw(const Render::Camera& cam) const;
 	};

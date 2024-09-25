@@ -34,6 +34,8 @@ namespace Resource {
 
 		void Use() const;
 		void SetLight();
+		inline const Render::OmniDirLight& GetLight() const { return light; }
+		inline Render::OmniDirLight& GetLight() { return light; }
 
 		inline GLuint GetHandle() const { return handle; }
 		inline std::string& GetVSSrc() { return vsSrc; }

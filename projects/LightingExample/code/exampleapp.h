@@ -35,10 +35,11 @@ namespace Example {
 		void HandleInput();
 
 	private:
-		std::shared_ptr<Resource::Shader> shader;
+		//std::shared_ptr<Resource::Shader> shader;
 		//Resource::Mesh mesh;
-		Resource::GraphicsNode cube;
-		Render::Grid* grid;
+		Resource::GraphicsNode obj1;
+		Resource::GraphicsNode obj2;
+		Resource::GraphicsNode obj3;
 		Render::Camera* camera;
 		Display::Window* window;
 		float time;
