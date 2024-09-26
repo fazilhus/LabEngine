@@ -1,7 +1,4 @@
 Johannes Hirche (johannes@gscept.com)
 Gustav Sterbrant (gustav@gscept.com)
 Fredrik Lindahl (fredrik.lindahl@ltu.se)
-    core, engine
-
 Fazil Khusnutdinov (khusnutdinov.fazil@gmail.com)
-    math, render, util
