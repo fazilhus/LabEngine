@@ -25,8 +25,9 @@ namespace Resource {
 		plight.SetAttenuation({ 1.0f, 0.022f, 0.019f });
 
 		slight.SetPos({ 10.0f, 2.0f, 0.0f });
-		slight.SetDirection(Math::vec3{ 0.0f, 0.0f, 0.0f } - slight.GetPos());
-		slight.SetCutoffAngle(Math::toRad(20.0f));
+		slight.SetDirection(slight.GetPos() - Math::vec3{ 0.0f, 0.0f, 0.0f });
+		slight.SetCutoffAngle(Math::toRad(15.0f));
+		slight.SetOuterCutoffAngle(Math::toRad(20.0f));
 		slight.SetAmbient({ 0.0f, 0.0f, 0.2f });
 		slight.SetDiffuse({ 0.0f, 0.0f, 0.5f });
 		plight.SetAttenuation({ 1.0f, 0.09f, 0.032f });
@@ -69,6 +70,7 @@ namespace Resource {
 		UploadUniform3fv("slight.pos", slight.GetPos());
 		UploadUniform3fv("slight.dir", slight.GetDirection());
 		UploadUniform1f("slight.cutoff", slight.GetCutoffAngle());
+		UploadUniform1f("slight.outerCutoff", slight.GetOuterCutoffAngle());
 		UploadUniform3fv("slight.ambient", slight.GetAmbient());
 		UploadUniform3fv("slight.diffuse", slight.GetDiffuse());
 		UploadUniform3fv("slight.specular", slight.GetSpecular());

@@ -38,6 +38,7 @@ struct SpotLight {
 	vec3 pos;
 	vec3 dir;
 	float cutoff;
+	float outerCutoff;
 
 	vec3 ambient;
 	vec3 diffuse;
@@ -87,26 +88,22 @@ void main()
 
 	// Spot Lights
 	ldir = normalize(slight.pos - iPos);
-	float theta = dot(ldir, normalize(-slight.dir));
 
 	ambient = slight.ambient * material.ambient;
-	if (theta > slight.cutoff)
-	{
-		diff = max(dot(norm, ldir), 0.0);
-		diffuse += slight.diffuse * (diff * material.diffuse);
+	diff = max(dot(norm, ldir), 0.0);
+	diffuse += slight.diffuse * (diff * material.diffuse);
 
-		halfwaydir = normalize(ldir + camdir);
-		spec = pow(max(dot(norm, halfwaydir), diff), 128.0 * material.shininess);
-		specular += slight.specular * (spec * material.specular);
-	}
-	else
-	{
-		diffuse = vec3(0);
-		specular = vec3(0);
-	}
+	halfwaydir = normalize(ldir + camdir);
+	spec = pow(max(dot(norm, halfwaydir), diff), 128.0 * material.shininess);
+	specular += slight.specular * (spec * material.specular);
+
+	float theta = dot(ldir, normalize(-slight.dir));
+	float epsilon = slight.cutoff - slight.outerCutoff;
+	float intensity = clamp((theta - slight.outerCutoff) / epsilon, 0.0, 1.0);
+
 	dist = length(slight.pos - iPos);
 	attenuation = 1.0 / (slight.attenuation.x + slight.attenuation.y * dist + slight.attenuation.z * (dist * dist));
-	tempCol += (ambient + diffuse + specular) * attenuation;
+	tempCol += (ambient + (diffuse + specular) * intensity) * attenuation;
 
 	oColor = vec4(tempCol, 1.0);
 }

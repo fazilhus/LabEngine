@@ -32,12 +32,13 @@ namespace Render {
 	}
 
 	SpotLight::SpotLight()
-		: pos(0.0f), dir({0.0f, -1.0f, 0.0f}), cutoff(Math::toRad(30.0f)), Light(), attenuation({ 1.0f, 0.0f, 0.0f }) {
+		: pos(0.0f), dir({0.0f, -1.0f, 0.0f}), cutoff(Math::toRad(20.0f)), outerCutoff(Math::toRad(35.0f)),
+		Light(), attenuation({ 1.0f, 0.0f, 0.0f }) {
 	}
 
-	SpotLight::SpotLight(const Math::vec3& pos, const Math::vec3& dir, float32 cutoff, const Math::vec3& a,
-		const Math::vec3& d, const Math::vec3& s, const Math::vec3& attenuation)
-		: pos(pos), dir(dir), cutoff(cutoff), Light(a, d, s), attenuation(attenuation) {
+	SpotLight::SpotLight(const Math::vec3& pos, const Math::vec3& dir, float32 cutoff, float32 ocutoff,
+		const Math::vec3& a, const Math::vec3& d, const Math::vec3& s, const Math::vec3& attenuation)
+		: pos(pos), dir(dir), cutoff(cutoff), outerCutoff(ocutoff), Light(a, d, s), attenuation(attenuation) {
 	}
 
 } // Render
