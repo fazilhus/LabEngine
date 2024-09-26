@@ -26,6 +26,7 @@ namespace Resource {
 
 		Render::DirectionalLight dlight;
 		Render::PointLight plight;
+		Render::SpotLight slight;
 
 	public:
 		Shader(const std::string& vsPath, const std::string& fsPath);
@@ -40,6 +41,8 @@ namespace Resource {
 		inline Render::PointLight& GetPointLight() { return plight; }
 		inline const Render::DirectionalLight& GetDirLight() const { return dlight; }
 		inline Render::DirectionalLight& GetDirLight() { return dlight; }
+		inline const Render::SpotLight& GetSpotLight() const { return slight; }
+		inline Render::SpotLight& GetSpotLight() { return slight; }
 
 		inline GLuint GetHandle() const { return handle; }
 		inline std::string& GetVSSrc() { return vsSrc; }

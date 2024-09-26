@@ -4,19 +4,32 @@
 #include <fstream>
 #include <iostream>
 
+#include "math/math.h"
+
 namespace Resource {
 
 	Shader::Shader(const std::string& vsPath, const std::string& fsPath)
-		: handle(0), vHandle(0), fHandle(0), dlight(), plight() {
+		: handle(0), vHandle(0), fHandle(0), dlight(), plight(), slight() {
 		ReadSource(vsPath, vsSrc);
 		ReadSource(fsPath, fsSrc);
 
 		CompileAndLink();
 
 		dlight.SetDirection({ -0.2f, -1.0f, -0.3f });
+		dlight.SetAmbient({ 0.2f, 0.0f, 0.0f });
+		dlight.SetDiffuse({ 0.5f, 0.0f, 0.0f });
 
 		plight.SetPos({ 0.0f, 0.0f, 10.0f });
+		plight.SetAmbient({ 0.0f, 0.2f, 0.0f });
+		plight.SetDiffuse({ 0.0f, 0.5f, 0.0f });
 		plight.SetAttenuation({ 1.0f, 0.022f, 0.019f });
+
+		slight.SetPos({ 10.0f, 2.0f, 0.0f });
+		slight.SetDirection(Math::vec3{ 0.0f, 0.0f, 0.0f } - slight.GetPos());
+		slight.SetCutoffAngle(Math::toRad(20.0f));
+		slight.SetAmbient({ 0.0f, 0.0f, 0.2f });
+		slight.SetDiffuse({ 0.0f, 0.0f, 0.5f });
+		plight.SetAttenuation({ 1.0f, 0.09f, 0.032f });
 	}
 
 	Shader::~Shader() {
@@ -52,6 +65,14 @@ namespace Resource {
 		UploadUniform3fv("plight.diffuse", plight.GetDiffuse());
 		UploadUniform3fv("plight.specular", plight.GetSpecular());
 		UploadUniform3fv("plight.attenuation", plight.GetAttenuation());
+
+		UploadUniform3fv("slight.pos", slight.GetPos());
+		UploadUniform3fv("slight.dir", slight.GetDirection());
+		UploadUniform1f("slight.cutoff", slight.GetCutoffAngle());
+		UploadUniform3fv("slight.ambient", slight.GetAmbient());
+		UploadUniform3fv("slight.diffuse", slight.GetDiffuse());
+		UploadUniform3fv("slight.specular", slight.GetSpecular());
+		UploadUniform3fv("slight.attenuation", slight.GetAttenuation());
 	}
 
 	void Shader::UploadUniform1i(const std::string& name, GLint v) {
