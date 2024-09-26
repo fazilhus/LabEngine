@@ -146,7 +146,9 @@ namespace Example {
 			HandleInput();
 
 			angle += dt;
-			this->obj1.GetShader().GetPointLight().SetPos({ cosf(angle) * 5.0f, 2.0f, sinf(angle) * 5.0f });
+			auto& slight = this->obj1.GetShader().GetSpotLight();
+			slight.SetPos({cosf(angle) * 10.0f, 2.0f, sinf(angle) * 10.0f});
+			slight.SetDirection(slight.GetPos() - Math::vec3{0.0f, 0.0f, 0.0f});
 
 			this->obj1.Draw(*camera);
 			this->obj2.Draw(*camera);
