@@ -2,6 +2,7 @@
 
 #include "render/mesh.h"
 #include "render/texture.h"
+#include "render/material.h"
 #include "render/shader.h"
 #include "math/mat4.h"
 #include "render/camera.h"
@@ -18,6 +19,7 @@ namespace Resource {
 	private:
 		std::shared_ptr<Mesh> mesh;
 		std::shared_ptr<Texture> texture;
+		std::shared_ptr<Material> material;
 		std::shared_ptr<Shader> shader;
 
 	public:
@@ -31,13 +33,17 @@ namespace Resource {
 
 		void SetMesh(std::shared_ptr<Mesh> meshPtr);
 		void SetTexture(std::shared_ptr<Texture> texPtr);
+		void SetMaterial(std::shared_ptr<Material> matPtr);
 		void SetShader(std::shared_ptr<Shader> shaderPtr);
 
 		inline const Mesh& GetMesh() const { return *mesh.get(); };
 		inline const Texture& GetTexture() const { return *texture.get(); };
+		inline const Material& GetMaterial() const { return *material.get(); };
 		inline const Shader& GetShader() const { return *shader.get(); };
+
 		inline Mesh& GetMesh() { return *mesh.get(); };
 		inline Texture& GetTexture() { return *texture.get(); };
+		inline Material& GetMaterial() { return *material.get(); };
 		inline Shader& GetShader() { return *shader.get(); };
 
 		void Draw(const Render::Camera& cam) const;

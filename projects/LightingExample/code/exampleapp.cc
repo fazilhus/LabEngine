@@ -69,6 +69,17 @@ namespace Example {
 			auto dirtTex = std::make_shared<Resource::Texture>("../projects/LightingExample/res/textures/minecraft-dirt.png");
 			auto ballTex = std::make_shared<Resource::Texture>("../projects/LightingExample/res/textures/ball.png");
 
+			auto goldMat = std::make_shared<Resource::Material>(Resource::Material{
+				{ 0.24725f , 0.1995f  , 0.0745f   },
+				{ 0.75164f , 0.60648f , 0.22648f  },
+				{ 0.628281f, 0.555802f,	0.366065f },
+				0.4f});
+			auto pearlMat = std::make_shared<Resource::Material>(Resource::Material{
+				{     0.25f, 0.20725f , 0.20725f  },
+				{     1.0f , 0.829f   , 0.829f    },
+				{ 0.296648f, 0.296648f,	0.296648f },
+				0.088f });
+
 			Resource::MeshBuilder meshBuilder{ "../projects/LightingExample/res/meshes/bunny.obj" };
 			auto bunnyMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh());
 
@@ -85,18 +96,21 @@ namespace Example {
 			this->obj1 = Resource::GraphicsNode();
 			this->obj1.SetTexture(dirtTex);
 			this->obj1.SetMesh(bunnyMesh);
+			this->obj1.SetMaterial(goldMat);
 			this->obj1.SetShader(shader);
 			this->obj1.transform *= Math::translate({1, 0, 1});
 
 			this->obj2 = Resource::GraphicsNode();
 			this->obj2.SetTexture(ballTex);
 			this->obj2.SetMesh(sphereMesh);
+			this->obj2.SetMaterial(pearlMat);
 			this->obj2.SetShader(shader);
 			this->obj2.transform *= Math::translate({ -1, 0, -1 });
 
 			this->obj3 = Resource::GraphicsNode();
 			this->obj3.SetTexture(ballTex);
 			this->obj3.SetMesh(cubeMesh);
+			this->obj3.SetMaterial(pearlMat);
 			this->obj3.SetShader(shader);
 			this->obj3.transform *= Math::translate({ 0, 2, 2 });
 			this->obj3.transform *= Math::scale(0.5f);
@@ -132,7 +146,7 @@ namespace Example {
 			HandleInput();
 
 			angle += dt;
-			this->obj1.GetShader().GetLight().SetPos({ cosf(angle) * 10.0f, 5.0f, sinf(angle) * 5.0f });
+			this->obj1.GetShader().GetLight().SetPos({ cosf(angle) * 5.0f, 2.0f, sinf(angle) * 5.0f });
 
 			this->obj1.Draw(*camera);
 			this->obj2.Draw(*camera);

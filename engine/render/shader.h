@@ -24,7 +24,7 @@ namespace Resource {
 
 		std::unordered_map<std::string, GLuint> uniformLoc;
 
-		Render::OmniDirLight light;
+		Render::PointLight light;
 
 	public:
 		Shader(const std::string& vsPath, const std::string& fsPath);
@@ -34,8 +34,8 @@ namespace Resource {
 
 		void Use() const;
 		void SetLight();
-		inline const Render::OmniDirLight& GetLight() const { return light; }
-		inline Render::OmniDirLight& GetLight() { return light; }
+		inline const Render::PointLight& GetLight() const { return light; }
+		inline Render::PointLight& GetLight() { return light; }
 
 		inline GLuint GetHandle() const { return handle; }
 		inline std::string& GetVSSrc() { return vsSrc; }

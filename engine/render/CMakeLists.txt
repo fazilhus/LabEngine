@@ -17,6 +17,8 @@ SET(files_render_display
 	shader.cc
 	node.h
 	node.cc
+	material.h
+	material.cc
 	light.h
 	light.cc
 	)

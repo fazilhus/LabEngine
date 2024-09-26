@@ -12,6 +12,6 @@ void main()
 {
 	gl_Position = perspective * view * transform * vec4(iPos, 1);
 	oPos = (transform * vec4(iPos, 1.0)).xyz;
-	oNorm = iNorm;
+	oNorm = mat3(transpose(inverse(transform))) * iNorm;
 	oUV = iUV;
 }
