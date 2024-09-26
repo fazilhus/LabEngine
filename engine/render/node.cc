@@ -49,7 +49,7 @@ namespace Resource {
 
 	void GraphicsNode::Draw(const Render::Camera& cam) const {
 		shader->Use();
-		shader->SetLight();
+		shader->SetLights();
 
 		shader->UploadUniform3fv("material.ambient", material->GetAmbient());
 		shader->UploadUniform3fv("material.diffuse", material->GetDiffuse());

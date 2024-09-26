@@ -7,13 +7,16 @@
 namespace Resource {
 
 	Shader::Shader(const std::string& vsPath, const std::string& fsPath)
-		: handle(0), vHandle(0), fHandle(0), light() {
+		: handle(0), vHandle(0), fHandle(0), dlight(), plight() {
 		ReadSource(vsPath, vsSrc);
 		ReadSource(fsPath, fsSrc);
 
 		CompileAndLink();
-		light.SetPos({ 0.0f, 0.0f, 10.0f });
-		light.SetAttenuation({ 1.0f, 0.022f, 0.019f });
+
+		dlight.SetDirection({ -0.2f, -1.0f, -0.3f });
+
+		plight.SetPos({ 0.0f, 0.0f, 10.0f });
+		plight.SetAttenuation({ 1.0f, 0.022f, 0.019f });
 	}
 
 	Shader::~Shader() {
@@ -38,12 +41,17 @@ namespace Resource {
 		glUseProgram(handle);
 	}
 
-	void Shader::SetLight() {
-		UploadUniform3fv("plight.pos", light.GetPos());
-		UploadUniform3fv("plight.ambient", light.GetAmbient());
-		UploadUniform3fv("plight.diffuse", light.GetDiffuse());
-		UploadUniform3fv("plight.specular", light.GetSpecular());
-		UploadUniform3fv("plight.attenuation", light.GetAttenuation());
+	void Shader::SetLights() {
+		UploadUniform3fv("dlight.dir", dlight.GetDirection());
+		UploadUniform3fv("dlight.ambient", dlight.GetAmbient());
+		UploadUniform3fv("dlight.diffuse", dlight.GetDiffuse());
+		UploadUniform3fv("dlight.specular", dlight.GetSpecular());
+
+		UploadUniform3fv("plight.pos", plight.GetPos());
+		UploadUniform3fv("plight.ambient", plight.GetAmbient());
+		UploadUniform3fv("plight.diffuse", plight.GetDiffuse());
+		UploadUniform3fv("plight.specular", plight.GetSpecular());
+		UploadUniform3fv("plight.attenuation", plight.GetAttenuation());
 	}
 
 	void Shader::UploadUniform1i(const std::string& name, GLint v) {

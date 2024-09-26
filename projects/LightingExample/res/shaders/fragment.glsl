@@ -12,6 +12,16 @@ struct Material {
 
 uniform Material material;
 
+struct DirectionalLight {
+	vec3 dir;
+
+	vec3 ambient;
+	vec3 diffuse;
+	vec3 specular;
+};
+
+uniform DirectionalLight dlight;
+
 struct PointLight {
 	vec3 pos;
 
@@ -31,36 +41,29 @@ out vec4 oColor;
 
 void main()
 {
-	//vec4 ambient_col = vec4(0.1, 0.1, 0.1, 1.0);
-	//vec4 surf_col = texture(tex, iUV);
-	//vec4 ambient_term = ambient_col * light_col;
-	//
-	//vec3 norm = normalize(iNorm);
-	//vec3 ldir = normalize(light_pos - iPos);
-	//float diff = max(dot(norm, ldir), 0.0);
-	//vec4 diffuse_term = light_col * diff;
-	//
-	//vec3 camdir = normalize(cam_pos - iPos);
-	//vec3 halfwaydir = normalize(ldir + camdir);
-	//float spec = pow(max(dot(norm, halfwaydir), diff), light_int);
-	//vec4 spec_term = spec * light_col;
-	//
-	//float dist = length(light_pos - iPos);
-	//float attenuation = 1.0 / (light_att.x + light_att.y * dist + light_att.z * (dist * dist));
-	//oColor = (ambient_term + diffuse_term + spec_term) * surf_col;
-	//oColor = vec4(oColor.rgb * attenuation, oColor.a);
-
-	vec3 ambient = plight.ambient * material.ambient;
+	//Global Light
+	vec3 ambient = dlight.ambient * material.ambient;
 
 	vec3 norm = normalize(iNorm);
-	vec3 ldir = normalize(plight.pos - iPos);
+	vec3 ldir = normalize(-dlight.dir);
 	float diff = max(dot(norm, ldir), 0.0);
-	vec3 diffuse = plight.diffuse * (diff * material.diffuse);
+	vec3 diffuse = dlight.diffuse * (diff * material.diffuse);
 
 	vec3 camdir = normalize(cam_pos - iPos);
 	vec3 halfwaydir = normalize(ldir + camdir);
 	float spec = pow(max(dot(norm, halfwaydir), diff), 128.0 * material.shininess);
-	vec3 spec_term = plight.specular * (spec * material.specular);
+	vec3 spec_term = dlight.specular * (spec * material.specular);
+
+	// Point Lights
+	ambient += plight.ambient * material.ambient;
+
+	ldir = normalize(plight.pos - iPos);
+	diff = max(dot(norm, ldir), 0.0);
+	diffuse += plight.diffuse * (diff * material.diffuse);
+
+	halfwaydir = normalize(ldir + camdir);
+	spec = pow(max(dot(norm, halfwaydir), diff), 128.0 * material.shininess);
+	spec_term += plight.specular * (spec * material.specular);
 
 	float dist = length(plight.pos - iPos);
 	float attenuation = 1.0 / (plight.attenuation.x + plight.attenuation.y * dist + plight.attenuation.z * (dist * dist));
