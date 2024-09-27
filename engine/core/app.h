@@ -7,7 +7,6 @@
 	(C) 2015-2020 Individual contributors, see AUTHORS file
 */
 //------------------------------------------------------------------------------
-#include <GL/glew.h>
 namespace Core
 {
 class App

@@ -1,8 +1,5 @@
 #pragma once
 
-#include "config.h"
-
-#include "math/vec4.h"
 #include "math/vec3.h"
 
 namespace Render {

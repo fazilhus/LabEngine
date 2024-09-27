@@ -1,8 +1,6 @@
 #pragma once
 
-#include <cmath>
 #include <cstdio>
-#include <cassert>
 
 #include "vec3.h"
 #include "vec4.h"

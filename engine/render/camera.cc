@@ -8,7 +8,7 @@
 
 namespace Render {
 	
-	Camera::Camera(const float fovy, const float aspect, const float near, const float far)
+	Camera::Camera(float fovy, float aspect, float near, float far)
 		: pos({ 0, 0, 0 }), at(Math::vec3{ 0, 0, 1 }), up({ 0, 1, 0 }),
 		yaw(0.0f), pitch(0), speed(25.0f), sens(0.15f) {
 		perspective = Math::perspective(fovy, aspect, near, far);

@@ -8,14 +8,9 @@
 //------------------------------------------------------------------------------
 #include "core/app.h"
 #include "render/window.h"
-#include "render/mesh.h"
-#include "render/shader.h"
-#include "render/grid.h"
 #include "render/camera.h"
-#include "math/mat4.h"
 #include "render/node.h"
 
-#include <memory>
 
 namespace Example {
 

@@ -5,11 +5,9 @@
 #include <vector>
 #include <string>
 #include <fstream>
-#include <memory>
 
 #include "math/vec2.h"
 #include "math/vec3.h"
-#include "math/vec4.h"
 #include "texture.h"
 
 namespace Resource {

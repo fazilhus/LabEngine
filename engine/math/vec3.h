@@ -1,8 +1,6 @@
 #pragma once
-#include <cmath>
 #include <cassert>
 #include <cstdio>
-#include <cstdint>
 
 namespace Math {
 

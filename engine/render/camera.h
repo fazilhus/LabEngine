@@ -2,7 +2,6 @@
 
 #include "math/vec3.h"
 #include "math/mat4.h"
-#include "render/window.h"
 
 namespace Render {
 
@@ -22,7 +21,7 @@ namespace Render {
         float sens;
 
     public:
-        Camera(const float fovy, const float aspect, const float near, const float far);
+        Camera(float fovy, float aspect, float near, float far);
         ~Camera() = default;
 
         void UpdateCamera(float dt);

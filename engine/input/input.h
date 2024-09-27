@@ -4,7 +4,6 @@
 #include "input/codes.h"
 
 #include <vector>
-#include <memory>
 
 namespace Input {
 
