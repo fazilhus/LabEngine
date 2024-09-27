@@ -175,7 +175,7 @@ namespace Resource {
 	}
 
 	GLuint Shader::GetOrUpdateUniformLoc(const std::string& name) {
-		if (uniformLoc.contains(name)) {
+		if (!uniformLoc.contains(name)) {
 		//if (uniformLoc.find(name) == uniformLoc.end()) {
 			uniformLoc[name] = glGetUniformLocation(handle, name.c_str());
 		}
