@@ -7,7 +7,6 @@
 #include "math/vec3.h"
 #include "math/vec4.h"
 #include "math/mat4.h"
-#include "render/light.h"
 
 namespace Resource {
 
@@ -22,10 +21,6 @@ namespace Resource {
 
 		std::unordered_map<std::string, GLuint> uniformLoc;
 
-		Render::DirectionalLight dlight;
-		Render::PointLight plight;
-		Render::SpotLight slight;
-
 	public:
 		Shader(const std::string& vsPath, const std::string& fsPath);
 		~Shader();
@@ -33,14 +28,6 @@ namespace Resource {
 		void Cleanup();
 
 		void Use() const;
-		void SetLights();
-
-		inline const Render::PointLight& GetPointLight() const { return plight; }
-		inline Render::PointLight& GetPointLight() { return plight; }
-		inline const Render::DirectionalLight& GetDirLight() const { return dlight; }
-		inline Render::DirectionalLight& GetDirLight() { return dlight; }
-		inline const Render::SpotLight& GetSpotLight() const { return slight; }
-		inline Render::SpotLight& GetSpotLight() { return slight; }
 
 		inline GLuint GetHandle() const { return handle; }
 		inline std::string& GetVSSrc() { return vsSrc; }

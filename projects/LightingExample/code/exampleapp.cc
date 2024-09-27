@@ -9,9 +9,11 @@
 
 #include "render/mesh.h"
 #include "math/mat4.h"
+#include "math/math.h"
 #include "input/input.h"
 
 #include <iostream>
+
 
 constexpr int STRING_BUFFER_SIZE = 8192;
 
@@ -62,58 +64,46 @@ namespace Example {
 		if (this->window->Open()) {
 			glfwSwapInterval(1);
 			// set clear color to gray
-			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+			glClearColor(0.01f, 0.01f, 0.01f, 1.0f);
 			time = (float)glfwGetTime();
 			prev_time = 0;
 
-			auto dirtTex = std::make_shared<Resource::Texture>("../projects/LightingExample/res/textures/minecraft-dirt.png");
-			auto ballTex = std::make_shared<Resource::Texture>("../projects/LightingExample/res/textures/ball.png");
+			auto catDiffTex = std::make_shared<Resource::Texture>(
+				"../projects/LightingExample/res/textures/cat_diff.tga", 1);
+			auto catSpecTex = std::make_shared<Resource::Texture>(
+				"../projects/LightingExample/res/textures/cat_spec.tga", 1);
+			auto catMat = std::make_shared<Resource::Material>(catDiffTex, catSpecTex, 4.0f);
 
-			auto goldMat = std::make_shared<Resource::Material>(Resource::Material{
-				{ 0.24725f , 0.1995f  , 0.0745f   },
-				{ 0.75164f , 0.60648f , 0.22648f  },
-				{ 0.628281f, 0.555802f,	0.366065f },
-				0.4f});
-			auto pearlMat = std::make_shared<Resource::Material>(Resource::Material{
-				{     0.25f, 0.20725f , 0.20725f  },
-				{     1.0f , 0.829f   , 0.829f    },
-				{ 0.296648f, 0.296648f,	0.296648f },
-				0.088f });
-
-			Resource::MeshBuilder meshBuilder{ "../projects/LightingExample/res/meshes/bunny.obj" };
-			auto bunnyMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh());
-
-			meshBuilder.ReadMeshData("../projects/LightingExample/res/meshes/sphere.obj");
-			auto sphereMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh());
-
-			meshBuilder.ReadMeshData("../projects/LightingExample/res/meshes/cube.obj");
-			auto cubeMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh());
+			Resource::MeshBuilder meshBuilder{ "../projects/LightingExample/res/meshes/cat.obj" };
+			auto catMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh());
 
 			auto shader = std::make_shared<Resource::Shader>(
 				"../projects/LightingExample/res/shaders/vertex.glsl",
 				"../projects/LightingExample/res/shaders/fragment.glsl");
 
 			this->obj1 = Resource::GraphicsNode();
-			this->obj1.SetTexture(dirtTex);
-			this->obj1.SetMesh(bunnyMesh);
-			this->obj1.SetMaterial(goldMat);
+			this->obj1.SetMaterial(catMat);
+			this->obj1.SetMesh(catMesh);
 			this->obj1.SetShader(shader);
 			this->obj1.transform *= Math::translate({1, 0, 1});
 
-			this->obj2 = Resource::GraphicsNode();
-			this->obj2.SetTexture(ballTex);
-			this->obj2.SetMesh(sphereMesh);
-			this->obj2.SetMaterial(pearlMat);
-			this->obj2.SetShader(shader);
-			this->obj2.transform *= Math::translate({ -1, 0, -1 });
 
-			this->obj3 = Resource::GraphicsNode();
-			this->obj3.SetTexture(ballTex);
-			this->obj3.SetMesh(cubeMesh);
-			this->obj3.SetMaterial(pearlMat);
-			this->obj3.SetShader(shader);
-			this->obj3.transform *= Math::translate({ 0, 2, 2 });
-			this->obj3.transform *= Math::scale(0.5f);
+			Render::DirectionalLight dl;
+			dl.SetAmbient(Math::vec3(0.01f));
+			lm.SetGlobalLight(dl);
+
+			Render::PointLight pl;
+			pl.SetPos({ 0.0f, 0.0f, 10.0f });
+			pl.SetAttenuation({ 1.0f, 0.022f, 0.019f });
+			lm.PushPointLight(pl);
+
+			Render::SpotLight sl;
+			sl.SetPos({ 10.0f, 2.0f, 0.0f });
+			sl.SetDirection(sl.GetPos() - Math::vec3{ 0.0f, 0.0f, 0.0f });
+			sl.SetCutoffAngle(Math::toRad(15.0f));
+			sl.SetOuterCutoffAngle(Math::toRad(20.0f));
+			sl.SetAttenuation({ 1.0f, 0.09f, 0.032f });
+			lm.PushSpotLight(sl);
 
 			this->camera = new Render::Camera(0.5f, 4.0f / 3.0f, 0.01f, 100.0f);
 			this->camera->SetCameraPosition({ 0.0f, 0.0f, 10.0f });
@@ -146,13 +136,16 @@ namespace Example {
 			HandleInput();
 
 			angle += dt;
-			auto& slight = this->obj1.GetShader().GetSpotLight();
-			slight.SetPos({cosf(angle) * 10.0f, 2.0f, sinf(angle) * 10.0f});
-			slight.SetDirection(slight.GetPos() - Math::vec3{0.0f, 0.0f, 0.0f});
+			//auto& slight = this->lm.GetSpotLights()[0];
+			//slight.SetPos({cosf(angle) * 10.0f, 2.0f, sinf(angle) * 10.0f});
+			//slight.SetDirection(slight.GetPos() - Math::vec3{0.0f, 0.0f, 0.0f});
+
+			this->obj1.GetShader().Use();
+			lm.SetLightUniforms(this->obj1.GetShader());
 
 			this->obj1.Draw(*camera);
-			this->obj2.Draw(*camera);
-			this->obj3.Draw(*camera);
+			//this->obj2.Draw(*camera);
+			//this->obj3.Draw(*camera);
 
 			// transfer new frame to window
 			this->window->SwapBuffers();

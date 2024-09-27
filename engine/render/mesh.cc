@@ -60,12 +60,10 @@ namespace Resource {
 		}*/
 	}
 
-	void Mesh::Draw(const Texture& tex) const {
+	void Mesh::Draw() const {
 		Bind();
 		for (const auto& el : groups) {
-			tex.Bind();
 			glDrawElements(GL_TRIANGLES, el.indices, GL_UNSIGNED_INT, (GLvoid*)(sizeof(GLuint) * el.offset));
-			tex.UnBind();
 		}
 		UnBind();
 	}

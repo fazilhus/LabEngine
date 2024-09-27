@@ -12,16 +12,16 @@ namespace Resource {
 
 	public:
 		Texture() = default;
-		Texture(const std::string& path);
+		Texture(const std::string& path, int flip = 0);
 		Texture(const Texture& other);
 		~Texture() = default;
 
 		Texture& operator=(const Texture& other);
 
-		void LoadFromFile(const std::string& path);
+		void LoadFromFile(const std::string& path, int flip = 0);
 		void Unload();
 
-		void Bind() const;
+		void Bind(GLuint loc = 0) const;
 		void UnBind() const;
 	};
 

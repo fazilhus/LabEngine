@@ -37,7 +37,7 @@ namespace Resource {
 			const std::size_t verticies, const std::size_t triangles, const std::size_t count);
 		void DeInit();
 
-		void Draw(const Texture& tex) const;
+		void Draw() const;
 		void Draw(const Texture& tex, std::size_t i) const;
 
 		void PushPrimitive(PrimitiveGroup group);

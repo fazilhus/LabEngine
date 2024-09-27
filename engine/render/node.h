@@ -18,13 +18,12 @@ namespace Resource {
 
 	private:
 		std::shared_ptr<Mesh> mesh;
-		std::shared_ptr<Texture> texture;
 		std::shared_ptr<Material> material;
 		std::shared_ptr<Shader> shader;
 
 	public:
 		GraphicsNode();
-		GraphicsNode(const std::string& meshPath, const std::string& texPath,
+		GraphicsNode(const std::string& meshPath,
 			const std::string& vsPath, const std::string& fsPath);
 		GraphicsNode(const GraphicsNode& other);
 		~GraphicsNode();
@@ -32,17 +31,14 @@ namespace Resource {
 		void DeInit();
 
 		void SetMesh(std::shared_ptr<Mesh> meshPtr);
-		void SetTexture(std::shared_ptr<Texture> texPtr);
 		void SetMaterial(std::shared_ptr<Material> matPtr);
 		void SetShader(std::shared_ptr<Shader> shaderPtr);
 
 		inline const Mesh& GetMesh() const { return *mesh.get(); };
-		inline const Texture& GetTexture() const { return *texture.get(); };
 		inline const Material& GetMaterial() const { return *material.get(); };
 		inline const Shader& GetShader() const { return *shader.get(); };
 
 		inline Mesh& GetMesh() { return *mesh.get(); };
-		inline Texture& GetTexture() { return *texture.get(); };
 		inline Material& GetMaterial() { return *material.get(); };
 		inline Shader& GetShader() { return *shader.get(); };
 

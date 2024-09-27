@@ -1,6 +1,10 @@
 #pragma once
 
 #include "math/vec3.h"
+#include "render/shader.h"
+
+#include <vector>
+
 
 namespace Render {
 
@@ -15,16 +19,16 @@ namespace Render {
 		Light(const Math::vec3& a, const Math::vec3& d, const Math::vec3& s);
 
 	public:
-		inline void SetAmbient(const Math::vec3& a) { this->ambient = a; }
-		inline void SetDiffuse(const Math::vec3& d) { this->diffuse = d; }
-		inline void SetSpecular(const Math::vec3& s) { this->specular = s; }
+		void SetAmbient(const Math::vec3& a) { this->ambient = a; }
+		void SetDiffuse(const Math::vec3& d) { this->diffuse = d; }
+		void SetSpecular(const Math::vec3& s) { this->specular = s; }
 
-		inline const Math::vec3& GetAmbient() const { return ambient; }
-		inline Math::vec3& GetAmbient() { return ambient; }
-		inline const Math::vec3& GetDiffuse() const { return diffuse; }
-		inline Math::vec3& GetDiffuse() { return diffuse; }
-		inline const Math::vec3& GetSpecular() const { return specular; }
-		inline Math::vec3& GetSpecular() { return specular; }
+		const Math::vec3& GetAmbient() const { return ambient; }
+		Math::vec3& GetAmbient() { return ambient; }
+		const Math::vec3& GetDiffuse() const { return diffuse; }
+		Math::vec3& GetDiffuse() { return diffuse; }
+		const Math::vec3& GetSpecular() const { return specular; }
+		Math::vec3& GetSpecular() { return specular; }
 	};
 
 	class DirectionalLight : public Light {
@@ -35,12 +39,12 @@ namespace Render {
 		DirectionalLight();
 		DirectionalLight(const Math::vec3& dir, const Math::vec3& a,
 			const Math::vec3& d, const Math::vec3& s);
-		~DirectionalLight() = default;
+		DirectionalLight(const DirectionalLight& other);
 
-		inline void SetDirection(const Math::vec3& dir) { this->dir = dir; }
+		void SetDirection(const Math::vec3& dir) { this->dir = dir; }
 
-		inline const Math::vec3& GetDirection() const { return dir; }
-		inline Math::vec3& GetDirection() { return dir; }
+		const Math::vec3& GetDirection() const { return dir; }
+		Math::vec3& GetDirection() { return dir; }
 	};
 
 	class PointLight : public Light {
@@ -53,15 +57,15 @@ namespace Render {
 		PointLight();
 		PointLight(const Math::vec3& pos, const Math::vec3& a,
 			const Math::vec3& d, const Math::vec3& s, const Math::vec3& attenuation);
-		~PointLight() = default;
+		PointLight(const PointLight& other);
 
-		inline void SetPos(const Math::vec3& pos) { this->pos = pos; }
-		inline void SetAttenuation(const Math::vec3& attenuation) { this->attenuation = attenuation; }
+		void SetPos(const Math::vec3& pos) { this->pos = pos; }
+		void SetAttenuation(const Math::vec3& attenuation) { this->attenuation = attenuation; }
 
-		inline const Math::vec3& GetPos() const { return pos; }
-		inline Math::vec3& GetPos() { return pos; }
-		inline const Math::vec3& GetAttenuation() const { return attenuation; }
-		inline Math::vec3& GetAttenuation() { return attenuation; }
+		const Math::vec3& GetPos() const { return pos; }
+		Math::vec3& GetPos() { return pos; }
+		const Math::vec3& GetAttenuation() const { return attenuation; }
+		Math::vec3& GetAttenuation() { return attenuation; }
 	};
 
 	class SpotLight : public Light {
@@ -79,22 +83,51 @@ namespace Render {
 			const Math::vec3& d, const Math::vec3& s, const Math::vec3& attenuation);
 		~SpotLight() = default;
 
-		inline void SetPos(const Math::vec3& pos) { this->pos = pos; }
-		inline void SetDirection(const Math::vec3& dir) { this->dir = dir; }
-		inline void SetCutoffAngle(float32 angle) { this->cutoff = angle; }
-		inline void SetOuterCutoffAngle(float32 angle) { this->outerCutoff = angle; }
-		inline void SetAttenuation(const Math::vec3& attenuation) { this->attenuation = attenuation; }
+		void SetPos(const Math::vec3& pos) { this->pos = pos; }
+		void SetDirection(const Math::vec3& dir) { this->dir = dir; }
+		void SetCutoffAngle(float32 angle) { this->cutoff = angle; }
+		void SetOuterCutoffAngle(float32 angle) { this->outerCutoff = angle; }
+		void SetAttenuation(const Math::vec3& attenuation) { this->attenuation = attenuation; }
 
-		inline const Math::vec3& GetPos() const { return pos; }
-		inline Math::vec3& GetPos() { return pos; }
-		inline const Math::vec3& GetDirection() const { return dir; }
-		inline Math::vec3& GetDirection() { return dir; }
-		inline float32 GetCutoffAngle() const { return cutoff; }
-		inline float32 GetCutoffAngle() { return cutoff; }
-		inline float32 GetOuterCutoffAngle() const { return outerCutoff; }
-		inline float32 GetOuterCutoffAngle() { return outerCutoff; }
-		inline const Math::vec3& GetAttenuation() const { return attenuation; }
-		inline Math::vec3& GetAttenuation() { return attenuation; }
+		const Math::vec3& GetPos() const { return pos; }
+		Math::vec3& GetPos() { return pos; }
+		const Math::vec3& GetDirection() const { return dir; }
+		Math::vec3& GetDirection() { return dir; }
+		float32 GetCutoffAngle() const { return cutoff; }
+		float32 GetCutoffAngle() { return cutoff; }
+		float32 GetOuterCutoffAngle() const { return outerCutoff; }
+		float32 GetOuterCutoffAngle() { return outerCutoff; }
+		const Math::vec3& GetAttenuation() const { return attenuation; }
+		Math::vec3& GetAttenuation() { return attenuation; }
+	};
+
+	constexpr int MAX_NUM_LIGHT_SOURCES = 4;
+
+	class LightManager {
+	private:
+		DirectionalLight globalLight;
+		std::vector<PointLight> pointLights;
+		std::size_t pointLightsCount;
+		std::vector<SpotLight> spotLights;
+		std::size_t spotLightsCount;
+
+	public:
+		LightManager();
+		~LightManager() = default;
+
+		DirectionalLight& GetGlobalLight() { return globalLight; }
+		const DirectionalLight& GetGlobalLight() const { return globalLight; }
+
+		std::vector<PointLight>& GetPointLights() { return pointLights; }
+		const std::vector<PointLight>& GetPointLights() const { return pointLights; }
+		std::vector<SpotLight>& GetSpotLights() { return spotLights; }
+		const std::vector<SpotLight>& GetSpotLights() const { return spotLights; }
+
+		void SetGlobalLight(const DirectionalLight& dl) { globalLight = dl; }
+		void PushPointLight(const PointLight& pl);
+		void PushSpotLight(const SpotLight& sl);
+
+		void SetLightUniforms(Resource::Shader& shader);
 	};
 
 } // Render

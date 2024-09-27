@@ -6,8 +6,8 @@
 
 namespace Resource {
 
-	Texture::Texture(const std::string& path) {
-		LoadFromFile(path);
+	Texture::Texture(const std::string& path, int flip) {
+		LoadFromFile(path, flip);
 	}
 	
 	Texture::Texture(const Texture& other)
@@ -18,9 +18,10 @@ namespace Resource {
 		this->handle = other.handle;
 		return *this;
 	}
-	void Texture::LoadFromFile(const std::string& path) {
+	void Texture::LoadFromFile(const std::string& path, int flip) {
 		int w, h, comp;
-		uchar* image = stbi_load(path.c_str(), &w, &h, &comp, STBI_rgb_alpha);
+		stbi_set_flip_vertically_on_load(flip);
+		uchar* image = stbi_load(path.c_str(), &w, &h, &comp, STBI_rgb);
 
 		if (image == nullptr) {
 			return;
@@ -32,12 +33,12 @@ namespace Resource {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		float maxAniso{ 1.0f };
 		glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &maxAniso);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY, maxAniso);
 
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*)image);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid*)image);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
 		glBindTexture(GL_TEXTURE_2D, 0);
@@ -50,8 +51,8 @@ namespace Resource {
 		}
 	}
 
-	void Texture::Bind() const {
-		glActiveTexture(GL_TEXTURE0);
+	void Texture::Bind(GLuint loc) const {
+		glActiveTexture(GL_TEXTURE0 + loc);
 		glBindTexture(GL_TEXTURE_2D, handle);
 		//glUniform1i(GL_TEXTURE0, 0);
 	}

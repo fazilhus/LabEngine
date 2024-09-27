@@ -4,11 +4,20 @@
 namespace Resource {
 
 	Material::Material()
-		: ambient(Math::vec3(0.1f)), diffuse(Math::vec3(0.8f)), specular(Math::vec3(0.9f)), shininess(32.0f) {
+		: diffuse(), specular(), shininess(32.0f) {
 	}
 
-	Material::Material(Math::vec3 amb, Math::vec3 diff, Math::vec3 spec, float32 shin)
-		: ambient(amb), diffuse(diff), specular(spec), shininess(shin) {
+	Material::Material(std::shared_ptr<Resource::Texture> diff, std::shared_ptr<Resource::Texture> spec, float32 shin)
+		: diffuse(diff), specular(spec), shininess(shin) {
+	}
+
+	void Material::Use(Shader& shader) {
+		shader.UploadUniform1i("material.diffuse", 0);
+		diffuse->Bind(0);
+		shader.UploadUniform1i("material.specular", 1);
+		specular->Bind(1);
+
+		shader.UploadUniform1f("material.shininess", shininess);
 	}
 
 } // Resource

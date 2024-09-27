@@ -6,10 +6,8 @@ namespace Resource {
 	GraphicsNode::GraphicsNode() {
 	}
 
-	GraphicsNode::GraphicsNode(const std::string& meshPath, const std::string& texPath,
+	GraphicsNode::GraphicsNode(const std::string& meshPath,
 		const std::string& vsPath, const std::string& fsPath) {
-		texture = std::make_shared<Texture>(texPath);
-
 		MeshBuilder mb{ meshPath };
 		mesh = std::make_shared<Mesh>(mb.CreateMesh());
 
@@ -19,7 +17,7 @@ namespace Resource {
 	}
 
 	GraphicsNode::GraphicsNode(const GraphicsNode& other)
-		: texture(other.texture), mesh(other.mesh), material(other.material), shader(other.shader) {
+		: mesh(other.mesh), material(other.material), shader(other.shader) {
 	}
 
 	GraphicsNode::~GraphicsNode() {
@@ -27,16 +25,12 @@ namespace Resource {
 
 	void GraphicsNode::DeInit() {
 		mesh->DeInit();
-		texture->Unload();
+		
 		shader->Cleanup();
 	}
 
 	void GraphicsNode::SetMesh(std::shared_ptr<Mesh> meshPtr) {
 		mesh = meshPtr;
-	}
-
-	void GraphicsNode::SetTexture(std::shared_ptr<Texture> texPtr) {
-		texture = texPtr;
 	}
 
 	void GraphicsNode::SetMaterial(std::shared_ptr<Material> matPtr) {
@@ -48,19 +42,19 @@ namespace Resource {
 	}
 
 	void GraphicsNode::Draw(const Render::Camera& cam) const {
-		shader->Use();
-		shader->SetLights();
+		//shader->Use();
 
-		shader->UploadUniform3fv("material.ambient", material->GetAmbient());
-		shader->UploadUniform3fv("material.diffuse", material->GetDiffuse());
-		shader->UploadUniform3fv("material.specular", material->GetSpecular());
-		shader->UploadUniform1f("material.shininess", material->GetShininess());
+		//shader->UploadUniform3fv("material.ambient", material->GetAmbient());
+		//shader->UploadUniform3fv("material.diffuse", material->GetDiffuse());
+		//shader->UploadUniform3fv("material.specular", material->GetSpecular());
+		//shader->UploadUniform1f("material.shininess", material->GetShininess());
+		material->Use(*shader);
 		shader->UploadUniformMat4fv("transform", transform);
 		shader->UploadUniformMat4fv("view", cam.GetView());
 		shader->UploadUniformMat4fv("perspective", cam.GetPerspective());
 		shader->UploadUniform3fv("cam_pos", cam.GetCameraPos());
 
-		mesh->Draw(*texture.get());
+		mesh->Draw();
 	}
 
 } // Resource

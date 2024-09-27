@@ -34,10 +34,10 @@ namespace Utils {
 		std::vector<std::streamoff> norm_lines;
 		std::vector<std::streamoff> uv_lines;
 
-		while (std::getline(in, line)) {
+		/*while (std::getline(in, line)) {
 			if (FirstToken(line) == "o") break;
 		}
-		auto data_pos = in.tellg();
+		auto data_pos = in.tellg();*/
 
 		while (!in.eof()) {
 			auto fpos = in.tellg();
