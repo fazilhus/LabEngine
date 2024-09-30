@@ -63,6 +63,14 @@ namespace Resource {
 		glUniformMatrix4fv(loc, 1, GL_FALSE, &m[0].x);
 	}
 
+	void Shader::Recompile(const std::string& vsPath, const std::string& fsPath) {
+		Cleanup();
+		ReadSource(vsPath, vsSrc);
+		ReadSource(fsPath, fsSrc);
+
+		CompileAndLink();
+	}
+
 	void Shader::ReadSource(const std::string& path, std::string& dst) {
 		dst.clear();
 		std::ifstream in(path, std::ios::in, std::ios::binary);

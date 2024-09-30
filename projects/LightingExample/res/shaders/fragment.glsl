@@ -21,7 +21,7 @@ struct DirectionalLight {
 
 uniform DirectionalLight dlight;
 
-#define MAX_NUM_LIGHT_SOURCES 4
+#define MAX_NUM_LIGHT_SOURCES 64
 
 struct PointLight {
 	vec3 pos;
@@ -79,6 +79,8 @@ void main()
 		tempCol += CalcSpotLight(slights[i], norm, cam_dir, iPos);
 	}
 
+	float gamma = 0.9;
+	tempCol = pow(tempCol, vec3(1.0 / gamma));
 	oColor = vec4(tempCol, 1.0);
 }
 

@@ -16,6 +16,8 @@ namespace Resource {
 		GLuint vHandle;
 		GLuint fHandle;
 
+		std::string vsSrcPath;
+		std::string fsSrcPath;
 		std::string vsSrc;
 		std::string fsSrc;
 
@@ -38,6 +40,8 @@ namespace Resource {
 		void UploadUniform3fv(const std::string& name, const Math::vec3& v);
 		void UploadUniform4fv(const std::string& name, const Math::vec4& v);
 		void UploadUniformMat4fv(const std::string& name, const Math::mat4& m);
+
+		void Recompile(const std::string& vsPath, const std::string& fsPath);
 
 	private:
 		void ReadSource(const std::string& path, std::string& dst);

@@ -74,12 +74,24 @@ namespace Example {
 				"../projects/LightingExample/res/textures/cat_spec.tga", 1);
 			auto catMat = std::make_shared<Resource::Material>(catDiffTex, catSpecTex, 4.0f);
 
+			auto boxDiffTex = std::make_shared<Resource::Texture>(
+				"../projects/LightingExample/res/textures/container2.png", 1);
+			auto boxSpecTex = std::make_shared<Resource::Texture>(
+				"../projects/LightingExample/res/textures/container2_specular.png", 1);
+			auto boxMat = std::make_shared<Resource::Material>(boxDiffTex, boxSpecTex, 32.0f);
+
 			Resource::MeshBuilder meshBuilder{ "../projects/LightingExample/res/meshes/cat.obj" };
 			auto catMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh());
 
-			auto shader = std::make_shared<Resource::Shader>(
+			meshBuilder.ReadMeshData("../projects/LightingExample/res/meshes/cube.obj");
+			auto cubeMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh());
+
+			shader = std::make_shared<Resource::Shader>(
 				"../projects/LightingExample/res/shaders/vertex.glsl",
 				"../projects/LightingExample/res/shaders/fragment.glsl");
+			lsrcShader = std::make_shared<Resource::Shader>(
+				"../projects/LightingExample/res/shaders/lightVert.glsl",
+				"../projects/LightingExample/res/shaders/lightFrag.glsl");
 
 			this->obj1 = Resource::GraphicsNode();
 			this->obj1.SetMaterial(catMat);
@@ -87,19 +99,36 @@ namespace Example {
 			this->obj1.SetShader(shader);
 			this->obj1.transform *= Math::translate({1, 0, 1});
 
+			this->obj2 = Resource::GraphicsNode();
+			this->obj2.SetMaterial(boxMat);
+			this->obj2.SetMesh(cubeMesh);
+			this->obj2.SetShader(shader);
+			this->obj2.transform *= Math::scale(0.5f);
+			this->obj2.transform *= Math::translate({ 0, 0, 2 });
+
+			lm.SetShader(lsrcShader);
+			lm.SetMesh(cubeMesh);
 
 			Render::DirectionalLight dl;
 			dl.SetAmbient(Math::vec3(0.01f));
+			dl.SetDiffuse(Math::vec3(0.1f));
+			dl.SetSpecular(Math::vec3(0.4f));
 			lm.SetGlobalLight(dl);
 
 			Render::PointLight pl;
 			pl.SetPos({ 0.0f, 0.0f, 10.0f });
+			pl.SetAmbient(Math::vec3({0.05f, 0.0f, 0.05f}));
+			pl.SetDiffuse(Math::vec3({0.2f, 0.0f, 0.2f}));
+			pl.SetSpecular(Math::vec3({0.5f, 0.0f, 0.5f}));
 			pl.SetAttenuation({ 1.0f, 0.022f, 0.019f });
 			lm.PushPointLight(pl);
 
 			Render::SpotLight sl;
-			sl.SetPos({ 10.0f, 2.0f, 0.0f });
+			sl.SetPos({ 2.5f, 2.5f, 2.5f });
 			sl.SetDirection(sl.GetPos() - Math::vec3{ 0.0f, 0.0f, 0.0f });
+			sl.SetAmbient(Math::vec3({ 0.0f, 0.05f, 0.05f }));
+			sl.SetDiffuse(Math::vec3({ 0.0f, 0.2f, 0.2f }));
+			sl.SetSpecular(Math::vec3({ 0.0f, 0.5f, 0.5f }));
 			sl.SetCutoffAngle(Math::toRad(15.0f));
 			sl.SetOuterCutoffAngle(Math::toRad(20.0f));
 			sl.SetAttenuation({ 1.0f, 0.09f, 0.032f });
@@ -127,6 +156,7 @@ namespace Example {
 		glEnable(GL_CULL_FACE);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glEnable(GL_FRAMEBUFFER_SRGB);
 
 		float angle = 0.0f;
 
@@ -136,16 +166,18 @@ namespace Example {
 			HandleInput();
 
 			angle += dt;
-			//auto& slight = this->lm.GetSpotLights()[0];
-			//slight.SetPos({cosf(angle) * 10.0f, 2.0f, sinf(angle) * 10.0f});
+			auto& slight = this->lm.GetPointLights()[0];
+			slight.SetPos({cosf(angle) * 5.0f, 0.0f, sinf(angle) * 5.0f});
 			//slight.SetDirection(slight.GetPos() - Math::vec3{0.0f, 0.0f, 0.0f});
 
 			this->obj1.GetShader().Use();
 			lm.SetLightUniforms(this->obj1.GetShader());
 
 			this->obj1.Draw(*camera);
-			//this->obj2.Draw(*camera);
+			this->obj2.Draw(*camera);
 			//this->obj3.Draw(*camera);
+
+			lm.DrawLightSources(*camera);
 
 			// transfer new frame to window
 			this->window->SwapBuffers();
@@ -167,8 +199,19 @@ namespace Example {
 
 	void ImGuiExampleApp::HandleInput() {
 		using namespace Input;
-		if (InputManager::IsKeyPressed(Key::Escape)) {
+		if (InputManager::IsKeyPressed(Key::Escape))
+		{
 			this->window->Close();
+		}
+
+		if (InputManager::IsKeyPressed(Key::LeftControl) && InputManager::IsKeyPressed(Key::R))
+		{
+			shader->Recompile(
+				"../projects/LightingExample/res/shaders/vertex.glsl",
+				"../projects/LightingExample/res/shaders/fragment.glsl");
+			lsrcShader->Recompile(
+				"../projects/LightingExample/res/shaders/lightVert.glsl",
+				"../projects/LightingExample/res/shaders/lightFrag.glsl");
 		}
 
 		this->camera->UpdateCamera(dt);

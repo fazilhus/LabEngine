@@ -103,4 +103,31 @@ namespace Render {
 		shader.UploadUniform1i("slights_count", spotLightsCount);
 	}
 
+	void LightManager::DrawLightSources(const Render::Camera& cam) const {
+		this->shader->Use();
+
+		shader->UploadUniformMat4fv("view", cam.GetView());
+		shader->UploadUniformMat4fv("perspective", cam.GetPerspective());
+
+		for (std::size_t i = 0; i < pointLightsCount; ++i) {
+			auto transform = Math::translate(pointLights[i].GetPos()) * Math::scale(0.1f);
+			shader->UploadUniformMat4fv("transform", transform);
+			shader->UploadUniform3fv("light.ambient", pointLights[i].GetAmbient());
+			shader->UploadUniform3fv("light.diffuse", pointLights[i].GetDiffuse());
+			shader->UploadUniform3fv("light.specular", pointLights[i].GetSpecular());
+
+			mesh->Draw();
+		}
+
+		for (std::size_t i = 0; i < spotLightsCount; ++i) {
+			auto transform = Math::translate(spotLights[i].GetPos()) * Math::scale(0.1f);
+			shader->UploadUniformMat4fv("transform", transform);
+			shader->UploadUniform3fv("light.ambient", spotLights[i].GetAmbient());
+			shader->UploadUniform3fv("light.diffuse", spotLights[i].GetDiffuse());
+			shader->UploadUniform3fv("light.specular", spotLights[i].GetSpecular());
+
+			mesh->Draw();
+		}
+	}
+
 } // Render

@@ -2,8 +2,12 @@
 
 #include "math/vec3.h"
 #include "render/shader.h"
+#include "render/mesh.h"
+#include "render/camera.h"
 
 #include <vector>
+#include <memory>
+
 
 
 namespace Render {
@@ -51,7 +55,9 @@ namespace Render {
 	private:
 		Math::vec3 pos;
 
-		Math::vec3 attenuation; 
+		Math::vec3 attenuation;
+
+		std::shared_ptr<Resource::Mesh> mesh;
 
 	public:
 		PointLight();
@@ -81,7 +87,6 @@ namespace Render {
 		SpotLight();
 		SpotLight(const Math::vec3& pos, const Math::vec3& dir, float32 cutoff, float32 ocutoff, const Math::vec3& a,
 			const Math::vec3& d, const Math::vec3& s, const Math::vec3& attenuation);
-		~SpotLight() = default;
 
 		void SetPos(const Math::vec3& pos) { this->pos = pos; }
 		void SetDirection(const Math::vec3& dir) { this->dir = dir; }
@@ -101,7 +106,7 @@ namespace Render {
 		Math::vec3& GetAttenuation() { return attenuation; }
 	};
 
-	constexpr int MAX_NUM_LIGHT_SOURCES = 4;
+	constexpr int MAX_NUM_LIGHT_SOURCES = 64;
 
 	class LightManager {
 	private:
@@ -111,9 +116,14 @@ namespace Render {
 		std::vector<SpotLight> spotLights;
 		std::size_t spotLightsCount;
 
+		std::shared_ptr<Resource::Shader> shader;
+		std::shared_ptr<Resource::Mesh> mesh;
+
 	public:
 		LightManager();
-		~LightManager() = default;
+
+		void SetShader(const std::shared_ptr<Resource::Shader>& s) { this->shader = s; }
+		void SetMesh(const std::shared_ptr<Resource::Mesh>& m) { this->mesh = m; }
 
 		DirectionalLight& GetGlobalLight() { return globalLight; }
 		const DirectionalLight& GetGlobalLight() const { return globalLight; }
@@ -128,6 +138,8 @@ namespace Render {
 		void PushSpotLight(const SpotLight& sl);
 
 		void SetLightUniforms(Resource::Shader& shader);
+
+		void DrawLightSources(const Render::Camera& cam) const;
 	};
 
 } // Render
