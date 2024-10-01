@@ -2,6 +2,7 @@
 #include "meshDataParser.h"
 
 #include <fstream>
+#include <sstream>
 #include <iostream>
 #include <cstdio>
 #include <unordered_map>
@@ -28,6 +29,9 @@ namespace Utils {
 			return;
 		}
 
+		std::stringstream contents;
+    	contents << in.rdbuf();
+
 		OBJMeshData data{};
 
         std::vector<std::string> fbuff;
@@ -44,9 +48,9 @@ namespace Utils {
 		}
 		auto data_pos = in.tellg();*/
 
-		while (!in.eof()) {
-			auto fpos = in.tellg();
-			std::getline(in, line);
+		while (!contents.eof()) {
+			auto fpos = contents.tellg();
+			std::getline(contents, line);
 			auto token = FirstToken(line);
 			if (token == "v") {
 				pos_lines.push_back(fpos);
@@ -64,8 +68,8 @@ namespace Utils {
 		std::unordered_map<std::string, unsigned int> map;
 
 		Face face = Face::triangle;
-		auto pos = in.tellg();
-		std::getline(in, line);
+		auto pos = contents.tellg();
+		std::getline(contents, line);
 		fbuff.clear();
 		Split(Tail(line), fbuff);
 		if (fbuff.size() == 3) {
@@ -77,8 +81,8 @@ namespace Utils {
 			return;
 		}
 
-		in.seekg(pos);
-		while (std::getline(in, line)) {
+		contents.seekg(pos);
+		while (std::getline(contents, line)) {
 			auto token = FirstToken(line);
 			if (token == "f") {
 				fbuff.clear();
@@ -96,25 +100,25 @@ namespace Utils {
 						uvi[i]--;
 						normi[i]--;
 
-						auto curr_pos = in.tellg();
+						auto curr_pos = contents.tellg();
 
 						vdata.push_back({});
-						in.seekg(pos_lines[posi[i]], in.beg);
-						std::getline(in, line);
+						contents.seekg(pos_lines[posi[i]], contents.beg);
+						std::getline(contents, line);
 						Split(Tail(line), vbuff);
 						for (std::size_t j = 0; j < 3; ++j) {
 							vdata.back().pos[j] = std::stof(vbuff[j]);
 						}
 
-						in.seekg(uv_lines[uvi[i]], in.beg);
-						std::getline(in, line);
+						contents.seekg(uv_lines[uvi[i]], contents.beg);
+						std::getline(contents, line);
 						Split(Tail(line), vbuff);
 						for (std::size_t j = 0; j < 2; ++j) {
 							vdata.back().uv[j] = std::stof(vbuff[j]);
 						}
 
-						in.seekg(norm_lines[normi[i]], in.beg);
-						std::getline(in, line);
+						contents.seekg(norm_lines[normi[i]], contents.beg);
+						std::getline(contents, line);
 						Split(Tail(line), vbuff);
 						for (std::size_t j = 0; j < 3; ++j) {
 							vdata.back().norm[j] = std::stof(vbuff[j]);
@@ -122,7 +126,7 @@ namespace Utils {
 						map[fbuff[i]] = vertex_count;
 						vertex_count++;
 
-						in.seekg(curr_pos, in.beg);
+						contents.seekg(curr_pos, in.beg);
 					}
 				}
 

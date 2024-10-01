@@ -228,7 +228,7 @@ Window::Open()
 		return false;
 	}
 	glfwMakeContextCurrent(this->window);
-	//glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	if (nullptr != this->window && WindowCount == 0)
 	{
