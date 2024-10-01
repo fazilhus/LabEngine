@@ -94,37 +94,32 @@ namespace Utils {
 					return;
 				}
 				
-				std::vector<unsigned int> posi(fbuff.size()), normi(fbuff.size()), uvi(fbuff.size());
+				unsigned int posi[4], normi[4], uvi[4];
 				for (std::size_t i = 0; i < fbuff.size(); ++i) {
 					if (map.find(fbuff[i]) == map.end()) {
-						auto res = std::sscanf(fbuff[i].c_str(), "%u/%u/%u", &posi[i], &uvi[i], &normi[i]);
+						sscanf_s(fbuff[i].c_str(), "%u/%u/%u", &posi[i], &uvi[i], &normi[i]);
 						posi[i]--;
 						uvi[i]--;
 						normi[i]--;
 
 						auto curr_pos = contents.tellg();
 
-						vdata.push_back({});
+						Math::vec3 p;
 						contents.seekg(pos_lines[posi[i]], contents.beg);
 						std::getline(contents, line);
-						Split(Tail(line), vbuff);
-						for (std::size_t j = 0; j < 3; ++j) {
-							vdata.back().pos[j] = std::stof(vbuff[j]);
-						}
+						sscanf_s(line.c_str(), "%f %f %f", p[0], p[1], p[2]);
 
+						Math::vec2 u;
 						contents.seekg(uv_lines[uvi[i]], contents.beg);
 						std::getline(contents, line);
-						Split(Tail(line), vbuff);
-						for (std::size_t j = 0; j < 2; ++j) {
-							vdata.back().uv[j] = std::stof(vbuff[j]);
-						}
+						sscanf_s(line.c_str(), "%f %f", u[0], u[1]);
 
+						Math::vec3 n;
 						contents.seekg(norm_lines[normi[i]], contents.beg);
 						std::getline(contents, line);
-						Split(Tail(line), vbuff);
-						for (std::size_t j = 0; j < 3; ++j) {
-							vdata.back().norm[j] = std::stof(vbuff[j]);
-						}
+						sscanf_s(line.c_str(), "%f %f %f", n[0], n[1], n[2]);
+						
+						vdata.push_back({p, n, u});
 						map[fbuff[i]] = vertex_count;
 						vertex_count++;
 

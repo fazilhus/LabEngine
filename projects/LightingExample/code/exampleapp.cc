@@ -80,14 +80,14 @@ namespace Example {
 				"../projects/LightingExample/res/textures/container2_specular.png", 1);
 			auto boxMat = std::make_shared<Resource::Material>(boxDiffTex, boxSpecTex, 32.0f);
 
-			Resource::MeshBuilder meshBuilder{ "../projects/LightingExample/res/meshes/dragon.obj" };
-			auto catMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh());
-
-			meshBuilder.ReadMeshData("../projects/LightingExample/res/meshes/cube.obj");
+			Resource::MeshBuilder meshBuilder{ "../projects/LightingExample/res/meshes/cube.obj" };
 			auto cubeMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh());
 
 			meshBuilder.ReadMeshData("../projects/LightingExample/res/meshes/cube_quad.obj");
 			auto cubeQuadMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh());
+
+			meshBuilder.ReadMeshData("../projects/LightingExample/res/meshes/dragon.obj");
+			auto catMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh());
 
 			shader = std::make_shared<Resource::Shader>(
 				"../projects/LightingExample/res/shaders/vertex.glsl",
