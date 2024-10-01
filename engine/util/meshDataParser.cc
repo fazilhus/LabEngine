@@ -7,6 +7,11 @@
 #include <unordered_map>
 
 namespace Utils {
+
+	enum class Face {
+		triangle = 0,
+		quad,
+	};
     
     void MeshDataParser::ParseOBJ(
 		const std::string& path,
@@ -58,17 +63,32 @@ namespace Utils {
 		std::size_t vertex_count = 0;
 		std::unordered_map<std::string, unsigned int> map;
 
+		Face face = Face::triangle;
+		auto pos = in.tellg();
+		std::getline(in, line);
+		fbuff.clear();
+		Split(Tail(line), fbuff);
+		if (fbuff.size() == 3) {
+			face = Face::triangle;
+		} else if (fbuff.size() == 4) {
+			face = Face::quad;
+		} else {
+			std::cerr << "[ERROR] corrupted OBJ file: face should have 3 or 4 values\n";
+			return;
+		}
+
+		in.seekg(pos);
 		while (std::getline(in, line)) {
 			auto token = FirstToken(line);
 			if (token == "f") {
 				fbuff.clear();
 				Split(Tail(line), fbuff);
-				if (fbuff.size() != 3) {
-					std::cerr << "[ERROR] corrupted OBJ file: face should have 3 values\n";
+				if (fbuff.size() != 3 && fbuff.size() != 4) {
+					std::cerr << "[ERROR] corrupted OBJ file: face should have 3 or 4 values\n";
 					return;
 				}
 				
-				unsigned int posi[3], normi[3], uvi[3];
+				std::vector<unsigned int> posi(fbuff.size()), normi(fbuff.size()), uvi(fbuff.size());
 				for (std::size_t i = 0; i < fbuff.size(); ++i) {
 					if (map.find(fbuff[i]) == map.end()) {
 						auto res = std::sscanf(fbuff[i].c_str(), "%u/%u/%u", &posi[i], &uvi[i], &normi[i]);
@@ -100,13 +120,27 @@ namespace Utils {
 							vdata.back().norm[j] = std::stof(vbuff[j]);
 						}
 						map[fbuff[i]] = vertex_count;
-						idata.push_back(vertex_count);
 						vertex_count++;
 
 						in.seekg(curr_pos, in.beg);
 					}
-					else {
-						idata.push_back(map[fbuff[i]]);
+				}
+
+				switch (face) {
+				case Face::triangle: {
+						idata.push_back(map[fbuff[0]]);
+						idata.push_back(map[fbuff[1]]);
+						idata.push_back(map[fbuff[2]]);
+						break;
+					}
+				case Face::quad: {
+						idata.push_back(map[fbuff[0]]);
+						idata.push_back(map[fbuff[1]]);
+						idata.push_back(map[fbuff[2]]);
+						idata.push_back(map[fbuff[2]]);
+						idata.push_back(map[fbuff[3]]);
+						idata.push_back(map[fbuff[0]]);
+						break;
 					}
 				}
 			}

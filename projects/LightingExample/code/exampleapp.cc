@@ -86,6 +86,9 @@ namespace Example {
 			meshBuilder.ReadMeshData("../projects/LightingExample/res/meshes/cube.obj");
 			auto cubeMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh());
 
+			meshBuilder.ReadMeshData("../projects/LightingExample/res/meshes/cube_quad.obj");
+			auto cubeQuadMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh());
+
 			shader = std::make_shared<Resource::Shader>(
 				"../projects/LightingExample/res/shaders/vertex.glsl",
 				"../projects/LightingExample/res/shaders/fragment.glsl");
@@ -101,7 +104,7 @@ namespace Example {
 
 			this->obj2 = Resource::GraphicsNode();
 			this->obj2.SetMaterial(boxMat);
-			this->obj2.SetMesh(cubeMesh);
+			this->obj2.SetMesh(cubeQuadMesh);
 			this->obj2.SetShader(shader);
 			this->obj2.transform *= Math::scale(0.5f);
 			this->obj2.transform *= Math::translate({ 0, 0, 2 });
