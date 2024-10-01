@@ -107,17 +107,17 @@ namespace Utils {
 						Math::vec3 p;
 						contents.seekg(pos_lines[posi[i]], contents.beg);
 						std::getline(contents, line);
-						sscanf_s(line.c_str(), "%f %f %f", p[0], p[1], p[2]);
+						sscanf_s(line.c_str(), "v %f %f %f", &p[0], &p[1], &p[2]);
 
 						Math::vec2 u;
 						contents.seekg(uv_lines[uvi[i]], contents.beg);
 						std::getline(contents, line);
-						sscanf_s(line.c_str(), "%f %f", u[0], u[1]);
+						sscanf_s(line.c_str(), "vt %f %f", &u[0], &u[1]);
 
 						Math::vec3 n;
 						contents.seekg(norm_lines[normi[i]], contents.beg);
 						std::getline(contents, line);
-						sscanf_s(line.c_str(), "%f %f %f", n[0], n[1], n[2]);
+						sscanf_s(line.c_str(), "vn %f %f %f", &n[0], &n[1], &n[2]);
 						
 						vdata.push_back({p, n, u});
 						map[fbuff[i]] = vertex_count;
