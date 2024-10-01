@@ -66,6 +66,8 @@ namespace Utils {
 
 		std::size_t vertex_count = 0;
 		std::unordered_map<std::string, unsigned int> map;
+		vdata.reserve(pos_lines.size() + norm_lines.size() + uv_lines.size());
+		idata.reserve(pos_lines.size() + norm_lines.size() + uv_lines.size());
 
 		Face face = Face::triangle;
 		auto pos = contents.tellg();
