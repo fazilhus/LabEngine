@@ -26,6 +26,7 @@ namespace Resource {
 
 	void Mesh::Init(GLfloat* vb, GLuint* ib, const std::size_t* sizes, const std::size_t* offsets,
 		const std::size_t verticies, const std::size_t triangles, const std::size_t count) {
+		// TODO maybe split the vertex data buffer into separate buffers (e.g pos, norm and uv buffers)
 		glGenVertexArrays(1, &this->vao);
 		glBindVertexArray(this->vao);
 
