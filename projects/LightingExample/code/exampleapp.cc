@@ -80,7 +80,7 @@ namespace Example {
 				"../projects/LightingExample/res/textures/container2_specular.png", 1);
 			auto boxMat = std::make_shared<Resource::Material>(boxDiffTex, boxSpecTex, 32.0f);
 
-			Resource::MeshBuilder meshBuilder{ "../projects/LightingExample/res/meshes/cat.obj" };
+			Resource::MeshBuilder meshBuilder{ "../projects/LightingExample/res/meshes/dragon.obj" };
 			auto catMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh());
 
 			meshBuilder.ReadMeshData("../projects/LightingExample/res/meshes/cube.obj");
