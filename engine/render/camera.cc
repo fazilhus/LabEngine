@@ -45,11 +45,11 @@ namespace Render {
 			auto md = InputManager::GetMouseDeltaPos();
 			yaw += sens * md.x * dt;
 			pitch -= sens * md.y * dt;
-			if (pitch > PI_OVER_TWO) {
-				pitch = PI_OVER_TWO - 0.0001f;
+			if (pitch > Math::PI_OVER_TWO) {
+				pitch = Math::PI_OVER_TWO - 0.0001f;
 			}
-			else if (pitch < -PI_OVER_TWO) {
-				pitch = -PI_OVER_TWO + 0.0001f;
+			else if (pitch < -Math::PI_OVER_TWO) {
+				pitch = -Math::PI_OVER_TWO + 0.0001f;
 			}
 		}
 		UpdateView();
