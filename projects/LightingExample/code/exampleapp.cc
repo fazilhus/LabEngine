@@ -72,7 +72,7 @@ namespace Example {
 				"../projects/LightingExample/res/textures/cat_diff.tga", 1);
 			auto catSpecTex = std::make_shared<Resource::Texture>(
 				"../projects/LightingExample/res/textures/cat_spec.tga", 1);
-			auto catMat = std::make_shared<Resource::Material>(catDiffTex, catSpecTex, 4.0f);
+			auto catMat = std::make_shared<Resource::Material>(catDiffTex, catSpecTex, 16.0f);
 
 			auto boxDiffTex = std::make_shared<Resource::Texture>(
 				"../projects/LightingExample/res/textures/container2.png", 1);
@@ -86,7 +86,7 @@ namespace Example {
 			meshBuilder.ReadMeshData("../projects/LightingExample/res/meshes/cube_quad.obj");
 			auto cubeQuadMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh());
 
-			meshBuilder.ReadMeshData("../projects/LightingExample/res/meshes/dragon.obj");
+			meshBuilder.ReadMeshData("../projects/LightingExample/res/meshes/cat.obj");
 			auto catMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh());
 
 			shader = std::make_shared<Resource::Shader>(

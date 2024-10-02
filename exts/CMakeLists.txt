@@ -26,10 +26,9 @@ ADD_LIBRARY(imgui STATIC imgui/imgui.cpp imgui/imgui_demo.cpp imgui/imgui_draw.c
 TARGET_LINK_LIBRARIES(imgui PUBLIC exts)
 TARGET_INCLUDE_DIRECTORIES(imgui PUBLIC imgui imgui/examples/opengl3_example)
 SET_TARGET_PROPERTIES(imgui PROPERTIES FOLDER "exts/imgui")
-
 TARGET_LINK_LIBRARIES(exts INTERFACE imgui)
 
-ADD_LIBRARY(stb_image STATIC stb/stb_image.h)
-TARGET_LINK_LIBRARIES(stb_image PUBLIC exts)
-TARGET_INCLUDE_DIRECTORIES(stb_image PUBLIC stb_image stb)
+ADD_LIBRARY(stb_image STATIC stb/stb_image.h stb/stb_image.c)
+TARGET_INCLUDE_DIRECTORIES(exts INTERFACE stb)
 SET_TARGET_PROPERTIES(stb_image PROPERTIES FOLDER "exts/stb")
+TARGET_LINK_LIBRARIES(exts INTERFACE stb_image)
