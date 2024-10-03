@@ -8,14 +8,14 @@
 
 #include "math/vec2.h"
 #include "math/vec3.h"
-#include "texture.h"
+#include "material.h"
 
 namespace Resource {
 
 	struct PrimitiveGroup {
 		std::size_t indices;
 		std::size_t offset;
-		//std::shared_ptr<Texture> tex;
+		std::weak_ptr<Material> mat;
 	};
 
 	class Mesh {
@@ -38,12 +38,9 @@ namespace Resource {
 		void DeInit();
 
 		void Draw() const;
-		void Draw(const Texture& tex, std::size_t i) const;
+		void DrawGroup(std::size_t i) const;
 
 		void PushPrimitive(PrimitiveGroup group);
-
-		static Mesh CreateQuadMesh(const float width = 1.0f, const float height = 1.0f);
-		static Mesh CreateCubeMesh(const float width = 1.0f, const float height = 1.0f, const float depth = 1.0f);
 
 	private:
 		void Bind() const;
@@ -66,7 +63,7 @@ namespace Resource {
 		~MeshBuilder() = default;
 
 		void ReadMeshData(const std::string& path);
-		Mesh CreateMesh() const;
+		Mesh CreateMesh(const std::shared_ptr<Resource::Material>& mat) const;
 	};
 
 } // Resource

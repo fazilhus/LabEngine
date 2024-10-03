@@ -3,6 +3,7 @@
 #include "GL/glew.h"
 #include <string>
 #include <unordered_map>
+#include <memory>
 
 #include "math/vec3.h"
 #include "math/vec4.h"
@@ -11,7 +12,6 @@
 namespace Resource {
 
 	class Shader {
-	private:
 		GLuint handle;
 		GLuint vHandle;
 		GLuint fHandle;
@@ -31,9 +31,9 @@ namespace Resource {
 
 		void Use() const;
 
-		inline GLuint GetHandle() const { return handle; }
-		inline std::string& GetVSSrc() { return vsSrc; }
-		inline std::string& GetFSSrc() { return fsSrc; }
+		GLuint GetHandle() const { return handle; }
+		std::string& GetVSSrc() { return vsSrc; }
+		std::string& GetFSSrc() { return fsSrc; }
 
 		void UploadUniform1i(const std::string& name, GLint v);
 		void UploadUniform1f(const std::string& name, float32 v);
@@ -41,7 +41,7 @@ namespace Resource {
 		void UploadUniform4fv(const std::string& name, const Math::vec4& v);
 		void UploadUniformMat4fv(const std::string& name, const Math::mat4& m);
 
-		void Recompile(const std::string& vsPath, const std::string& fsPath);
+		void Recompile();
 
 	private:
 		void ReadSource(const std::string& path, std::string& dst);
@@ -49,6 +49,25 @@ namespace Resource {
 		
 
 		GLuint GetOrUpdateUniformLoc(const std::string& name);
+	};
+
+	class ShaderManager {
+		std::unordered_map<std::string, std::shared_ptr<Shader>> shaders;
+
+	public:
+		ShaderManager() = default;
+		ShaderManager(const ShaderManager&) = delete;
+		ShaderManager(ShaderManager&&) = delete;
+		~ShaderManager() = default;
+
+		ShaderManager& operator=(const ShaderManager&) = delete;
+		ShaderManager& operator=(ShaderManager&&) = delete;
+
+		void NewShader(const std::string& name, const std::string& vsPath, const std::string& fsPath);
+		std::weak_ptr<Shader> GetShader(const std::string& name) const;
+
+		void RecompileAll();
+		void Recompile(const std::string& name);
 	};
 
 } // Resource

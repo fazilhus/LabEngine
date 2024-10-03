@@ -3,15 +3,16 @@
 
 #include <fstream>
 #include <iostream>
+#include <ranges>
 
 #include "math/math.h"
 
 namespace Resource {
 
 	Shader::Shader(const std::string& vsPath, const std::string& fsPath)
-		: handle(0), vHandle(0), fHandle(0) {
-		ReadSource(vsPath, vsSrc);
-		ReadSource(fsPath, fsSrc);
+		: handle(0), vHandle(0), fHandle(0), vsSrcPath(vsPath), fsSrcPath(fsPath) {
+		ReadSource(vsSrcPath, vsSrc);
+		ReadSource(fsSrcPath, fsSrc);
 
 		CompileAndLink();
 	}
@@ -63,10 +64,10 @@ namespace Resource {
 		glUniformMatrix4fv(loc, 1, GL_FALSE, &m[0].x);
 	}
 
-	void Shader::Recompile(const std::string& vsPath, const std::string& fsPath) {
+	void Shader::Recompile() {
 		Cleanup();
-		ReadSource(vsPath, vsSrc);
-		ReadSource(fsPath, fsSrc);
+		ReadSource(vsSrcPath, vsSrc);
+		ReadSource(fsSrcPath, fsSrc);
 
 		CompileAndLink();
 	}
@@ -82,7 +83,7 @@ namespace Resource {
 		in.seekg(0, std::ios::end);
 		dst.resize(in.tellg());
 		in.seekg(0, std::ios::beg);
-		in.read(&dst[0], dst.size());
+		in.read(dst.data(), dst.size());
 		in.close();
 	}
 
@@ -144,14 +145,44 @@ namespace Resource {
 	}
 
 	GLuint Shader::GetOrUpdateUniformLoc(const std::string& name) {
-		//std::cout << "Uniform name " << name;
 		if (!uniformLoc.contains(name)) {
-		//if (uniformLoc.find(name) == uniformLoc.end()) {
-			//std::cout << " new";
 			uniformLoc[name] = glGetUniformLocation(handle, name.c_str());
 		}
-		//std::cout << " at " << uniformLoc[name] << '\n';
 		return uniformLoc[name];
+	}
+
+	void ShaderManager::NewShader(const std::string& name, const std::string& vsPath, const std::string& fsPath) {
+		if (shaders.contains(name)) {
+			std::cerr << "[WARNING] Overwriting existing shader " << name << '\n';
+			shaders[name]->Cleanup();
+			shaders[name].reset();
+		}
+
+		shaders[name] = std::make_shared<Resource::Shader>(vsPath, fsPath);
+	}
+
+	std::weak_ptr<Shader> ShaderManager::GetShader(const std::string& name) const {
+		if (!shaders.contains(name)) {
+			std::cerr << "[ERROR] Trying to access nonexistent shader " << name << '\n';
+			return {};
+		}
+
+		return shaders.at(name);
+	}
+
+	void ShaderManager::RecompileAll() {
+		for (auto& shader : shaders | std::views::values) {
+			shader->Recompile();
+		}
+	}
+
+	void ShaderManager::Recompile(const std::string& name) {
+		if (!shaders.contains(name)) {
+			std::cerr << "[ERROR] Trying to recompile nonexistent shader " << name << '\n';
+			return;
+		}
+
+		shaders[name]->Recompile();
 	}
 
 } // Resource

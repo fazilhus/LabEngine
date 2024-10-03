@@ -22,9 +22,7 @@ namespace Resource {
 		std::shared_ptr<Shader> shader;
 
 	public:
-		GraphicsNode();
-		GraphicsNode(const std::string& meshPath,
-			const std::string& vsPath, const std::string& fsPath);
+		GraphicsNode() = default;
 		GraphicsNode(const GraphicsNode& other);
 		~GraphicsNode();
 
@@ -34,13 +32,13 @@ namespace Resource {
 		void SetMaterial(std::shared_ptr<Material> matPtr);
 		void SetShader(std::shared_ptr<Shader> shaderPtr);
 
-		inline const Mesh& GetMesh() const { return *mesh.get(); };
-		inline const Material& GetMaterial() const { return *material.get(); };
-		inline const Shader& GetShader() const { return *shader.get(); };
+		const Mesh& GetMesh() const { return *mesh; }
+		const Material& GetMaterial() const { return *material; }
+		const Shader& GetShader() const { return *shader; }
 
-		inline Mesh& GetMesh() { return *mesh.get(); };
-		inline Material& GetMaterial() { return *material.get(); };
-		inline Shader& GetShader() { return *shader.get(); };
+		Mesh& GetMesh() { return *mesh; }
+		Material& GetMaterial() { return *material; }
+		Shader& GetShader() { return *shader; }
 
 		void Draw(const Render::Camera& cam) const;
 	};

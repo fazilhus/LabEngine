@@ -3,19 +3,6 @@
 
 namespace Resource {
 
-	GraphicsNode::GraphicsNode() {
-	}
-
-	GraphicsNode::GraphicsNode(const std::string& meshPath,
-		const std::string& vsPath, const std::string& fsPath) {
-		MeshBuilder mb{ meshPath };
-		mesh = std::make_shared<Mesh>(mb.CreateMesh());
-
-		material = nullptr;
-
-		shader = std::make_shared<Shader>(Shader(vsPath, fsPath));
-	}
-
 	GraphicsNode::GraphicsNode(const GraphicsNode& other)
 		: mesh(other.mesh), material(other.material), shader(other.shader) {
 	}
@@ -42,13 +29,7 @@ namespace Resource {
 	}
 
 	void GraphicsNode::Draw(const Render::Camera& cam) const {
-		//shader->Use();
-
-		//shader->UploadUniform3fv("material.ambient", material->GetAmbient());
-		//shader->UploadUniform3fv("material.diffuse", material->GetDiffuse());
-		//shader->UploadUniform3fv("material.specular", material->GetSpecular());
-		//shader->UploadUniform1f("material.shininess", material->GetShininess());
-		material->Use(*shader);
+		material->Use();
 		shader->UploadUniformMat4fv("transform", transform);
 		shader->UploadUniformMat4fv("view", cam.GetView());
 		shader->UploadUniformMat4fv("perspective", cam.GetPerspective());

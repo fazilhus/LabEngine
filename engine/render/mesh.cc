@@ -3,7 +3,6 @@
 
 #include <cassert>
 #include <iostream>
-#include <unordered_map>
 
 #include "util/meshDataParser.h"
 
@@ -56,9 +55,6 @@ namespace Resource {
 		glDeleteVertexArrays(1, &vao);
 		glDeleteBuffers(1, &vbo);
 		glDeleteBuffers(1, &ebo);
-		/*for (auto& el : groups) {
-			el.tex->Unload();
-		}*/
 	}
 
 	void Mesh::Draw() const {
@@ -69,11 +65,15 @@ namespace Resource {
 		UnBind();
 	}
 
-	void Mesh::Draw(const Texture& tex, std::size_t i) const {
+	void Mesh::DrawGroup(std::size_t i) const {
+		if (i > groups.size()) {
+			std::cerr << "[ERROR] attempting to draw " << i + 1 << "th primitive group, when only " << groups.size() << " exist\n";
+			return;
+		}
+
 		Bind();
-		tex.Bind();
+		groups[i].mat.lock()->Use();
 		glDrawElements(GL_TRIANGLES, groups[i].indices, GL_UNSIGNED_INT, (GLvoid*)(sizeof(GLuint) * groups[i].offset));
-		tex.UnBind();
 		UnBind();
 	}
 
@@ -89,63 +89,6 @@ namespace Resource {
 		glBindVertexArray(0);
 	}
 
-	Mesh Mesh::CreateQuadMesh(const float width, const float height) {
-		Mesh mesh{};
-		GLfloat vb[] =
-		{
-			-0.5f * width, 0.01f, -0.5f * height,	1.0f, 0.0f, 0.0f, 1.0f,		1.0f, 0.0f,
-			-0.5f * width, 0.01f,  0.5f * height,	0.0f, 1.0f, 0.0f, 1.0f,		0.0f, 0.0f,
-			 0.5f * width, 0.01f,  0.5f * height,	0.0f, 0.0f, 1.0f, 1.0f,		0.0f, 1.0f,
-			 0.5f * width, 0.01f, -0.5f * height,	0.0f, 0.0f, 0.0f, 1.0f,		1.0f, 1.0f
-		};
-
-		GLuint ib[] = {
-			0, 2, 3,
-			0, 1, 2,
-		};
-		std::size_t sizes[] = { 3, 4, 2 };
-		std::size_t offsets[] = { 0, 3, 7 };
-		mesh.Init(vb, ib, sizes, offsets, 4, 2, 3);
-		mesh.PushPrimitive({ 6, 0 });
-		return mesh;
-	}
-
-	Mesh Mesh::CreateCubeMesh(const float width, const float height, const float depth)
-	{
-		Mesh mesh{};
-		GLfloat vb[] =
-		{
-			-0.5f * width,	-0.5f * height,	-0.5f * depth,	1, 0, 0, 1,		1.0f, 0.0f,
-			-0.5f * width,	 0.5f * height,	-0.5f * depth,	0, 1, 0, 1,		0.0f, 0.0f,
-			0.5f * width,	 0.5f * height,	-0.5f * depth,	0, 0, 0, 1,		0.0f, 1.0f,
-			0.5f * width,	-0.5f * height,	-0.5f * depth,	0, 0, 1, 1,		1.0f, 1.0f,
-			-0.5f * width,	-0.5f * height,	 0.5f * depth,	1, 0, 0, 1,		1.0f, 1.0f,
-			-0.5f * width,	 0.5f * height,	 0.5f * depth,	0, 1, 0, 1,		0.0f, 1.0f,
-			0.5f * width,	 0.5f * height,	 0.5f * depth,	0, 0, 0, 1,		0.0f, 0.0f,
-			0.5f * width,	-0.5f * height,	 0.5f * depth,	0, 0, 1, 1,		1.0f, 0.0f,
-		};
-
-		GLuint ib[] = {
-			0, 2, 3,
-			0, 1, 2,
-			0, 5, 1,
-			0, 4, 5,
-			2, 6, 3,
-			3, 6, 7,
-			0, 7, 4,
-			0, 3, 7,
-			1, 6, 2,
-			1, 5, 6,
-			4, 6, 5,
-			4, 7, 6
-		};
-		std::size_t sizes[] = { 3, 4, 2 };
-		std::size_t offsets[] = { 0, 3, 7 };
-		mesh.Init(vb, ib, sizes, offsets, 8, 12, 3);
-		mesh.PushPrimitive({ 36, 0 });
-		return mesh;
-	}
-
 	MeshBuilder::MeshBuilder(const std::string& path) {
 		ReadMeshData(path);
 	}
@@ -157,12 +100,12 @@ namespace Resource {
 		parser.ParseOBJ(path, vertexes, indices);
 	}
 
-	Mesh MeshBuilder::CreateMesh() const {
+	Mesh MeshBuilder::CreateMesh(const std::shared_ptr<Resource::Material>& mat) const {
 		Mesh mesh{};
 		std::size_t sizes[] = {3, 3, 2};
 		std::size_t offsets[] = {0, 3, 6};
 		mesh.Init((GLfloat*)vertexes.data(), (GLuint*)indices.data(), sizes, offsets, vertexes.size(), indices.size() / 3, 3);
-		mesh.PushPrimitive({ indices.size(), 0 });
+		mesh.PushPrimitive({ indices.size(), 0, mat});
 		return mesh;
 	}
 

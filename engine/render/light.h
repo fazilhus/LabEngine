@@ -13,7 +13,6 @@
 namespace Render {
 
 	class Light {
-	private:
 		Math::vec3 ambient;
 		Math::vec3 diffuse;
 		Math::vec3 specular;
@@ -36,7 +35,6 @@ namespace Render {
 	};
 
 	class DirectionalLight : public Light {
-	private:
 		Math::vec3 dir;
 
 	public:
@@ -52,7 +50,6 @@ namespace Render {
 	};
 
 	class PointLight : public Light {
-	private:
 		Math::vec3 pos;
 
 		Math::vec3 attenuation;
@@ -75,7 +72,6 @@ namespace Render {
 	};
 
 	class SpotLight : public Light {
-	private:
 		Math::vec3 pos;
 		Math::vec3 dir;
 		float32 cutoff;
@@ -109,20 +105,19 @@ namespace Render {
 	constexpr int MAX_NUM_LIGHT_SOURCES = 64;
 
 	class LightManager {
-	private:
 		DirectionalLight globalLight;
 		std::vector<PointLight> pointLights;
 		std::size_t pointLightsCount;
 		std::vector<SpotLight> spotLights;
 		std::size_t spotLightsCount;
 
-		std::shared_ptr<Resource::Shader> shader;
+		std::weak_ptr<Resource::Shader> shader;
 		std::shared_ptr<Resource::Mesh> mesh;
 
 	public:
 		LightManager();
 
-		void SetShader(const std::shared_ptr<Resource::Shader>& s) { this->shader = s; }
+		void SetShader(const std::weak_ptr<Resource::Shader>& s) { this->shader = s; }
 		void SetMesh(const std::shared_ptr<Resource::Mesh>& m) { this->mesh = m; }
 
 		DirectionalLight& GetGlobalLight() { return globalLight; }

@@ -68,26 +68,37 @@ namespace Example {
 			time = (float)glfwGetTime();
 			prev_time = 0;
 
+			sm.NewShader(
+				"lightSourceShader", 
+				"../projects/LightingExample/res/shaders/lightVert.glsl",
+				"../projects/LightingExample/res/shaders/lightFrag.glsl");
+			sm.NewShader(
+				"defaultShader",
+				"../projects/LightingExample/res/shaders/vertex.glsl",
+				"../projects/LightingExample/res/shaders/fragment.glsl");
+
 			auto catDiffTex = std::make_shared<Resource::Texture>(
 				"../projects/LightingExample/res/textures/cat_diff.tga", 1);
 			auto catSpecTex = std::make_shared<Resource::Texture>(
 				"../projects/LightingExample/res/textures/cat_spec.tga", 1);
-			auto catMat = std::make_shared<Resource::Material>(catDiffTex, catSpecTex, 16.0f);
+			auto catMat = std::make_shared<Resource::Material>(
+				catDiffTex, catSpecTex, 16.0f, sm.GetShader("defaultShader"));
 
 			auto boxDiffTex = std::make_shared<Resource::Texture>(
 				"../projects/LightingExample/res/textures/container2.png", 1);
 			auto boxSpecTex = std::make_shared<Resource::Texture>(
 				"../projects/LightingExample/res/textures/container2_specular.png", 1);
-			auto boxMat = std::make_shared<Resource::Material>(boxDiffTex, boxSpecTex, 32.0f);
+			auto boxMat = std::make_shared<Resource::Material>(
+				boxDiffTex, boxSpecTex, 32.0f, sm.GetShader("defaultShader"));
 
 			Resource::MeshBuilder meshBuilder{ "../projects/LightingExample/res/meshes/cube.obj" };
-			auto cubeMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh());
+			auto cubeMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh(nullptr));
 
 			meshBuilder.ReadMeshData("../projects/LightingExample/res/meshes/cube_quad.obj");
-			auto cubeQuadMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh());
+			auto cubeQuadMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh(boxMat));
 
 			meshBuilder.ReadMeshData("../projects/LightingExample/res/meshes/cat.obj");
-			auto catMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh());
+			auto catMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh(catMat));
 
 			shader = std::make_shared<Resource::Shader>(
 				"../projects/LightingExample/res/shaders/vertex.glsl",
@@ -109,7 +120,7 @@ namespace Example {
 			this->obj2.transform *= Math::scale(0.5f);
 			this->obj2.transform *= Math::translate({ 0, 0, 2 });
 
-			lm.SetShader(lsrcShader);
+			lm.SetShader(sm.GetShader("defaultShader"));
 			lm.SetMesh(cubeMesh);
 
 			Render::DirectionalLight dl;
@@ -209,12 +220,8 @@ namespace Example {
 
 		if (InputManager::IsKeyPressed(Key::LeftControl) && InputManager::IsKeyPressed(Key::R))
 		{
-			shader->Recompile(
-				"../projects/LightingExample/res/shaders/vertex.glsl",
-				"../projects/LightingExample/res/shaders/fragment.glsl");
-			lsrcShader->Recompile(
-				"../projects/LightingExample/res/shaders/lightVert.glsl",
-				"../projects/LightingExample/res/shaders/lightFrag.glsl");
+			shader->Recompile();
+			lsrcShader->Recompile();
 		}
 
 		this->camera->UpdateCamera(dt);

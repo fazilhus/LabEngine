@@ -7,7 +7,6 @@
 namespace Resource {
 
 	class Texture {
-	private:
 		GLuint handle;
 
 	public:

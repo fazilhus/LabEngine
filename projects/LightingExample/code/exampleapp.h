@@ -34,6 +34,7 @@ namespace Example {
 		std::shared_ptr<Resource::Shader> shader;
 		std::shared_ptr<Resource::Shader> lsrcShader;
 		Render::LightManager lm;
+		Resource::ShaderManager sm;
 		Resource::GraphicsNode obj1;
 		Resource::GraphicsNode obj2;
 		//Resource::GraphicsNode obj3;

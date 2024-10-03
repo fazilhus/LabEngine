@@ -15,16 +15,21 @@ namespace Resource {
 		std::shared_ptr<Resource::Texture> specular;
 		float32 shininess;
 
+		std::weak_ptr<Resource::Shader> shader;
+
 	public:
 		Material();
-		Material(std::shared_ptr<Resource::Texture> diff, std::shared_ptr<Resource::Texture> spec, float32 shin);
+		Material(const std::shared_ptr<Resource::Texture>& diff,
+			const std::shared_ptr<Resource::Texture>& spec, float32 shin,
+			const std::weak_ptr<Shader>& shader);
 		~Material() = default;
 
-		void Use(Shader& shader);
+		void Use();
 
-		inline void SetShininess(float32 shininess) { this->shininess = shininess; }
+		void SetShininess(float32 shininess) { this->shininess = shininess; }
+		void SetShader(const std::weak_ptr<Shader>& shader) { this->shader = shader; }
 
-		inline float32 GetShininess() const { return shininess; }
+		float32 GetShininess() const { return shininess; }
 	};
 
 } // Resource
