@@ -60,6 +60,9 @@ namespace Resource {
 	void Mesh::Draw() const {
 		Bind();
 		for (const auto& el : groups) {
+			if (!el.mat.expired()) {
+				el.mat.lock()->Use();
+			}
 			glDrawElements(GL_TRIANGLES, el.indices, GL_UNSIGNED_INT, (GLvoid*)(sizeof(GLuint) * el.offset));
 		}
 		UnBind();
@@ -100,7 +103,7 @@ namespace Resource {
 		parser.ParseOBJ(path, vertexes, indices);
 	}
 
-	Mesh MeshBuilder::CreateMesh(const std::shared_ptr<Resource::Material>& mat) const {
+	Mesh MeshBuilder::CreateMesh(const std::weak_ptr<Resource::Material>& mat) const {
 		Mesh mesh{};
 		std::size_t sizes[] = {3, 3, 2};
 		std::size_t offsets[] = {0, 3, 6};

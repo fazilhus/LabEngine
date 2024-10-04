@@ -19,7 +19,6 @@ namespace Resource {
 	};
 
 	class Mesh {
-	private:
 		GLuint vao;
 		GLuint vbo;
 		GLuint ebo;
@@ -34,7 +33,7 @@ namespace Resource {
 		Mesh& operator=(const Mesh& other);
 
 		void Init(GLfloat* vb, GLuint* ib, const std::size_t* sizes, const std::size_t* offsets, 
-			const std::size_t verticies, const std::size_t triangles, const std::size_t count);
+			std::size_t verticies, std::size_t triangles, std::size_t count);
 		void DeInit();
 
 		void Draw() const;
@@ -54,7 +53,6 @@ namespace Resource {
 	};
 
 	class MeshBuilder {
-	private:
 		std::vector<VertexData> vertexes;
 		std::vector<GLuint> indices;
 
@@ -63,7 +61,7 @@ namespace Resource {
 		~MeshBuilder() = default;
 
 		void ReadMeshData(const std::string& path);
-		Mesh CreateMesh(const std::shared_ptr<Resource::Material>& mat) const;
+		Mesh CreateMesh(const std::weak_ptr<Resource::Material>& mat) const;
 	};
 
 } // Resource

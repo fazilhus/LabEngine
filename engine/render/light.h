@@ -111,13 +111,15 @@ namespace Render {
 		std::vector<SpotLight> spotLights;
 		std::size_t spotLightsCount;
 
-		std::weak_ptr<Resource::Shader> shader;
+		std::weak_ptr<Resource::Shader> lightingShader;
+		std::weak_ptr<Resource::Shader> lightSourceShader;
 		std::shared_ptr<Resource::Mesh> mesh;
 
 	public:
 		LightManager();
 
-		void SetShader(const std::weak_ptr<Resource::Shader>& s) { this->shader = s; }
+		void SetLightingShader(const std::weak_ptr<Resource::Shader>& s) { this->lightingShader = s; }
+		void SetLightSourceShader(const std::weak_ptr<Resource::Shader>& s) { this->lightSourceShader = s; }
 		void SetMesh(const std::shared_ptr<Resource::Mesh>& m) { this->mesh = m; }
 
 		DirectionalLight& GetGlobalLight() { return globalLight; }
@@ -132,7 +134,7 @@ namespace Render {
 		void PushPointLight(const PointLight& pl);
 		void PushSpotLight(const SpotLight& sl);
 
-		void SetLightUniforms(Resource::Shader& shader);
+		void SetLightUniforms();
 
 		void DrawLightSources(const Render::Camera& cam) const;
 	};

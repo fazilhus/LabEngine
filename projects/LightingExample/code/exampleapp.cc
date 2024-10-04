@@ -65,8 +65,6 @@ namespace Example {
 			glfwSwapInterval(1);
 			// set clear color to gray
 			glClearColor(0.01f, 0.01f, 0.01f, 1.0f);
-			time = (float)glfwGetTime();
-			prev_time = 0;
 
 			sm.NewShader(
 				"lightSourceShader", 
@@ -77,50 +75,44 @@ namespace Example {
 				"../projects/LightingExample/res/shaders/vertex.glsl",
 				"../projects/LightingExample/res/shaders/fragment.glsl");
 
-			auto catDiffTex = std::make_shared<Resource::Texture>(
-				"../projects/LightingExample/res/textures/cat_diff.tga", 1);
-			auto catSpecTex = std::make_shared<Resource::Texture>(
-				"../projects/LightingExample/res/textures/cat_spec.tga", 1);
-			auto catMat = std::make_shared<Resource::Material>(
-				catDiffTex, catSpecTex, 16.0f, sm.GetShader("defaultShader"));
+			mm.NewMaterial(
+				"cat",
+				"../projects/LightingExample/res/textures/cat_diff.tga",
+				"../projects/LightingExample/res/textures/cat_spec.tga",
+				16.0f,
+				sm.GetShader("defaultShader"));
 
-			auto boxDiffTex = std::make_shared<Resource::Texture>(
-				"../projects/LightingExample/res/textures/container2.png", 1);
-			auto boxSpecTex = std::make_shared<Resource::Texture>(
-				"../projects/LightingExample/res/textures/container2_specular.png", 1);
-			auto boxMat = std::make_shared<Resource::Material>(
-				boxDiffTex, boxSpecTex, 32.0f, sm.GetShader("defaultShader"));
+			mm.NewMaterial(
+				"box",
+				"../projects/LightingExample/res/textures/container2.png",
+				"../projects/LightingExample/res/textures/container2_specular.png",
+				64.0f,
+				sm.GetShader("defaultShader"));
 
 			Resource::MeshBuilder meshBuilder{ "../projects/LightingExample/res/meshes/cube.obj" };
-			auto cubeMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh(nullptr));
+			auto cubeMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh({}));
 
 			meshBuilder.ReadMeshData("../projects/LightingExample/res/meshes/cube_quad.obj");
-			auto cubeQuadMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh(boxMat));
+			auto cubeQuadMesh = std::make_shared<Resource::Mesh>(
+				meshBuilder.CreateMesh(mm.GetMaterial("box")));
 
 			meshBuilder.ReadMeshData("../projects/LightingExample/res/meshes/cat.obj");
-			auto catMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh(catMat));
-
-			shader = std::make_shared<Resource::Shader>(
-				"../projects/LightingExample/res/shaders/vertex.glsl",
-				"../projects/LightingExample/res/shaders/fragment.glsl");
-			lsrcShader = std::make_shared<Resource::Shader>(
-				"../projects/LightingExample/res/shaders/lightVert.glsl",
-				"../projects/LightingExample/res/shaders/lightFrag.glsl");
+			auto catMesh = std::make_shared<Resource::Mesh>(
+				meshBuilder.CreateMesh(mm.GetMaterial("cat")));
 
 			this->obj1 = Resource::GraphicsNode();
-			this->obj1.SetMaterial(catMat);
 			this->obj1.SetMesh(catMesh);
-			this->obj1.SetShader(shader);
+			this->obj1.SetShader(sm.GetShader("defaultShader"));
 			this->obj1.transform *= Math::translate({1, 0, 1});
 
 			this->obj2 = Resource::GraphicsNode();
-			this->obj2.SetMaterial(boxMat);
 			this->obj2.SetMesh(cubeQuadMesh);
-			this->obj2.SetShader(shader);
+			this->obj2.SetShader(sm.GetShader("defaultShader"));
 			this->obj2.transform *= Math::scale(0.5f);
 			this->obj2.transform *= Math::translate({ 0, 0, 2 });
 
-			lm.SetShader(sm.GetShader("defaultShader"));
+			lm.SetLightingShader(sm.GetShader("defaultShader"));
+			lm.SetLightSourceShader(sm.GetShader("lightSourceShader"));
 			lm.SetMesh(cubeMesh);
 
 			Render::DirectionalLight dl;
@@ -130,7 +122,7 @@ namespace Example {
 			lm.SetGlobalLight(dl);
 
 			Render::PointLight pl;
-			pl.SetPos({ 0.0f, 0.0f, 10.0f });
+			pl.SetPos({ 0.0f, 0.0f, 5.0f });
 			pl.SetAmbient(Math::vec3({0.05f, 0.0f, 0.05f}));
 			pl.SetDiffuse(Math::vec3({0.2f, 0.0f, 0.2f}));
 			pl.SetSpecular(Math::vec3({0.5f, 0.0f, 0.5f}));
@@ -152,6 +144,10 @@ namespace Example {
 			this->camera->SetCameraPosition({ 0.0f, 0.0f, 10.0f });
 			this->camera->SetSpeed(7.5f);
 			this->camera->SetSens(0.05f);
+
+			time = (float)glfwGetTime();
+			prev_time = 0;
+			dt = time - prev_time;
 
 			return true;
 		}
@@ -180,12 +176,11 @@ namespace Example {
 			HandleInput();
 
 			angle += dt;
-			auto& slight = this->lm.GetPointLights()[0];
-			slight.SetPos({cosf(angle) * 5.0f, 0.0f, sinf(angle) * 5.0f});
-			//slight.SetDirection(slight.GetPos() - Math::vec3{0.0f, 0.0f, 0.0f});
+			auto& slight = this->lm.GetSpotLights()[0];
+			slight.SetPos({cosf(angle) * 2.5f, 1.0f, sinf(angle) * 2.5f});
+			slight.SetDirection(slight.GetPos() - Math::vec3{0.0f, 0.0f, 0.0f});
 
-			this->obj1.GetShader().Use();
-			lm.SetLightUniforms(this->obj1.GetShader());
+			lm.SetLightUniforms();
 
 			this->obj1.Draw(*camera);
 			this->obj2.Draw(*camera);
@@ -198,7 +193,7 @@ namespace Example {
 
 			// delta time
 			prev_time = time;
-			time = (float)glfwGetTime();
+			time = static_cast<float>(glfwGetTime());
 			dt = time - prev_time;
 
 			Input::InputManager::Flush();
@@ -220,8 +215,7 @@ namespace Example {
 
 		if (InputManager::IsKeyPressed(Key::LeftControl) && InputManager::IsKeyPressed(Key::R))
 		{
-			shader->Recompile();
-			lsrcShader->Recompile();
+			sm.RecompileAll();
 		}
 
 		this->camera->UpdateCamera(dt);
