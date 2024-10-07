@@ -24,11 +24,21 @@ ADD_LIBRARY(imgui STATIC imgui/imgui.cpp imgui/imgui_demo.cpp imgui/imgui_draw.c
 			imgui/examples/opengl3_example/imgui_impl_glfw_gl3.cpp)
 
 TARGET_LINK_LIBRARIES(imgui PUBLIC exts)
-TARGET_INCLUDE_DIRECTORIES(imgui PUBLIC imgui imgui/examples/opengl3_example)
 SET_TARGET_PROPERTIES(imgui PROPERTIES FOLDER "exts/imgui")
+TARGET_INCLUDE_DIRECTORIES(imgui PUBLIC imgui imgui/examples/opengl3_example)
 TARGET_LINK_LIBRARIES(exts INTERFACE imgui)
 
 ADD_LIBRARY(stb_image STATIC stb/stb_image.h stb/stb_image.c)
-TARGET_INCLUDE_DIRECTORIES(exts INTERFACE stb)
 SET_TARGET_PROPERTIES(stb_image PROPERTIES FOLDER "exts/stb")
+TARGET_INCLUDE_DIRECTORIES(exts INTERFACE stb)
 TARGET_LINK_LIBRARIES(exts INTERFACE stb_image)
+
+ADD_LIBRARY(nlohmann_json STATIC nlohmann_json/include/nlohmann/json.hpp nlohmann_json/json.cpp)
+SET_TARGET_PROPERTIES(nlohmann_json PROPERTIES FOLDER "exts/nlohmann_json")
+TARGET_INCLUDE_DIRECTORIES(exts INTERFACE nlohmann_json/include)
+TARGET_LINK_LIBRARIES(exts INTERFACE nlohmann_json)
+
+ADD_LIBRARY(fx_gltf STATIC fx_gltf/include/fx/gltf.h fx_gltf/gltf.cpp)
+SET_TARGET_PROPERTIES(fx_gltf PROPERTIES FOLDER "exts/fx_gltf")
+TARGET_INCLUDE_DIRECTORIES(exts INTERFACE fx_gltf/include)
+TARGET_LINK_LIBRARIES(exts INTERFACE fx_gltf)

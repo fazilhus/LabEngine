@@ -31,9 +31,9 @@ namespace Example {
 		void HandleInput();
 
 	private:
-		Render::LightManager lm;
-		Resource::ShaderManager sm;
-		Resource::MaterialManager mm;
+		Render::LightManager lightManager;
+		Resource::ShaderManager shaderManager;
+		Resource::MaterialManager materialManager;
 		Resource::GraphicsNode obj1;
 		Resource::GraphicsNode obj2;
 		//Resource::GraphicsNode obj3;

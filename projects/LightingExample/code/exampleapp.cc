@@ -14,9 +14,6 @@
 
 #include <iostream>
 
-
-constexpr int STRING_BUFFER_SIZE = 8192;
-
 using namespace Display;
 namespace Example {
 
@@ -44,8 +41,6 @@ namespace Example {
 
 		Input::InputManager::Destroy();
 		Core::App::Close();
-		//this->mesh.DeInit();
-		//this->shader.reset();
 		this->obj1.DeInit();
 		delete this->camera;
 	}
@@ -66,60 +61,60 @@ namespace Example {
 			// set clear color to gray
 			glClearColor(0.01f, 0.01f, 0.01f, 1.0f);
 
-			sm.NewShader(
+			shaderManager.NewShader(
 				"lightSourceShader", 
 				"../projects/LightingExample/res/shaders/lightVert.glsl",
 				"../projects/LightingExample/res/shaders/lightFrag.glsl");
-			sm.NewShader(
+			shaderManager.NewShader(
 				"defaultShader",
 				"../projects/LightingExample/res/shaders/vertex.glsl",
 				"../projects/LightingExample/res/shaders/fragment.glsl");
 
-			mm.NewMaterial(
+			materialManager.NewMaterial(
 				"cat",
 				"../projects/LightingExample/res/textures/cat_diff.tga",
 				"../projects/LightingExample/res/textures/cat_spec.tga",
 				16.0f,
-				sm.GetShader("defaultShader"));
+				shaderManager.GetShader("defaultShader"));
 
-			mm.NewMaterial(
+			materialManager.NewMaterial(
 				"box",
 				"../projects/LightingExample/res/textures/container2.png",
 				"../projects/LightingExample/res/textures/container2_specular.png",
 				64.0f,
-				sm.GetShader("defaultShader"));
+				shaderManager.GetShader("defaultShader"));
 
 			Resource::MeshBuilder meshBuilder{ "../projects/LightingExample/res/meshes/cube.obj" };
 			auto cubeMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh({}));
 
 			meshBuilder.ReadMeshData("../projects/LightingExample/res/meshes/cube_quad.obj");
 			auto cubeQuadMesh = std::make_shared<Resource::Mesh>(
-				meshBuilder.CreateMesh(mm.GetMaterial("box")));
+				meshBuilder.CreateMesh(materialManager.GetMaterial("box")));
 
 			meshBuilder.ReadMeshData("../projects/LightingExample/res/meshes/cat.obj");
 			auto catMesh = std::make_shared<Resource::Mesh>(
-				meshBuilder.CreateMesh(mm.GetMaterial("cat")));
+				meshBuilder.CreateMesh(materialManager.GetMaterial("cat")));
 
 			this->obj1 = Resource::GraphicsNode();
 			this->obj1.SetMesh(catMesh);
-			this->obj1.SetShader(sm.GetShader("defaultShader"));
+			this->obj1.SetShader(shaderManager.GetShader("defaultShader"));
 			this->obj1.transform *= Math::translate({1, 0, 1});
 
 			this->obj2 = Resource::GraphicsNode();
 			this->obj2.SetMesh(cubeQuadMesh);
-			this->obj2.SetShader(sm.GetShader("defaultShader"));
+			this->obj2.SetShader(shaderManager.GetShader("defaultShader"));
 			this->obj2.transform *= Math::scale(0.5f);
 			this->obj2.transform *= Math::translate({ 0, 0, 2 });
 
-			lm.SetLightingShader(sm.GetShader("defaultShader"));
-			lm.SetLightSourceShader(sm.GetShader("lightSourceShader"));
-			lm.SetMesh(cubeMesh);
+			lightManager.SetLightingShader(shaderManager.GetShader("defaultShader"));
+			lightManager.SetLightSourceShader(shaderManager.GetShader("lightSourceShader"));
+			lightManager.SetMesh(cubeMesh);
 
 			Render::DirectionalLight dl;
 			dl.SetAmbient(Math::vec3(0.01f));
 			dl.SetDiffuse(Math::vec3(0.1f));
 			dl.SetSpecular(Math::vec3(0.4f));
-			lm.SetGlobalLight(dl);
+			lightManager.SetGlobalLight(dl);
 
 			Render::PointLight pl;
 			pl.SetPos({ 0.0f, 0.0f, 5.0f });
@@ -127,7 +122,7 @@ namespace Example {
 			pl.SetDiffuse(Math::vec3({0.2f, 0.0f, 0.2f}));
 			pl.SetSpecular(Math::vec3({0.5f, 0.0f, 0.5f}));
 			pl.SetAttenuation({ 1.0f, 0.022f, 0.019f });
-			lm.PushPointLight(pl);
+			lightManager.PushPointLight(pl);
 
 			Render::SpotLight sl;
 			sl.SetPos({ 2.5f, 2.5f, 2.5f });
@@ -138,7 +133,7 @@ namespace Example {
 			sl.SetCutoffAngle(Math::toRad(15.0f));
 			sl.SetOuterCutoffAngle(Math::toRad(20.0f));
 			sl.SetAttenuation({ 1.0f, 0.09f, 0.032f });
-			lm.PushSpotLight(sl);
+			lightManager.PushSpotLight(sl);
 
 			this->camera = new Render::Camera(0.5f, 4.0f / 3.0f, 0.01f, 100.0f);
 			this->camera->SetCameraPosition({ 0.0f, 0.0f, 10.0f });
@@ -176,17 +171,17 @@ namespace Example {
 			HandleInput();
 
 			angle += dt;
-			auto& slight = this->lm.GetSpotLights()[0];
+			auto& slight = this->lightManager.GetSpotLights()[0];
 			slight.SetPos({cosf(angle) * 2.5f, 1.0f, sinf(angle) * 2.5f});
 			slight.SetDirection(slight.GetPos() - Math::vec3{0.0f, 0.0f, 0.0f});
 
-			lm.SetLightUniforms();
+			lightManager.SetLightUniforms();
 
 			this->obj1.Draw(*camera);
 			this->obj2.Draw(*camera);
 			//this->obj3.Draw(*camera);
 
-			lm.DrawLightSources(*camera);
+			lightManager.DrawLightSources(*camera);
 
 			// transfer new frame to window
 			this->window->SwapBuffers();
@@ -215,7 +210,7 @@ namespace Example {
 
 		if (InputManager::IsKeyPressed(Key::LeftControl) && InputManager::IsKeyPressed(Key::R))
 		{
-			sm.RecompileAll();
+			shaderManager.RecompileAll();
 		}
 
 		this->camera->UpdateCamera(dt);
