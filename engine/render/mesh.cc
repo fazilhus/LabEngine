@@ -6,6 +6,8 @@
 
 #include "util/meshDataParser.h"
 
+#include "fx/gltf.h"
+
 namespace Resource {
 
 	Mesh::Mesh()
@@ -75,7 +77,9 @@ namespace Resource {
 		}
 
 		Bind();
-		groups[i].mat.lock()->Use();
+		if (!groups[i].mat.expired()) {
+			groups[i].mat.lock()->Use();
+		}
 		glDrawElements(GL_TRIANGLES, groups[i].indices, GL_UNSIGNED_INT, (GLvoid*)(sizeof(GLuint) * groups[i].offset));
 		UnBind();
 	}
@@ -92,24 +96,40 @@ namespace Resource {
 		glBindVertexArray(0);
 	}
 
-	MeshBuilder::MeshBuilder(const std::string& path) {
+	OBJMeshBuilder::OBJMeshBuilder(const std::string& path) {
 		ReadMeshData(path);
 	}
 
-	void MeshBuilder::ReadMeshData(const std::string& path) {
+	void OBJMeshBuilder::ReadMeshData(const std::string& path) {
 		Utils::MeshDataParser parser{};
 		vertexes.clear();
 		indices.clear();
 		parser.ParseOBJ(path, vertexes, indices);
 	}
 
-	Mesh MeshBuilder::CreateMesh(const std::weak_ptr<Resource::Material>& mat) const {
+	Mesh OBJMeshBuilder::CreateMesh(const std::weak_ptr<Resource::Material>& mat) const {
 		Mesh mesh{};
-		std::size_t sizes[] = {3, 3, 2};
-		std::size_t offsets[] = {0, 3, 6};
+		std::size_t sizes[] = { 3, 3, 2 };
+		std::size_t offsets[] = { 0, 3, 6 };
 		mesh.Init((GLfloat*)vertexes.data(), (GLuint*)indices.data(), sizes, offsets, vertexes.size(), indices.size() / 3, 3);
-		mesh.PushPrimitive({ indices.size(), 0, mat});
+		mesh.PushPrimitive({ indices.size(), 0, mat });
 		return mesh;
+	}
+
+	GLTFMeshBuilder::GLTFMeshBuilder(const std::string& path_str) {
+		auto path = std::filesystem::path(path_str);
+		if (!is_regular_file(path)) {
+			std::cerr << "[ERROR] file " << path_str << " does not exist\n";
+			return;
+		}
+
+		
+	}
+
+	void GLTFMeshBuilder::ReadMeshData(const std::string& path) {
+	}
+
+	Mesh GLTFMeshBuilder::CreateMesh(const std::weak_ptr<Resource::Material>& mat) const {
 	}
 
 } // Resource

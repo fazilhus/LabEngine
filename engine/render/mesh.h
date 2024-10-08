@@ -53,15 +53,38 @@ namespace Resource {
 	};
 
 	class MeshBuilder {
+	protected:
 		std::vector<VertexData> vertexes;
 		std::vector<GLuint> indices;
 
 	public:
-		MeshBuilder(const std::string& path);
-		~MeshBuilder() = default;
+		MeshBuilder() = default;
+		MeshBuilder(const MeshBuilder&) = delete;
+		MeshBuilder(MeshBuilder&&) = delete;
+		virtual ~MeshBuilder() = 0;
 
-		void ReadMeshData(const std::string& path);
-		Mesh CreateMesh(const std::weak_ptr<Resource::Material>& mat) const;
+		MeshBuilder& operator=(const MeshBuilder&) = delete;
+		MeshBuilder& operator=(MeshBuilder&&) = delete;
+
+		virtual void ReadMeshData(const std::string& path) = 0;
+		virtual Mesh CreateMesh(const std::weak_ptr<Resource::Material>& mat) const = 0;
+	};
+
+	class OBJMeshBuilder final : public MeshBuilder {
+	public:
+		explicit OBJMeshBuilder(const std::string& path);
+		~OBJMeshBuilder() override = default;
+
+		void ReadMeshData(const std::string& path) override;
+		Mesh CreateMesh(const std::weak_ptr<Resource::Material>& mat) const override;
+	};
+
+	class GLTFMeshBuilder final : public MeshBuilder {
+		explicit GLTFMeshBuilder(const std::string& path);
+		~GLTFMeshBuilder() override = default;
+
+		void ReadMeshData(const std::string& path) override;
+		Mesh CreateMesh(const std::weak_ptr<Resource::Material>& mat) const override;
 	};
 
 } // Resource

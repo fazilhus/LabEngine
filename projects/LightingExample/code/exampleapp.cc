@@ -84,7 +84,7 @@ namespace Example {
 				64.0f,
 				shaderManager.GetShader("defaultShader"));
 
-			Resource::MeshBuilder meshBuilder{ "../projects/LightingExample/res/meshes/cube.obj" };
+			Resource::OBJMeshBuilder meshBuilder{ "../projects/LightingExample/res/meshes/cube.obj" };
 			auto cubeMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh({}));
 
 			meshBuilder.ReadMeshData("../projects/LightingExample/res/meshes/cube_quad.obj");
