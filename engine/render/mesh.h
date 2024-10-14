@@ -4,7 +4,6 @@
 
 #include <vector>
 #include <string>
-#include <fstream>
 
 #include "math/vec2.h"
 #include "math/vec3.h"
@@ -77,24 +76,24 @@ namespace Resource {
 		MeshBuilder& operator=(const MeshBuilder&) = delete;
 		MeshBuilder& operator=(MeshBuilder&&) = delete;
 
-		virtual void ReadMeshData(const std::string& path) = 0;
+		virtual void ReadMeshData(const std::filesystem::path& path) = 0;
 		virtual Mesh CreateMesh() const = 0;
 	};
 
 	class OBJMeshBuilder final : public MeshBuilder {
 	public:
-		explicit OBJMeshBuilder(const std::string& path);
+		explicit OBJMeshBuilder(const std::filesystem::path& path);
 		~OBJMeshBuilder() override = default;
 
-		void ReadMeshData(const std::string& path) override;
+		void ReadMeshData(const std::filesystem::path& path) override;
 		Mesh CreateMesh() const override;
 	};
 
 	class GLTFMeshBuilder final : public MeshBuilder {
-		explicit GLTFMeshBuilder(const std::string& path);
+		explicit GLTFMeshBuilder(const std::filesystem::path& path);
 		~GLTFMeshBuilder() override = default;
 
-		void ReadMeshData(const std::string& path) override;
+		void ReadMeshData(const std::filesystem::path& path) override;
 		Mesh CreateMesh() const override;
 	};
 

@@ -2,6 +2,7 @@
 
 #include <GL/glew.h>
 
+#include <filesystem>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -13,13 +14,13 @@ namespace Resource {
 
 	public:
 		Texture() = default;
-		Texture(const std::string& path, int flip = 0);
+		Texture(const std::filesystem::path& path, int flip = 0);
 		Texture(const Texture& other);
 		~Texture() = default;
 
 		Texture& operator=(const Texture& other);
 
-		void LoadFromFile(const std::string& path, int flip = 0);
+		void LoadFromFile(const std::filesystem::path& path, int flip = 0);
 		void Unload();
 
 		void Bind(GLint loc = 0) const;
@@ -38,7 +39,7 @@ namespace Resource {
 		TextureManager& operator=(const TextureManager&) = delete;
 		TextureManager& operator=(TextureManager&&) = delete;
 
-		void Push(const std::string& name, const std::string& path, int flip = 0);
+		void Push(const std::string& name, const std::filesystem::path& path, int flip = 0);
 		std::weak_ptr<Texture> Get(const std::string& name) const;
 	};
 

@@ -1,9 +1,12 @@
 #pragma once
 
 #include "GL/glew.h"
+
+#include <filesystem>
 #include <string>
 #include <unordered_map>
 #include <memory>
+
 
 #include "math/vec3.h"
 #include "math/vec4.h"
@@ -16,8 +19,8 @@ namespace Resource {
 		GLuint vHandle;
 		GLuint fHandle;
 
-		std::string vsSrcPath;
-		std::string fsSrcPath;
+		std::filesystem::path vsSrcPath;
+		std::filesystem::path fsSrcPath;
 		std::string vsSrc;
 		std::string fsSrc;
 
@@ -26,7 +29,7 @@ namespace Resource {
 		bool used;
 
 	public:
-		Shader(const std::string& vsPath, const std::string& fsPath);
+		Shader(const std::filesystem::path& vsPath, const std::filesystem::path& fsPath);
 		~Shader();
 
 		void Cleanup();
@@ -66,7 +69,8 @@ namespace Resource {
 		ShaderManager& operator=(const ShaderManager&) = delete;
 		ShaderManager& operator=(ShaderManager&&) = delete;
 
-		void Push(const std::string& name, const std::string& vsPath, const std::string& fsPath);
+		void Push(const std::string& name, const std::filesystem::path& vsPath,
+			const std::filesystem::path& fsPath);
 		std::weak_ptr<Shader> Get(const std::string& name) const;
 
 		void RecompileAll();

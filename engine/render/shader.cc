@@ -9,10 +9,10 @@
 
 namespace Resource {
 
-	Shader::Shader(const std::string& vsPath, const std::string& fsPath)
+	Shader::Shader(const std::filesystem::path& vsPath, const std::filesystem::path& fsPath)
 		: handle(0), vHandle(0), fHandle(0), vsSrcPath(vsPath), fsSrcPath(fsPath), used(false) {
-		ReadSource(vsSrcPath, vsSrc);
-		ReadSource(fsSrcPath, fsSrc);
+		ReadSource(vsSrcPath.string(), vsSrc);
+		ReadSource(fsSrcPath.string(), fsSrc);
 
 		CompileAndLink();
 	}
@@ -76,8 +76,8 @@ namespace Resource {
 
 	void Shader::Recompile() {
 		Cleanup();
-		ReadSource(vsSrcPath, vsSrc);
-		ReadSource(fsSrcPath, fsSrc);
+		ReadSource(vsSrcPath.string(), vsSrc);
+		ReadSource(fsSrcPath.string(), fsSrc);
 
 		CompileAndLink();
 	}
@@ -161,14 +161,15 @@ namespace Resource {
 		return uniformLoc[name];
 	}
 
-	void ShaderManager::Push(const std::string& name, const std::string& vsPath, const std::string& fsPath) {
+	void ShaderManager::Push(const std::string& name, const std::filesystem::path& vsPath,
+		const std::filesystem::path& fsPath) {
 		if (shaders.contains(name)) {
 			std::cerr << "[WARNING] Overwriting existing shader " << name << '\n';
 			shaders[name]->Cleanup();
 			shaders[name].reset();
 		}
 
-		shaders[name] = std::make_shared<Resource::Shader>(vsPath, fsPath);
+		shaders[name] = std::make_shared<Shader>(vsPath, fsPath);
 	}
 
 	std::weak_ptr<Shader> ShaderManager::Get(const std::string& name) const {

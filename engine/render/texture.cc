@@ -7,7 +7,7 @@
 
 namespace Resource {
 
-	Texture::Texture(const std::string& path, int flip) {
+	Texture::Texture(const std::filesystem::path& path, int flip) {
 		LoadFromFile(path, flip);
 	}
 	
@@ -19,10 +19,15 @@ namespace Resource {
 		this->handle = other.handle;
 		return *this;
 	}
-	void Texture::LoadFromFile(const std::string& path, int flip) {
+	void Texture::LoadFromFile(const std::filesystem::path& path, int flip) {
+		if (!std::filesystem::exists(path)) {
+			std::cerr << "[ERROR] trying to read non-existing texture file: " << path << '\n';
+			return;
+		}
+
 		int w, h, comp;
 		stbi_set_flip_vertically_on_load(flip);
-		uchar* image = stbi_load(path.c_str(), &w, &h, &comp, STBI_rgb);
+		uchar* image = stbi_load(path.string().c_str(), &w, &h, &comp, STBI_rgb);
 
 		if (image == nullptr) {
 			return;
@@ -62,7 +67,7 @@ namespace Resource {
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-	void TextureManager::Push(const std::string& name, const std::string& path, int flip) {
+	void TextureManager::Push(const std::string& name, const std::filesystem::path& path, int flip) {
 		if (textures.contains(name)) {
 			std::cerr << "[WARNING] Overwriting existing shader " << name << '\n';
 			textures[name]->Unload();

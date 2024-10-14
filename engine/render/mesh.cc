@@ -162,15 +162,15 @@ namespace Resource {
 		uv.push_back(u);
 	}
 
-	OBJMeshBuilder::OBJMeshBuilder(const std::string& path) {
+	OBJMeshBuilder::OBJMeshBuilder(const std::filesystem::path& path) {
 		ReadMeshData(path);
 	}
 
-	void OBJMeshBuilder::ReadMeshData(const std::string& path) {
+	void OBJMeshBuilder::ReadMeshData(const std::filesystem::path& path) {
 		Utils::MeshDataParser parser{};
 		vertexes.clear();
 		indices.clear();
-		parser.ParseOBJ(path, vertexes, indices);
+		parser.ParseOBJ(path.string(), vertexes, indices);
 	}
 
 	Mesh OBJMeshBuilder::CreateMesh() const {
@@ -182,17 +182,17 @@ namespace Resource {
 		return mesh;
 	}
 
-	GLTFMeshBuilder::GLTFMeshBuilder(const std::string& path_str) {
-		auto path = std::filesystem::path(path_str);
+	GLTFMeshBuilder::GLTFMeshBuilder(const std::filesystem::path& path) {
+		//auto path = std::filesystem::path(path_str);
 		if (!is_regular_file(path)) {
-			std::cerr << "[ERROR] file " << path_str << " does not exist\n";
+			std::cerr << "[ERROR] file " << path << " does not exist\n";
 			return;
 		}
 
 		
 	}
 
-	void GLTFMeshBuilder::ReadMeshData(const std::string& path) {
+	void GLTFMeshBuilder::ReadMeshData(const std::filesystem::path& path) {
 
 	}
 

@@ -14,6 +14,8 @@
 
 #include <iostream>
 
+#include "fx/gltf.h"
+
 using namespace Display;
 namespace Example {
 
@@ -61,17 +63,30 @@ namespace Example {
 			// set clear color to gray
 			glClearColor(0.01f, 0.01f, 0.01f, 1.0f);
 
+			std::filesystem::path resPath{ "../projects/GLTFExample/res" };
+			resPath.make_preferred();
+
 			shaderManager.Push(
 				"lightSourceShader", 
-				"../projects/GLTFExample/res/shaders/lightVert.glsl",
-				"../projects/GLTFExample/res/shaders/lightFrag.glsl");
+				(resPath / "shaders/lightVert.glsl").make_preferred(),
+				(resPath / "shaders/lightFrag.glsl").make_preferred());
 			shaderManager.Push(
 				"defaultShader",
-				"../projects/GLTFExample/res/shaders/vertex.glsl",
-				"../projects/GLTFExample/res/shaders/fragment.glsl");
+				(resPath / "shaders/vertex.glsl").make_preferred(),
+				(resPath / "shaders/fragment.glsl").make_preferred());
 
-			Resource::OBJMeshBuilder meshBuilder{ "../projects/GLTFExample/res/meshes/cube.obj" };
+			Resource::OBJMeshBuilder meshBuilder{ (resPath / "meshes/cube.obj").make_preferred() };
 			auto cubeMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh());
+
+			auto model = fx::gltf::LoadFromText(
+				(resPath / "models/Cube/gltf/Cube.gltf").make_preferred());
+
+			auto texDirPath = (resPath / "models/Cube/gltf").make_preferred();
+			for (const auto& el : model.images) {
+				auto texPath = (texDirPath / el.uri).make_preferred();
+				//std::cout << texPath << '\n';
+				textureManager.Push(texPath.stem().string(), texPath);
+			}
 
 			lightManager.SetLightingShader(shaderManager.Get("defaultShader"));
 			lightManager.SetLightSourceShader(shaderManager.Get("lightSourceShader"));
