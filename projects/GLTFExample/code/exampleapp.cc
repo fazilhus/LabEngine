@@ -63,28 +63,28 @@ namespace Example {
 
 			shaderManager.Push(
 				"lightSourceShader", 
-				"../projects/LightingExample/res/shaders/lightVert.glsl",
-				"../projects/LightingExample/res/shaders/lightFrag.glsl");
+				"../projects/GLTFExample/res/shaders/lightVert.glsl",
+				"../projects/GLTFExample/res/shaders/lightFrag.glsl");
 			shaderManager.Push(
 				"defaultShader",
-				"../projects/LightingExample/res/shaders/vertex.glsl",
-				"../projects/LightingExample/res/shaders/fragment.glsl");
+				"../projects/GLTFExample/res/shaders/vertex.glsl",
+				"../projects/GLTFExample/res/shaders/fragment.glsl");
 
 			textureManager.Push(
 				"cat_diff",
-				"../projects/LightingExample/res/textures/cat_diff.tga",
+				"../projects/GLTFExample/res/textures/cat_diff.tga",
 				1);
 			textureManager.Push(
 				"cat_spec",
-				"../projects/LightingExample/res/textures/cat_spec.tga",
+				"../projects/GLTFExample/res/textures/cat_spec.tga",
 				1);
 			textureManager.Push(
 				"box_diff",
-				"../projects/LightingExample/res/textures/container2.png",
+				"../projects/GLTFExample/res/textures/container2.png",
 				1);
 			textureManager.Push(
 				"box_spec",
-				"../projects/LightingExample/res/textures/container2_specular.png",
+				"../projects/GLTFExample/res/textures/container2_specular.png",
 				1);
 
 			auto catMat = std::make_shared<Resource::Material>(
@@ -98,14 +98,14 @@ namespace Example {
 				32.0f,
 				shaderManager.Get("defaultShader"));
 
-			Resource::OBJMeshBuilder meshBuilder{ "../projects/LightingExample/res/meshes/cube.obj" };
+			Resource::OBJMeshBuilder meshBuilder{ "../projects/GLTFExample/res/meshes/cube.obj" };
 			auto cubeMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh());
 
-			meshBuilder.ReadMeshData("../projects/LightingExample/res/meshes/cube_quad.obj");
+			meshBuilder.ReadMeshData("../projects/GLTFExample/res/meshes/cube_quad.obj");
 			auto cubeQuadMesh = std::make_shared<Resource::Mesh>(
 				meshBuilder.CreateMesh());
 
-			meshBuilder.ReadMeshData("../projects/LightingExample/res/meshes/cat.obj");
+			meshBuilder.ReadMeshData("../projects/GLTFExample/res/meshes/cat.obj");
 			auto catMesh = std::make_shared<Resource::Mesh>(
 				meshBuilder.CreateMesh());
 
