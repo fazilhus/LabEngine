@@ -193,6 +193,7 @@ namespace Resource {
 	}
 
 	void GLTFMeshBuilder::ReadMeshData(const std::string& path) {
+
 	}
 
 	Mesh GLTFMeshBuilder::CreateMesh() const {

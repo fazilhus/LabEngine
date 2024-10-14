@@ -104,6 +104,8 @@ namespace Render {
 			s->UploadUniform3fv(temp + "].attenuation", spotLights[i].GetAttenuation());
 		}
 		s->UploadUniform1i("slights_count", spotLightsCount);
+
+		s->UnUse();
 	}
 
 	void LightManager::DrawLightSources(const Render::Camera& cam) const {

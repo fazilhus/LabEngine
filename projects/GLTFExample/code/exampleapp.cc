@@ -70,55 +70,8 @@ namespace Example {
 				"../projects/GLTFExample/res/shaders/vertex.glsl",
 				"../projects/GLTFExample/res/shaders/fragment.glsl");
 
-			textureManager.Push(
-				"cat_diff",
-				"../projects/GLTFExample/res/textures/cat_diff.tga",
-				1);
-			textureManager.Push(
-				"cat_spec",
-				"../projects/GLTFExample/res/textures/cat_spec.tga",
-				1);
-			textureManager.Push(
-				"box_diff",
-				"../projects/GLTFExample/res/textures/container2.png",
-				1);
-			textureManager.Push(
-				"box_spec",
-				"../projects/GLTFExample/res/textures/container2_specular.png",
-				1);
-
-			auto catMat = std::make_shared<Resource::Material>(
-				textureManager.Get("cat_diff"),
-				textureManager.Get("cat_spec"),
-				16.0f,
-				shaderManager.Get("defaultShader"));
-			auto boxMat = std::make_shared<Resource::Material>(
-				textureManager.Get("box_diff"),
-				textureManager.Get("box_spec"),
-				32.0f,
-				shaderManager.Get("defaultShader"));
-
 			Resource::OBJMeshBuilder meshBuilder{ "../projects/GLTFExample/res/meshes/cube.obj" };
 			auto cubeMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh());
-
-			meshBuilder.ReadMeshData("../projects/GLTFExample/res/meshes/cube_quad.obj");
-			auto cubeQuadMesh = std::make_shared<Resource::Mesh>(
-				meshBuilder.CreateMesh());
-
-			meshBuilder.ReadMeshData("../projects/GLTFExample/res/meshes/cat.obj");
-			auto catMesh = std::make_shared<Resource::Mesh>(
-				meshBuilder.CreateMesh());
-
-			this->obj1 = Resource::GraphicsNode();
-			this->obj1.SetMesh(catMesh);
-			this->obj1.PushMaterial(catMat);
-			this->obj1.transform *= Math::translate({1, 0, 1});
-
-			this->obj2 = Resource::GraphicsNode();
-			this->obj2.SetMesh(cubeQuadMesh);
-			this->obj2.PushMaterial(boxMat);
-			this->obj2.transform *= Math::scale(0.5f);
-			this->obj2.transform *= Math::translate({ 0, 0, 2 });
 
 			lightManager.SetLightingShader(shaderManager.Get("defaultShader"));
 			lightManager.SetLightSourceShader(shaderManager.Get("lightSourceShader"));
@@ -191,8 +144,8 @@ namespace Example {
 
 			lightManager.SetLightUniforms();
 
-			this->obj1.Draw(*camera);
-			this->obj2.Draw(*camera);
+			//this->obj1.Draw(*camera);
+			//this->obj2.Draw(*camera);
 			//this->obj3.Draw(*camera);
 
 			lightManager.DrawLightSources(*camera);
