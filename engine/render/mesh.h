@@ -18,9 +18,11 @@ namespace Resource {
 		std::weak_ptr<Material> mat;
 	};
 
+	struct VertexData;
+
 	class Mesh {
 		GLuint vao;
-		GLuint vbo;
+		GLuint vbos[3];
 		GLuint ebo;
 
 		std::vector<PrimitiveGroup> groups;
@@ -32,8 +34,8 @@ namespace Resource {
 
 		Mesh& operator=(const Mesh& other);
 
-		void Init(GLfloat* vb, GLuint* ib, const std::size_t* sizes, const std::size_t* offsets, 
-			std::size_t verticies, std::size_t triangles, std::size_t count);
+		void Init(const VertexData& vb, const std::vector<GLuint>& ib, const std::size_t* sizes,
+			const std::size_t* offsets, std::size_t count);
 		void DeInit();
 
 		void Draw() const;
@@ -52,14 +54,18 @@ namespace Resource {
 	};
 
 	struct VertexData {
-		Math::vec3 pos;
-		Math::vec3 norm;
-		Math::vec2 uv;
+		std::vector<Math::vec3> pos;
+		std::vector<Math::vec3> norm;
+		std::vector<Math::vec2> uv;
+
+		void clear();
+		void reserve(std::size_t a, std::size_t b, std::size_t c);
+		void push_back(Math::vec3 p, Math::vec3 n, Math::vec2 u);
 	};
 
 	class MeshBuilder {
 	protected:
-		std::vector<VertexData> vertexes;
+		VertexData vertexes;
 		std::vector<GLuint> indices;
 
 	public:

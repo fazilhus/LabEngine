@@ -16,7 +16,7 @@ namespace Utils {
     
     void MeshDataParser::ParseOBJ(
 		const std::string& path,
-		std::vector<Resource::VertexData>& vdata,
+		Resource::VertexData& vdata,
 		std::vector<unsigned int>& idata) {
         if (path.substr(path.size() - 4, 4) != ".obj") {
 			std::cerr << "[ERROR] wrong file type\n";
@@ -32,8 +32,6 @@ namespace Utils {
 		std::stringstream contents;
     	contents << in.rdbuf();
 
-		OBJMeshData data{};
-
         std::vector<std::string> fbuff;
 		std::vector<std::string> vbuff;
 
@@ -42,11 +40,6 @@ namespace Utils {
 		std::vector<std::streamoff> pos_lines;
 		std::vector<std::streamoff> norm_lines;
 		std::vector<std::streamoff> uv_lines;
-
-		/*while (std::getline(in, line)) {
-			if (FirstToken(line) == "o") break;
-		}
-		auto data_pos = in.tellg();*/
 
 		while (!contents.eof()) {
 			auto fpos = contents.tellg();
@@ -66,7 +59,7 @@ namespace Utils {
 
 		std::size_t vertex_count = 0;
 		std::unordered_map<std::string, unsigned int> map;
-		vdata.reserve(pos_lines.size() + norm_lines.size() + uv_lines.size());
+		vdata.reserve(pos_lines.size(), norm_lines.size(), uv_lines.size());
 		idata.reserve(pos_lines.size() + norm_lines.size() + uv_lines.size());
 
 		Face face = Face::triangle;
@@ -119,7 +112,7 @@ namespace Utils {
 						std::getline(contents, line);
 						sscanf_s(line.c_str(), "vn %f %f %f", &n[0], &n[1], &n[2]);
 						
-						vdata.push_back({p, n, u});
+						vdata.push_back(p, n, u);
 						map[fbuff[i]] = vertex_count;
 						vertex_count++;
 

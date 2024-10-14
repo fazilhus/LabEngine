@@ -11,22 +11,27 @@
 namespace Resource {
 
 	Mesh::Mesh()
-		: vao(0), vbo(0), ebo(0) {}
+		: vao(0), vbos(), ebo(0) {}
 
 	Mesh::Mesh(const Mesh& other)
-		: vao(other.vao), vbo(other.vbo), ebo(other.ebo), groups(other.groups) {
+		: vao(other.vao), ebo(other.ebo), groups(other.groups) {
+		for (std::size_t i = 0; i < 3; ++i) {
+			this->vbos[i] = other.vbos[i];
+		}
 	}
 
 	Mesh& Mesh::operator=(const Mesh& other) {
 		this->vao = other.vao;
-		this->vbo = other.vbo;
+		for (std::size_t i = 0; i < 3; ++i) {
+			this->vbos[i] = other.vbos[i];
+		}
 		this->ebo = other.ebo;
 		this->groups = other.groups;
 		return *this;
 	}
 
-	void Mesh::Init(GLfloat* vb, GLuint* ib, const std::size_t* sizes, const std::size_t* offsets,
-		const std::size_t verticies, const std::size_t triangles, const std::size_t count) {
+	void Mesh::Init(const VertexData& vb, const std::vector<GLuint>& ib, const std::size_t* sizes,
+		const std::size_t* offsets, std::size_t count) {
 		// TODO maybe split the vertex data buffer into separate buffers (e.g pos, norm and uv buffers)
 		glGenVertexArrays(1, &this->vao);
 		glBindVertexArray(this->vao);
@@ -34,18 +39,58 @@ namespace Resource {
 		std::size_t stride{ 0 };
 		for (std::size_t i = 0; i < count; ++i) stride += sizes[i];
 
-		glGenBuffers(1, &this->vbo);
-		glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * stride * verticies, vb, GL_STATIC_DRAW);
+		glGenBuffers(3, vbos);
+
+		glBindBuffer(GL_ARRAY_BUFFER, vbos[0]);
+		glBufferData(
+			GL_ARRAY_BUFFER,
+			sizeof(GLfloat) * sizes[0] * vb.pos.size(),
+			vb.pos.data(),
+			GL_STATIC_DRAW);
+		glVertexAttribPointer(
+			0,
+			sizes[0],
+			GL_FLOAT,
+			GL_FALSE,
+			0,
+			NULL);
+
+		glBindBuffer(GL_ARRAY_BUFFER, vbos[1]);
+		glBufferData(
+			GL_ARRAY_BUFFER,
+			sizeof(GLfloat) * sizes[1] * vb.norm.size(),
+			vb.norm.data(),
+			GL_STATIC_DRAW);
+		glVertexAttribPointer(
+			1,
+			sizes[1],
+			GL_FLOAT,
+			GL_FALSE,
+			0,
+			NULL);
+
+		glBindBuffer(GL_ARRAY_BUFFER, vbos[2]);
+		glBufferData(
+			GL_ARRAY_BUFFER,
+			sizeof(GLfloat) * sizes[2] * vb.uv.size(),
+			vb.uv.data(),
+			GL_STATIC_DRAW);
+		glVertexAttribPointer(
+			2,
+			sizes[2],
+			GL_FLOAT,
+			GL_FALSE,
+			0,
+			NULL);
+
 
 		glGenBuffers(1, &this->ebo);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ebo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * 3 * triangles, ib, GL_STATIC_DRAW);
-
-		for (std::size_t i = 0; i < count; ++i) {
-			glVertexAttribPointer(i, sizes[i], GL_FLOAT, GL_FALSE, sizeof(GLfloat) * stride, (GLvoid*)(sizeof(GLfloat) * offsets[i]));
-			glEnableVertexAttribArray(i);
-		}
+		glBufferData(
+			GL_ELEMENT_ARRAY_BUFFER, 
+			sizeof(GLuint) * ib.size(),
+			ib.data(), 
+			GL_STATIC_DRAW);
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -55,7 +100,7 @@ namespace Resource {
 
 	void Mesh::DeInit() {
 		glDeleteVertexArrays(1, &vao);
-		glDeleteBuffers(1, &vbo);
+		glDeleteBuffers(3, vbos);
 		glDeleteBuffers(1, &ebo);
 	}
 
@@ -71,7 +116,7 @@ namespace Resource {
 	}
 
 	void Mesh::DrawGroup(std::size_t i) const {
-		if (i > groups.size()) {
+		if (i >= groups.size()) {
 			std::cerr << "[ERROR] attempting to draw " << i + 1 << "th primitive group, when only " << groups.size() << " exist\n";
 			return;
 		}
@@ -90,10 +135,31 @@ namespace Resource {
 
 	void Mesh::Bind() const {
 		glBindVertexArray(this->vao);
+		for (std::size_t i = 0; i < 3; ++i) {
+			glEnableVertexAttribArray(i);
+		}
 	}
 
 	void Mesh::UnBind() const {
 		glBindVertexArray(0);
+	}
+
+	void VertexData::clear() {
+		pos.clear();
+		norm.clear();
+		uv.clear();
+	}
+
+	void VertexData::reserve(std::size_t a, std::size_t b, std::size_t c) {
+		pos.reserve(a);
+		norm.reserve(b);
+		uv.reserve(c);
+	}
+
+	void VertexData::push_back(Math::vec3 p, Math::vec3 n, Math::vec2 u) {
+		pos.push_back(p);
+		norm.push_back(n);
+		uv.push_back(u);
 	}
 
 	OBJMeshBuilder::OBJMeshBuilder(const std::string& path) {
@@ -111,7 +177,7 @@ namespace Resource {
 		Mesh mesh{};
 		std::size_t sizes[] = { 3, 3, 2 };
 		std::size_t offsets[] = { 0, 3, 6 };
-		mesh.Init((GLfloat*)vertexes.data(), (GLuint*)indices.data(), sizes, offsets, vertexes.size(), indices.size() / 3, 3);
+		mesh.Init(vertexes, indices, sizes, offsets, 3);
 		mesh.PushPrimitive({ indices.size(), 0, {} });
 		return mesh;
 	}
