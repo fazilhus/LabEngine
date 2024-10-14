@@ -23,13 +23,16 @@ namespace Resource {
 
 		std::unordered_map<std::string, GLuint> uniformLoc;
 
+		bool used;
+
 	public:
 		Shader(const std::string& vsPath, const std::string& fsPath);
 		~Shader();
 
 		void Cleanup();
 
-		void Use() const;
+		void Use();
+		void UnUse();
 
 		GLuint GetHandle() const { return handle; }
 		std::string& GetVSSrc() { return vsSrc; }
@@ -63,8 +66,8 @@ namespace Resource {
 		ShaderManager& operator=(const ShaderManager&) = delete;
 		ShaderManager& operator=(ShaderManager&&) = delete;
 
-		void NewShader(const std::string& name, const std::string& vsPath, const std::string& fsPath);
-		std::weak_ptr<Shader> GetShader(const std::string& name) const;
+		void Push(const std::string& name, const std::string& vsPath, const std::string& fsPath);
+		std::weak_ptr<Shader> Get(const std::string& name) const;
 
 		void RecompileAll();
 		void Recompile(const std::string& name);

@@ -41,6 +41,11 @@ namespace Resource {
 
 		void PushPrimitive(PrimitiveGroup group);
 
+		std::size_t GetGroupsSize() const { return groups.size(); }
+		const std::vector<PrimitiveGroup>& GetGroups() const { return groups; }
+		std::vector<PrimitiveGroup>& GetGroups() { return groups; }
+
+
 	private:
 		void Bind() const;
 		void UnBind() const;
@@ -61,13 +66,13 @@ namespace Resource {
 		MeshBuilder() = default;
 		MeshBuilder(const MeshBuilder&) = delete;
 		MeshBuilder(MeshBuilder&&) = delete;
-		virtual ~MeshBuilder() = 0;
+		virtual ~MeshBuilder() {}
 
 		MeshBuilder& operator=(const MeshBuilder&) = delete;
 		MeshBuilder& operator=(MeshBuilder&&) = delete;
 
 		virtual void ReadMeshData(const std::string& path) = 0;
-		virtual Mesh CreateMesh(const std::weak_ptr<Resource::Material>& mat) const = 0;
+		virtual Mesh CreateMesh() const = 0;
 	};
 
 	class OBJMeshBuilder final : public MeshBuilder {
@@ -76,7 +81,7 @@ namespace Resource {
 		~OBJMeshBuilder() override = default;
 
 		void ReadMeshData(const std::string& path) override;
-		Mesh CreateMesh(const std::weak_ptr<Resource::Material>& mat) const override;
+		Mesh CreateMesh() const override;
 	};
 
 	class GLTFMeshBuilder final : public MeshBuilder {
@@ -84,7 +89,7 @@ namespace Resource {
 		~GLTFMeshBuilder() override = default;
 
 		void ReadMeshData(const std::string& path) override;
-		Mesh CreateMesh(const std::weak_ptr<Resource::Material>& mat) const override;
+		Mesh CreateMesh() const override;
 	};
 
 } // Resource

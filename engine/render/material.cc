@@ -9,42 +9,46 @@ namespace Resource {
 		: shininess(32.0f) {
 	}
 
-	Material::Material(const std::shared_ptr<Resource::Texture>& diff,
-		const std::shared_ptr<Resource::Texture>& spec, float32 shin,
+	Material::Material(const std::weak_ptr<Resource::Texture>& diff,
+		const std::weak_ptr<Resource::Texture>& spec, float32 shin,
 		const std::weak_ptr<Shader>& shader)
 		: diffuse(diff), specular(spec), shininess(shin), shader(shader) {
 	}
 
+	Material::Material(const Material& other)
+		: diffuse(other.diffuse), specular(other.specular), shininess(other.shininess),
+		shader(other.shader) {
+	}
+
+	Material::Material(Material&& other) noexcept
+		: diffuse(std::move(other.diffuse)), specular(std::move(other.specular)),
+		shininess(std::move(other.shininess)), shader(std::move(other.shader)) {
+	}
+
+	Material& Material::operator=(const Material& other) {
+		diffuse = other.diffuse;
+		specular = other.specular;
+		shininess = other.shininess;
+		shader = other.shader;
+		return *this;
+	}
+
+	Material& Material::operator=(Material&& other) noexcept {
+		diffuse = std::move(other.diffuse);
+		specular = std::move(other.specular);
+		shininess = other.shininess;
+		shader = std::move(other.shader);
+		return *this;
+	}
+
 	void Material::Use() {
 		shader.lock()->UploadUniform1i("material.diffuse", 0);
-		diffuse->Bind(0);
+		diffuse.lock()->Bind(0);
 
 		shader.lock()->UploadUniform1i("material.specular", 1);
-		specular->Bind(1);
+		specular.lock()->Bind(1);
 
 		shader.lock()->UploadUniform1f("material.shininess", shininess);
-	}
-
-	void MaterialManager::NewMaterial(const std::string& name, const std::string& diffTexPath,
-		const std::string& specTexPath, float shin, const std::weak_ptr<Shader>& shader) {
-		if (materials.contains(name)) {
-			std::cerr << "[WARNING] Overwriting existing material " << name << '\n';
-			materials[name].reset();
-		}
-
-		auto diffTex = std::make_shared<Resource::Texture>(diffTexPath, 1);
-		auto specTex = std::make_shared<Resource::Texture>(specTexPath, 1);
-
-		materials[name] = std::make_shared<Resource::Material>(diffTex, specTex, shin, shader);
-	}
-
-	std::weak_ptr<Material> MaterialManager::GetMaterial(const std::string& name) const {
-		if (!materials.contains(name)) {
-			std::cerr << "[ERROR] Trying to access nonexistent material " << name << '\n';
-			return {};
-		}
-
-		return materials.at(name);
 	}
 
 } // Resource

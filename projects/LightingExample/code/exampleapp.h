@@ -33,7 +33,7 @@ namespace Example {
 	private:
 		Render::LightManager lightManager;
 		Resource::ShaderManager shaderManager;
-		Resource::MaterialManager materialManager;
+		Resource::TextureManager textureManager;
 		Resource::GraphicsNode obj1;
 		Resource::GraphicsNode obj2;
 		//Resource::GraphicsNode obj3;

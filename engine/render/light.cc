@@ -132,6 +132,8 @@ namespace Render {
 
 			mesh->Draw();
 		}
+
+		s->UnUse();
 	}
 
 } // Render

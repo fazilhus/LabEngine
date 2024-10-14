@@ -61,53 +61,67 @@ namespace Example {
 			// set clear color to gray
 			glClearColor(0.01f, 0.01f, 0.01f, 1.0f);
 
-			shaderManager.NewShader(
+			shaderManager.Push(
 				"lightSourceShader", 
 				"../projects/LightingExample/res/shaders/lightVert.glsl",
 				"../projects/LightingExample/res/shaders/lightFrag.glsl");
-			shaderManager.NewShader(
+			shaderManager.Push(
 				"defaultShader",
 				"../projects/LightingExample/res/shaders/vertex.glsl",
 				"../projects/LightingExample/res/shaders/fragment.glsl");
 
-			materialManager.NewMaterial(
-				"cat",
+			textureManager.Push(
+				"cat_diff",
 				"../projects/LightingExample/res/textures/cat_diff.tga",
+				1);
+			textureManager.Push(
+				"cat_spec",
 				"../projects/LightingExample/res/textures/cat_spec.tga",
-				16.0f,
-				shaderManager.GetShader("defaultShader"));
-
-			materialManager.NewMaterial(
-				"box",
+				1);
+			textureManager.Push(
+				"box_diff",
 				"../projects/LightingExample/res/textures/container2.png",
+				1);
+			textureManager.Push(
+				"box_spec",
 				"../projects/LightingExample/res/textures/container2_specular.png",
-				64.0f,
-				shaderManager.GetShader("defaultShader"));
+				1);
+
+			auto catMat = std::make_shared<Resource::Material>(
+				textureManager.Get("cat_diff"),
+				textureManager.Get("cat_spec"),
+				16.0f,
+				shaderManager.Get("defaultShader"));
+			auto boxMat = std::make_shared<Resource::Material>(
+				textureManager.Get("box_diff"),
+				textureManager.Get("box_spec"),
+				32.0f,
+				shaderManager.Get("defaultShader"));
 
 			Resource::OBJMeshBuilder meshBuilder{ "../projects/LightingExample/res/meshes/cube.obj" };
-			auto cubeMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh({}));
+			auto cubeMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh());
 
 			meshBuilder.ReadMeshData("../projects/LightingExample/res/meshes/cube_quad.obj");
 			auto cubeQuadMesh = std::make_shared<Resource::Mesh>(
-				meshBuilder.CreateMesh(materialManager.GetMaterial("box")));
+				meshBuilder.CreateMesh());
 
 			meshBuilder.ReadMeshData("../projects/LightingExample/res/meshes/cat.obj");
 			auto catMesh = std::make_shared<Resource::Mesh>(
-				meshBuilder.CreateMesh(materialManager.GetMaterial("cat")));
+				meshBuilder.CreateMesh());
 
 			this->obj1 = Resource::GraphicsNode();
 			this->obj1.SetMesh(catMesh);
-			this->obj1.SetShader(shaderManager.GetShader("defaultShader"));
+			this->obj1.PushMaterial(catMat);
 			this->obj1.transform *= Math::translate({1, 0, 1});
 
 			this->obj2 = Resource::GraphicsNode();
 			this->obj2.SetMesh(cubeQuadMesh);
-			this->obj2.SetShader(shaderManager.GetShader("defaultShader"));
+			this->obj2.PushMaterial(boxMat);
 			this->obj2.transform *= Math::scale(0.5f);
 			this->obj2.transform *= Math::translate({ 0, 0, 2 });
 
-			lightManager.SetLightingShader(shaderManager.GetShader("defaultShader"));
-			lightManager.SetLightSourceShader(shaderManager.GetShader("lightSourceShader"));
+			lightManager.SetLightingShader(shaderManager.Get("defaultShader"));
+			lightManager.SetLightSourceShader(shaderManager.Get("lightSourceShader"));
 			lightManager.SetMesh(cubeMesh);
 
 			Render::DirectionalLight dl;

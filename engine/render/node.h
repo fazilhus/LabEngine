@@ -15,7 +15,7 @@ namespace Resource {
 
 	private:
 		std::shared_ptr<Mesh> mesh;
-		std::weak_ptr<Shader> shader;
+		std::vector<std::shared_ptr<Material>> materials;
 
 	public:
 		GraphicsNode() = default;
@@ -24,14 +24,14 @@ namespace Resource {
 
 		void DeInit();
 
-		void SetMesh(std::shared_ptr<Mesh> meshPtr);
-		void SetShader(std::weak_ptr<Shader> shaderPtr);
+		void SetMesh(const std::shared_ptr<Mesh>& meshPtr) { mesh = meshPtr; }
+		void PushMaterial(const std::shared_ptr<Material>& mat);
 
 		const Mesh& GetMesh() const { return *mesh; }
-		const Shader& GetShader() const { return *shader.lock(); }
+		const std::vector<std::shared_ptr<Material>>& GetMaterials() const { return materials; }
 
 		Mesh& GetMesh() { return *mesh; }
-		Shader& GetShader() { return *shader.lock(); }
+		std::vector<std::shared_ptr<Material>>& GetMaterials() { return materials; }
 
 		void Draw(const Render::Camera& cam) const;
 	};

@@ -2,7 +2,9 @@
 
 #include <GL/glew.h>
 
+#include <memory>
 #include <string>
+#include <unordered_map>
 
 namespace Resource {
 
@@ -20,8 +22,24 @@ namespace Resource {
 		void LoadFromFile(const std::string& path, int flip = 0);
 		void Unload();
 
-		void Bind(GLuint loc = 0) const;
+		void Bind(GLint loc = 0) const;
 		void UnBind() const;
+	};
+
+	class TextureManager {
+		std::unordered_map<std::string, std::shared_ptr<Texture>> textures;
+
+	public:
+		TextureManager() = default;
+		TextureManager(const TextureManager&) = delete;
+		TextureManager(TextureManager&&) = delete;
+		~TextureManager() = default;
+
+		TextureManager& operator=(const TextureManager&) = delete;
+		TextureManager& operator=(TextureManager&&) = delete;
+
+		void Push(const std::string& name, const std::string& path, int flip = 0);
+		std::weak_ptr<Texture> Get(const std::string& name) const;
 	};
 
 } // Resource

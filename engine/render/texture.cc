@@ -1,6 +1,8 @@
 #include "config.h"
 #include "texture.h"
 
+#include <iostream>
+
 #include "stb_image.h"
 
 namespace Resource {
@@ -50,14 +52,33 @@ namespace Resource {
 		}
 	}
 
-	void Texture::Bind(GLuint loc) const {
+	void Texture::Bind(GLint loc) const {
+		//glUniform1i(GL_TEXTURE0, loc);
 		glActiveTexture(GL_TEXTURE0 + loc);
 		glBindTexture(GL_TEXTURE_2D, handle);
-		//glUniform1i(GL_TEXTURE0, 0);
 	}
 
 	void Texture::UnBind() const {
 		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+
+	void TextureManager::Push(const std::string& name, const std::string& path, int flip) {
+		if (textures.contains(name)) {
+			std::cerr << "[WARNING] Overwriting existing shader " << name << '\n';
+			textures[name]->Unload();
+			textures[name].reset();
+		}
+
+		textures[name] = std::make_shared<Texture>(path, flip);
+	}
+
+	std::weak_ptr<Texture> TextureManager::Get(const std::string& name) const {
+		if (!textures.contains(name)) {
+			std::cerr << "[ERROR] Trying to access nonexistent texture " << name << '\n';
+			return {};
+		}
+
+		return textures.at(name);
 	}
 
 } // Resource

@@ -10,7 +10,7 @@
 namespace Resource {
 
 	Shader::Shader(const std::string& vsPath, const std::string& fsPath)
-		: handle(0), vHandle(0), fHandle(0), vsSrcPath(vsPath), fsSrcPath(fsPath) {
+		: handle(0), vHandle(0), fHandle(0), vsSrcPath(vsPath), fsSrcPath(fsPath), used(false) {
 		ReadSource(vsSrcPath, vsSrc);
 		ReadSource(fsSrcPath, fsSrc);
 
@@ -35,8 +35,18 @@ namespace Resource {
 		}
 	}
 
-	void Shader::Use() const {
-		glUseProgram(handle);
+	void Shader::Use() {
+		if (!used) {
+			glUseProgram(handle);
+			used = true;
+		}
+	}
+
+	void Shader::UnUse() {
+		if (used) {
+			glUseProgram(0);
+			used = false;
+		}
 	}
 
 	void Shader::UploadUniform1i(const std::string& name, GLint v) {
@@ -151,7 +161,7 @@ namespace Resource {
 		return uniformLoc[name];
 	}
 
-	void ShaderManager::NewShader(const std::string& name, const std::string& vsPath, const std::string& fsPath) {
+	void ShaderManager::Push(const std::string& name, const std::string& vsPath, const std::string& fsPath) {
 		if (shaders.contains(name)) {
 			std::cerr << "[WARNING] Overwriting existing shader " << name << '\n';
 			shaders[name]->Cleanup();
@@ -161,7 +171,7 @@ namespace Resource {
 		shaders[name] = std::make_shared<Resource::Shader>(vsPath, fsPath);
 	}
 
-	std::weak_ptr<Shader> ShaderManager::GetShader(const std::string& name) const {
+	std::weak_ptr<Shader> ShaderManager::Get(const std::string& name) const {
 		if (!shaders.contains(name)) {
 			std::cerr << "[ERROR] Trying to access nonexistent shader " << name << '\n';
 			return {};

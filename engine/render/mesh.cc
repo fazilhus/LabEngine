@@ -107,12 +107,12 @@ namespace Resource {
 		parser.ParseOBJ(path, vertexes, indices);
 	}
 
-	Mesh OBJMeshBuilder::CreateMesh(const std::weak_ptr<Resource::Material>& mat) const {
+	Mesh OBJMeshBuilder::CreateMesh() const {
 		Mesh mesh{};
 		std::size_t sizes[] = { 3, 3, 2 };
 		std::size_t offsets[] = { 0, 3, 6 };
 		mesh.Init((GLfloat*)vertexes.data(), (GLuint*)indices.data(), sizes, offsets, vertexes.size(), indices.size() / 3, 3);
-		mesh.PushPrimitive({ indices.size(), 0, mat });
+		mesh.PushPrimitive({ indices.size(), 0, {} });
 		return mesh;
 	}
 
@@ -129,7 +129,8 @@ namespace Resource {
 	void GLTFMeshBuilder::ReadMeshData(const std::string& path) {
 	}
 
-	Mesh GLTFMeshBuilder::CreateMesh(const std::weak_ptr<Resource::Material>& mat) const {
+	Mesh GLTFMeshBuilder::CreateMesh() const {
+		return {};
 	}
 
 } // Resource
