@@ -9,6 +9,8 @@ SET(files_render_display
 	grid.cc
 	mesh.h
 	mesh.cc
+	model.h
+	model.cc
 	texture.h
 	texture.cc
 	camera.h

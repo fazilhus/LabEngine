@@ -4,13 +4,12 @@
 //------------------------------------------------------------------------------
 #include "config.h"
 #include "exampleapp.h"
-#include <cstring>
 #include "imgui.h"
 
 #include "render/mesh.h"
-#include "math/mat4.h"
 #include "math/math.h"
 #include "input/input.h"
+#include "render/model.h"
 
 #include <iostream>
 
@@ -43,7 +42,7 @@ namespace Example {
 
 		Input::InputManager::Destroy();
 		Core::App::Close();
-		this->obj1.DeInit();
+		//this->obj1.DeInit();
 		delete this->camera;
 	}
 
@@ -74,21 +73,18 @@ namespace Example {
 				"defaultShader",
 				(resPath / "shaders/vertex.glsl").make_preferred(),
 				(resPath / "shaders/fragment.glsl").make_preferred());
+			shaderManager.Push(
+				"BlinnPhongShader",
+				(resPath / "shaders/blinnVertex.glsl").make_preferred(),
+				(resPath / "shaders/blinnFragment.glsl").make_preferred());
 
 			Resource::OBJMeshBuilder meshBuilder{ (resPath / "meshes/cube.obj").make_preferred() };
 			auto cubeMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh());
 
-			auto model = fx::gltf::LoadFromText(
-				(resPath / "models/Cube/gltf/Cube.gltf").make_preferred());
+			cube = Resource::Model(
+				resPath / std::filesystem::path("models/Cube/gltf/Cube.gltf").make_preferred());
 
-			auto texDirPath = (resPath / "models/Cube/gltf").make_preferred();
-			for (const auto& el : model.images) {
-				auto texPath = (texDirPath / el.uri).make_preferred();
-				//std::cout << texPath << '\n';
-				textureManager.Push(texPath.stem().string(), texPath);
-			}
-
-			lightManager.SetLightingShader(shaderManager.Get("defaultShader"));
+			lightManager.SetLightingShader(shaderManager.Get("BlinnPhongShader"));
 			lightManager.SetLightSourceShader(shaderManager.Get("lightSourceShader"));
 			lightManager.SetMesh(cubeMesh);
 

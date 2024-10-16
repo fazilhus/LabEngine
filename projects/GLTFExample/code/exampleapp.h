@@ -10,6 +10,7 @@
 #include "render/window.h"
 #include "render/camera.h"
 #include "render/light.h"
+#include "render/model.h"
 #include "render/node.h"
 
 
@@ -34,8 +35,9 @@ namespace Example {
 		Render::LightManager lightManager;
 		Resource::ShaderManager shaderManager;
 		Resource::TextureManager textureManager;
-		Resource::GraphicsNode obj1;
-		Resource::GraphicsNode obj2;
+		Resource::Model cube;
+		//Resource::GraphicsNode obj1;
+		//Resource::GraphicsNode obj2;
 		//Resource::GraphicsNode obj3;
 		Render::Camera* camera;
 		Display::Window* window;
