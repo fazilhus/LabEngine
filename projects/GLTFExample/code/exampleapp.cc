@@ -159,6 +159,8 @@ namespace Example {
 			//this->obj2.Draw(*camera);
 			//this->obj3.Draw(*camera);
 
+			cube.Draw(shaderManager.Get("defaultShader"), *camera);
+
 			lightManager.DrawLightSources(*camera);
 
 			// transfer new frame to window

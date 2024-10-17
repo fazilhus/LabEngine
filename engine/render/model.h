@@ -1,52 +1,44 @@
 #pragma once
 
-#include <filesystem>
 #include <vector>
 
+#include "camera.h"
 #include "shader.h"
+#include "fx/gltf.h"
 #include "GL/glew.h"
 
 namespace Resource {
 
-	class GLTFMesh {
-	public:
-		struct Primitive {
-			GLuint vao;
-			GLuint indices;
-			GLuint offset = 0;
-			GLenum indexType;
+	struct Model {
+		struct Mesh {
+			struct Primitive {
+				GLuint vao;
+				GLuint indices;
+				GLuint offset = 0;
+				GLenum indexType;
+				GLenum mode;
+
+				void Draw(const std::shared_ptr<Shader>& shader, const Render::Camera& cam) const;
+			};
+
+			std::vector<Primitive> groups;
 		};
 
-	private:
-		std::vector<Primitive> groups;
+		struct Buffer {
+			GLenum target;
+			GLuint handle;
+		};
 
-	public:
-		GLTFMesh() = default;
-		GLTFMesh(const std::filesystem::path& filepath);
-		GLTFMesh(const GLTFMesh&) = default;
-		GLTFMesh(GLTFMesh&&) noexcept = default;
-		~GLTFMesh() = default;
+		std::vector<Mesh> meshes;
+		std::vector<Buffer> buffers;
 
-		GLTFMesh& operator=(const GLTFMesh&) = default;
-		GLTFMesh& operator=(GLTFMesh&&) noexcept = default;
-
-	};
-
-	class Model {
-		std::vector<GLTFMesh> meshes;
-		std::vector<GLuint> buffers;
-
-	public:
 		Model() = default;
 		Model(const std::filesystem::path& filepath);
-		Model(const Model&) = default;
-		Model(Model&&) noexcept = default;
-		~Model() = default;
 
-		Model& operator=(const Model&) = default;
-		Model& operator=(Model&&) noexcept = default;
+		void Draw(const std::weak_ptr<Shader>& shader, const Render::Camera& cam) const;
 
-		void Draw(const std::weak_ptr<Shader>& shader) const;
+	private:
+		GLuint SlotFromGLTF(const std::string& attribute) const;
 	};
 
 } // Resource
