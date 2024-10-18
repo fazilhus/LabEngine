@@ -4,13 +4,39 @@
 #include <iostream>
 
 #include "stb_image.h"
+#include "fx/gltf.h"
 
 namespace Resource {
 
 	Texture::Texture(const std::filesystem::path& path, int flip) {
+		SetDefaultSampling();
 		LoadFromFile(path, flip);
 	}
-	
+
+	Texture::Texture(const std::filesystem::path& dir, const fx::gltf::Document& doc, int tex_i, int flip) {
+		SetDefaultSampling();
+		if (!doc.samplers.empty()) {
+			const auto& sampler = doc.samplers[doc.textures[tex_i].sampler];
+
+			wrap = { (GLint)sampler.wrapS, (GLint)sampler.wrapT };
+
+			if (sampler.minFilter == fx::gltf::Sampler::MinFilter::None) {
+				filter.min = GL_LINEAR;
+			}
+			else {
+				filter.min = (GLint)sampler.minFilter;
+			}
+
+			if (sampler.magFilter == fx::gltf::Sampler::MagFilter::None) {
+				filter.mag = GL_LINEAR;
+			}
+			else {
+				filter.mag = (GLint)sampler.magFilter;
+			}
+		}
+		LoadFromGLTF(dir, doc, tex_i, flip);
+	}
+
 	Texture::Texture(const Texture& other)
 		: handle(other.handle) {
 	}
@@ -19,6 +45,23 @@ namespace Resource {
 		this->handle = other.handle;
 		return *this;
 	}
+
+	void Texture::Unload() {
+		if (handle != 0) {
+			glDeleteTextures(1, &handle);
+		}
+	}
+
+	void Texture::Bind(GLint loc) const {
+		//glUniform1i(GL_TEXTURE0, loc);
+		glActiveTexture(GL_TEXTURE0 + loc);
+		glBindTexture(GL_TEXTURE_2D, handle);
+	}
+
+	void Texture::UnBind() const {
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+
 	void Texture::LoadFromFile(const std::filesystem::path& path, int flip) {
 		if (!std::filesystem::exists(path)) {
 			std::cerr << "[ERROR] trying to read non-existing texture file: " << path << '\n';
@@ -36,35 +79,45 @@ namespace Resource {
 		glCreateTextures(GL_TEXTURE_2D, 1, &handle);
 		glBindTexture(GL_TEXTURE_2D, handle);
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap.s);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap.s);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter.min);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter.mag);
+
 		float maxAniso{ 1.0f };
 		glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &maxAniso);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY, maxAniso);
 
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid*)image);
-		glGenerateMipmap(GL_TEXTURE_2D);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, w, h, 0,
+			GL_RGB, GL_UNSIGNED_BYTE, (GLvoid*)image);
+
+		GenerateMipMapifNeeded();
 
 		glBindTexture(GL_TEXTURE_2D, 0);
 		stbi_image_free(image);
 	}
 
-	void Texture::Unload() {
-		if (handle != 0) {
-			glDeleteTextures(1, &handle);
+	void Texture::LoadFromGLTF(const std::filesystem::path& dir, const fx::gltf::Document& doc, int tex_i, int flip) {
+		const auto& path = dir / std::filesystem::path(doc.images[doc.textures[tex_i].source].uri).make_preferred();
+		LoadFromFile(path, flip);
+	}
+
+	void Texture::SetDefaultSampling() {
+		wrap = { GL_REPEAT, GL_REPEAT };
+		filter = { GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR };
+	}
+
+	void Texture::GenerateMipMapifNeeded() const {
+		switch (filter.min) {
+		case GL_NEAREST_MIPMAP_NEAREST:
+		case GL_NEAREST_MIPMAP_LINEAR:
+		case GL_LINEAR_MIPMAP_NEAREST:
+		case GL_LINEAR_MIPMAP_LINEAR: {
+			glGenerateMipmap(GL_TEXTURE_2D);
+			break;
 		}
-	}
-
-	void Texture::Bind(GLint loc) const {
-		//glUniform1i(GL_TEXTURE0, loc);
-		glActiveTexture(GL_TEXTURE0 + loc);
-		glBindTexture(GL_TEXTURE_2D, handle);
-	}
-
-	void Texture::UnBind() const {
-		glBindTexture(GL_TEXTURE_2D, 0);
+		default: break;
+		}
 	}
 
 	void TextureManager::Push(const std::string& name, const std::filesystem::path& path, int flip) {
@@ -85,5 +138,4 @@ namespace Resource {
 
 		return textures.at(name);
 	}
-
 } // Resource

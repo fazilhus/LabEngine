@@ -36,6 +36,7 @@ namespace Example {
 		Resource::ShaderManager shaderManager;
 		Resource::TextureManager textureManager;
 		Resource::Model cube;
+		Resource::Model avocado;
 		//Resource::GraphicsNode obj1;
 		//Resource::GraphicsNode obj2;
 		//Resource::GraphicsNode obj3;

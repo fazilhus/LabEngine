@@ -7,18 +7,35 @@
 
 namespace Resource {
 
-	void Model::Mesh::Primitive::Draw(const std::shared_ptr<Shader>& shader, const Render::Camera& cam) const {
+	void Model::Mesh::Primitive::Draw(const Render::Camera& cam, const Math::mat4& transform) const {
+		const auto& mat = material.lock();
+		const auto& s = mat->GetShader().lock();
+
+		s->Use();
+
 		glBindVertexArray(vao);
 
-		auto mat = cam.GetPerspective() * cam.GetView();
+		auto normMat = dynamic_cast<NormalMapMaterial*>(mat.get());
+		if (normMat) {
+			normMat->Use();
+		}
+		else {
+			mat->Use();
+		}
 
-		shader->UploadUniformMat4fv("mvp", mat);
+		const auto& mvp = cam.GetPerspective() * cam.GetView();
+		s->UploadUniformMat4fv("perspective", cam.GetPerspective());
+		s->UploadUniformMat4fv("view", cam.GetView());
+		s->UploadUniformMat4fv("transform", transform);
 		glDrawElements(mode, indices, indexType, (GLvoid*)offset);
 
+		
 		glBindVertexArray(0);
+
+		s->UnUse();
 	}
 
-	Model::Model(const std::filesystem::path& filepath) {
+	Model::Model(const std::filesystem::path& filepath, const ShaderManager& sm) {
 		if (!std::filesystem::exists(filepath)) {
 			std::cerr << "[ERROR] trying to access non-existing file: " << filepath << '\n';
 			return;
@@ -30,11 +47,37 @@ namespace Resource {
 			glGenBuffers(1, &buffers[i].handle);
 
 		for (const auto& [i, buf] : std::views::enumerate(doc.bufferViews)) {
-			auto target = static_cast<GLenum>(buf.target);
+			GLenum target = static_cast<GLenum>(buf.target);
 			buffers[i].target = target;
 			glBindBuffer(target, buffers[i].handle);
 			const auto dataPtr = reinterpret_cast<GLbyte*>(doc.buffers[buf.buffer].data.data()) + buf.byteOffset;
 			glBufferData(target, buf.byteLength, dataPtr, GL_STATIC_DRAW);
+		}
+
+		for (const auto& [i, tex] : std::views::enumerate(doc.textures)) {
+			textures.push_back(std::make_shared<Texture>(filepath.parent_path(), doc, i));
+		}
+
+		for (const auto& mat : doc.materials) {
+			if (mat.normalTexture.empty()) {
+				Material m(
+					textures[mat.pbrMetallicRoughness.baseColorTexture.index],
+					textures[mat.pbrMetallicRoughness.metallicRoughnessTexture.index],
+					8.0f,
+					sm.Get("BlinnPhongShader")
+				);
+				materials.push_back(std::make_shared<Material>(m));
+			}
+			else {
+				NormalMapMaterial m(
+					textures[mat.pbrMetallicRoughness.baseColorTexture.index],
+					textures[mat.pbrMetallicRoughness.metallicRoughnessTexture.index],
+					textures[mat.normalTexture.index],
+					8.0f,
+					sm.Get("BlinnPhongNormalShader")
+				);
+				materials.push_back(std::make_shared<NormalMapMaterial>(m));
+			}
 		}
 
 		for (const auto& mesh : doc.meshes) {
@@ -83,6 +126,7 @@ namespace Resource {
 				p.offset = accessor.byteOffset;
 				p.mode = (GLenum)group.mode;
 				p.indexType = (GLenum)accessor.componentType;
+				p.material = materials[group.material];
 				m.groups.push_back(p);
 
 				glBindBuffer(buffers[bv].target, buffers[bv].handle);
@@ -95,24 +139,19 @@ namespace Resource {
 		}
 	}
 
-	void Model::Draw(const std::weak_ptr<Shader>& shader, const Render::Camera& cam) const {
-		const auto& s = shader.lock();
-		s->Use();
-
+	void Model::Draw(const Render::Camera& cam) const {
 		for (const auto& mesh : meshes) {
 			for (const auto& group : mesh.groups) {
-				group.Draw(s, cam);
+				group.Draw(cam, transform);
 			}
 		}
-
-		s->UnUse();
 	}
 
 	GLuint Model::SlotFromGLTF(const std::string& attribute) const {
 		if (attribute == "POSITION") return 0;
 		if (attribute == "NORMAL") return 1;
-		if (attribute == "TEXCOORD_0") return 3;
-		if (attribute == "TANGENT") return 4;
+		if (attribute == "TEXCOORD_0") return 2;
+		if (attribute == "TANGENT") return 3;
 		assert(false && "unsupported vertex attribute");
 		return -1;
 	}

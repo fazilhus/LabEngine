@@ -77,14 +77,25 @@ namespace Example {
 				"BlinnPhongShader",
 				(resPath / "shaders/blinnVertex.glsl").make_preferred(),
 				(resPath / "shaders/blinnFragment.glsl").make_preferred());
+			shaderManager.Push(
+				"BlinnPhongNormalShader",
+				(resPath / "shaders/blinnNormVertex.glsl").make_preferred(),
+				(resPath / "shaders/blinnNormFragment.glsl").make_preferred());
 
 			Resource::OBJMeshBuilder meshBuilder{ (resPath / "meshes/cube.obj").make_preferred() };
 			auto cubeMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh());
 
 			cube = Resource::Model(
-				resPath / std::filesystem::path("models/Cube/gltf/Cube.gltf").make_preferred());
+				resPath / std::filesystem::path("models/Cube/gltf/Cube.gltf").make_preferred(),
+				shaderManager);
+			cube.transform *= Math::translate({2.5f, 0.0f, 0.0f});
+			avocado = Resource::Model(
+				resPath / std::filesystem::path("models/Avocado/gltf/Avocado.gltf").make_preferred(),
+				shaderManager);
+			avocado.transform *= Math::scale(10.0f) * Math::rotationy(Math::toRad(180.0f));
 
-			lightManager.SetLightingShader(shaderManager.Get("BlinnPhongShader"));
+			lightManager.PushLightingShader(shaderManager.Get("BlinnPhongShader"));
+			lightManager.PushLightingShader(shaderManager.Get("BlinnPhongNormalShader"));
 			lightManager.SetLightSourceShader(shaderManager.Get("lightSourceShader"));
 			lightManager.SetMesh(cubeMesh);
 
@@ -159,7 +170,8 @@ namespace Example {
 			//this->obj2.Draw(*camera);
 			//this->obj3.Draw(*camera);
 
-			cube.Draw(shaderManager.Get("defaultShader"), *camera);
+			cube.Draw(*camera);
+			avocado.Draw(*camera);
 
 			lightManager.DrawLightSources(*camera);
 

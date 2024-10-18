@@ -111,14 +111,14 @@ namespace Render {
 		std::vector<SpotLight> spotLights;
 		std::size_t spotLightsCount;
 
-		std::weak_ptr<Resource::Shader> lightingShader;
+		std::vector<std::weak_ptr<Resource::Shader>> lightingShaders;
 		std::weak_ptr<Resource::Shader> lightSourceShader;
 		std::shared_ptr<Resource::Mesh> mesh;
 
 	public:
 		LightManager();
 
-		void SetLightingShader(const std::weak_ptr<Resource::Shader>& s) { this->lightingShader = s; }
+		void PushLightingShader(const std::weak_ptr<Resource::Shader>& s) { this->lightingShaders.push_back(s); }
 		void SetLightSourceShader(const std::weak_ptr<Resource::Shader>& s) { this->lightSourceShader = s; }
 		void SetMesh(const std::shared_ptr<Resource::Mesh>& m) { this->mesh = m; }
 

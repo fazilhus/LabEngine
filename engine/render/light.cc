@@ -71,41 +71,43 @@ namespace Render {
 	}
 
 	void LightManager::SetLightUniforms() {
-		auto s = lightingShader.lock();
-		s->Use();
+		for (const auto& shader : lightingShaders) {
+			auto s = shader.lock();
+			s->Use();
 
-		// set uniforms for the global light source (a.k.a directional light source)
-		s->UploadUniform3fv("dlight.dir", globalLight.GetDirection());
-		s->UploadUniform3fv("dlight.ambient", globalLight.GetAmbient());
-		s->UploadUniform3fv("dlight.diffuse", globalLight.GetDiffuse());
-		s->UploadUniform3fv("dlight.specular", globalLight.GetSpecular());
+			// set uniforms for the global light source (a.k.a directional light source)
+			s->UploadUniform3fv("dlight.dir", globalLight.GetDirection());
+			s->UploadUniform3fv("dlight.ambient", globalLight.GetAmbient());
+			s->UploadUniform3fv("dlight.diffuse", globalLight.GetDiffuse());
+			s->UploadUniform3fv("dlight.specular", globalLight.GetSpecular());
 
-		std::string uniNameLeft = "plights[";
-		for (std::size_t i = 0; i < pointLightsCount; ++i) {
-			auto temp = uniNameLeft + std::to_string(i);
-			s->UploadUniform3fv(temp + "].pos", pointLights[i].GetPos());
-			s->UploadUniform3fv(temp + "].ambient", pointLights[i].GetAmbient());
-			s->UploadUniform3fv(temp + "].diffuse", pointLights[i].GetDiffuse());
-			s->UploadUniform3fv(temp + "].specular", pointLights[i].GetSpecular());
-			s->UploadUniform3fv(temp + "].attenuation", pointLights[i].GetAttenuation());
+			std::string uniNameLeft = "plights[";
+			for (std::size_t i = 0; i < pointLightsCount; ++i) {
+				auto temp = uniNameLeft + std::to_string(i);
+				s->UploadUniform3fv(temp + "].pos", pointLights[i].GetPos());
+				s->UploadUniform3fv(temp + "].ambient", pointLights[i].GetAmbient());
+				s->UploadUniform3fv(temp + "].diffuse", pointLights[i].GetDiffuse());
+				s->UploadUniform3fv(temp + "].specular", pointLights[i].GetSpecular());
+				s->UploadUniform3fv(temp + "].attenuation", pointLights[i].GetAttenuation());
+			}
+			s->UploadUniform1i("plights_count", pointLightsCount);
+
+			uniNameLeft = "slights[";
+			for (std::size_t i = 0; i < spotLightsCount; ++i) {
+				auto temp = uniNameLeft + std::to_string(i);
+				s->UploadUniform3fv(temp + "].pos", spotLights[i].GetPos());
+				s->UploadUniform3fv(temp + "].dir", spotLights[i].GetDirection());
+				s->UploadUniform1f(temp + "].cutoff", spotLights[i].GetCutoffAngle());
+				s->UploadUniform1f(temp + "].outerCutoff", spotLights[i].GetOuterCutoffAngle());
+				s->UploadUniform3fv(temp + "].ambient", spotLights[i].GetAmbient());
+				s->UploadUniform3fv(temp + "].diffuse", spotLights[i].GetDiffuse());
+				s->UploadUniform3fv(temp + "].specular", spotLights[i].GetSpecular());
+				s->UploadUniform3fv(temp + "].attenuation", spotLights[i].GetAttenuation());
+			}
+			s->UploadUniform1i("slights_count", spotLightsCount);
+
+			s->UnUse();
 		}
-		s->UploadUniform1i("plights_count", pointLightsCount);
-
-		uniNameLeft = "slights[";
-		for (std::size_t i = 0; i < spotLightsCount; ++i) {
-			auto temp = uniNameLeft + std::to_string(i);
-			s->UploadUniform3fv(temp + "].pos", spotLights[i].GetPos());
-			s->UploadUniform3fv(temp + "].dir", spotLights[i].GetDirection());
-			s->UploadUniform1f(temp + "].cutoff", spotLights[i].GetCutoffAngle());
-			s->UploadUniform1f(temp + "].outerCutoff", spotLights[i].GetOuterCutoffAngle());
-			s->UploadUniform3fv(temp + "].ambient", spotLights[i].GetAmbient());
-			s->UploadUniform3fv(temp + "].diffuse", spotLights[i].GetDiffuse());
-			s->UploadUniform3fv(temp + "].specular", spotLights[i].GetSpecular());
-			s->UploadUniform3fv(temp + "].attenuation", spotLights[i].GetAttenuation());
-		}
-		s->UploadUniform1i("slights_count", spotLightsCount);
-
-		s->UnUse();
 	}
 
 	void LightManager::DrawLightSources(const Render::Camera& cam) const {
