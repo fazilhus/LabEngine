@@ -6,6 +6,8 @@ layout(location=2) in vec2 iUV;
 struct Material {
 	sampler2D diffuse;
 	sampler2D specular;
+	vec4 ambient;
+	float roughness;
 	float shininess;
 };
 
@@ -93,8 +95,9 @@ vec3 CalcDirectionalLight(DirectionalLight light, vec3 norm, vec3 cam_dir)
 	vec3 diffuse = light.diffuse * diff * texture(material.diffuse, iUV).rgb;
 
 	vec3 halfwaydir = normalize(ldir + cam_dir);
-	float spec = pow(max(dot(norm, halfwaydir), diff), material.shininess);
-	vec3 specular = light.specular * spec * texture(material.specular, iUV).rgb;
+	float shin = (1 - texture(material.specular, iUV).g) * 128.0;
+	float spec = pow(max(dot(norm, halfwaydir), diff), shin);
+	vec3 specular = light.specular * spec * texture(material.diffuse, iUV).rgb;
 
 	return ambient + diffuse + specular;
 }
@@ -108,8 +111,9 @@ vec3 CalcPointLight(PointLight light, vec3 norm, vec3 cam_dir, vec3 frag_pos)
 	vec3 diffuse = light.diffuse * (diff * texture(material.diffuse, iUV).rgb);
 
 	vec3 halfwaydir = normalize(ldir + cam_dir);
-	float spec = pow(max(dot(norm, halfwaydir), diff), material.shininess);
-	vec3 specular = light.specular * (spec * texture(material.specular, iUV).rgb);
+	float shin = (1 - texture(material.specular, iUV).g) * 128.0;
+	float spec = pow(max(dot(norm, halfwaydir), diff), shin);
+	vec3 specular = light.specular * spec * texture(material.diffuse, iUV).rgb;
 
 	float dist = length(light.pos - frag_pos);
 	float attenuation = 1.0 / (light.attenuation.x + light.attenuation.y * dist + light.attenuation.z * (dist * dist));
@@ -125,8 +129,9 @@ vec3 CalcSpotLight(SpotLight light, vec3 norm, vec3 cam_dir, vec3 frag_pos)
 	vec3 diffuse = light.diffuse * (diff * texture(material.diffuse, iUV).rgb);
 
 	vec3 halfwaydir = normalize(ldir + cam_dir);
-	float spec = pow(max(dot(norm, halfwaydir), diff), material.shininess);
-	vec3 specular = light.specular * (spec * texture(material.specular, iUV).rgb);
+	float shin = (1 - texture(material.specular, iUV).g) * 128.0;
+	float spec = pow(max(dot(norm, halfwaydir), diff), shin);
+	vec3 specular = light.specular * spec * texture(material.diffuse, iUV).rgb;
 
 	float theta = dot(ldir, normalize(-light.dir));
 	float epsilon = light.cutoff - light.outerCutoff;

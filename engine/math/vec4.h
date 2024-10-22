@@ -1,4 +1,5 @@
 #pragma once
+#include <array>
 #include <cstdio>
 
 namespace Math {
@@ -7,11 +8,13 @@ namespace Math {
 	public:
 		float x, y, z, w;
 
-		vec4(const float x, const float y, const float z, const float w) : x(x), y(y), z(z), w(w) {}
+		vec4(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
 
 		vec4() : vec4(0, 0, 0, 0) {}
 
 		vec4(float v) : vec4(v, v, v, v) {}
+
+		vec4(const std::array<float, 4>& a) : vec4(a[0], a[1], a[2], a[3]) {}
 
 		vec4(const vec4& other) : vec4(other.x, other.y, other.z, other.w) {}
 
@@ -23,7 +26,7 @@ namespace Math {
 			return *this;
 		}
 
-		const vec4 operator+(const vec4& rhs) const {
+		vec4 operator+(const vec4& rhs) const {
 			vec4 res{ *this };
 			return res += rhs;
 		}
@@ -36,7 +39,7 @@ namespace Math {
 			return *this;
 		}
 
-		const vec4 operator-() const {
+		vec4 operator-() const {
 			vec4 res{ *this };
 			res.x = -res.x;
 			res.y = -res.y;
@@ -45,7 +48,7 @@ namespace Math {
 			return res;
 		}
 
-		const vec4 operator-(const vec4& rhs) const {
+		vec4 operator-(const vec4& rhs) const {
 			vec4 res{ *this };
 			return res -= rhs;
 		}
@@ -58,12 +61,12 @@ namespace Math {
 			return *this;
 		}
 
-		const vec4 operator*(const float scalar) const {
+		vec4 operator*(float scalar) const {
 			vec4 res{ *this };
 			return res *= scalar;
 		}
 
-		vec4& operator*=(const float scalar) {
+		vec4& operator*=(float scalar) {
 			this->x *= scalar;
 			this->y *= scalar;
 			this->z *= scalar;
@@ -71,16 +74,16 @@ namespace Math {
 			return *this;
 		}
 
-		const bool operator==(const vec4& rhs) const {
+		bool operator==(const vec4& rhs) const {
 			return (this->x == rhs.x) && (this->y == rhs.y)
 				&& (this->z == rhs.z) && (this->w == rhs.w);
 		}
 
-		const bool operator!=(const vec4& rhs) const {
+		bool operator!=(const vec4& rhs) const {
 			return !(*this == rhs);
 		}
 
-		float& operator[](const std::size_t i) {
+		float& operator[](std::size_t i) {
 			switch (i) {
 			case 0: return this->x;
 			case 1: return this->y;
@@ -90,7 +93,7 @@ namespace Math {
 			}
 		}
 
-		const float operator[](const std::size_t i) const {
+		float operator[](std::size_t i) const {
 			switch (i) {
 			case 0: return this->x;
 			case 1: return this->y;

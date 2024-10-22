@@ -47,7 +47,23 @@ namespace Resource {
 			glGenBuffers(1, &buffers[i].handle);
 
 		for (const auto& [i, buf] : std::views::enumerate(doc.bufferViews)) {
-			GLenum target = static_cast<GLenum>(buf.target);
+			GLenum target;
+			if (buf.target == fx::gltf::BufferView::TargetType::None) {
+				for (const auto& mesh : doc.meshes) {
+					for (const auto& group : mesh.primitives) {
+						if (group.indices == i) {
+							target = GL_ELEMENT_ARRAY_BUFFER;
+							goto finish;
+						}
+					}
+				}
+				target = GL_ARRAY_BUFFER;
+			finish:;
+			}
+			else {
+				target = static_cast<GLenum>(buf.target);
+			}
+			
 			buffers[i].target = target;
 			glBindBuffer(target, buffers[i].handle);
 			const auto dataPtr = reinterpret_cast<GLbyte*>(doc.buffers[buf.buffer].data.data()) + buf.byteOffset;
@@ -57,25 +73,53 @@ namespace Resource {
 		for (const auto& [i, tex] : std::views::enumerate(doc.textures)) {
 			textures.push_back(std::make_shared<Texture>(filepath.parent_path(), doc, i));
 		}
+		dummyTexture = std::make_shared<Texture>(Texture::DummyTexture());
 
 		for (const auto& mat : doc.materials) {
 			if (mat.normalTexture.empty()) {
-				Material m(
-					textures[mat.pbrMetallicRoughness.baseColorTexture.index],
-					textures[mat.pbrMetallicRoughness.metallicRoughnessTexture.index],
-					8.0f,
-					sm.Get("BlinnPhongShader")
-				);
+				Material m;
+				m.SetAmbient(mat.pbrMetallicRoughness.baseColorFactor);
+				m.SetRoughness(mat.pbrMetallicRoughness.roughnessFactor);
+				m.SetShininess(mat.pbrMetallicRoughness.metallicFactor);
+				if (mat.pbrMetallicRoughness.baseColorTexture.empty()) {
+					m.SetDiffuseTex(dummyTexture);
+				}
+				else {
+					m.SetDiffuseTex(textures[mat.pbrMetallicRoughness.baseColorTexture.index]);
+				}
+				if (mat.pbrMetallicRoughness.metallicRoughnessTexture.empty()) {
+					m.SetSpecTex(dummyTexture);
+				}
+				else {
+					m.SetSpecTex(textures[mat.pbrMetallicRoughness.metallicRoughnessTexture.index]);
+				}
+				m.SetShader(sm.Get("BlinnPhongShader"));
 				materials.push_back(std::make_shared<Material>(m));
 			}
 			else {
-				NormalMapMaterial m(
-					textures[mat.pbrMetallicRoughness.baseColorTexture.index],
-					textures[mat.pbrMetallicRoughness.metallicRoughnessTexture.index],
-					textures[mat.normalTexture.index],
-					8.0f,
-					sm.Get("BlinnPhongNormalShader")
-				);
+				NormalMapMaterial m;
+				m.SetAmbient(mat.pbrMetallicRoughness.baseColorFactor);
+				m.SetRoughness(mat.pbrMetallicRoughness.roughnessFactor);
+				m.SetShininess(mat.pbrMetallicRoughness.metallicFactor);
+				if (mat.pbrMetallicRoughness.baseColorTexture.empty()) {
+					m.SetDiffuseTex(dummyTexture);
+				}
+				else {
+					m.SetDiffuseTex(textures[mat.pbrMetallicRoughness.baseColorTexture.index]);
+				}
+				if (mat.pbrMetallicRoughness.metallicRoughnessTexture.empty()) {
+					m.SetSpecTex(dummyTexture);
+				}
+				else {
+					m.SetSpecTex(textures[mat.pbrMetallicRoughness.metallicRoughnessTexture.index]);
+				}
+				if (mat.normalTexture.empty()) {
+					m.SetNormTex(dummyTexture);
+				}
+				else {
+					m.SetNormTex(textures[mat.normalTexture.index]);
+				}
+				m.SetShader(sm.Get("BlinnPhongNormalShader"));
 				materials.push_back(std::make_shared<NormalMapMaterial>(m));
 			}
 		}

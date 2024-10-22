@@ -48,32 +48,27 @@
   "bufferViews": [
     {
       "buffer": 0,
-      "byteLength": 3248,
-      "target" : 34962
+      "byteLength": 3248
     },
     {
       "buffer": 0,
       "byteOffset": 3248,
-      "byteLength": 4872,
-      "target" : 34962
+      "byteLength": 4872
     },
     {
       "buffer": 0,
       "byteOffset": 8120,
-      "byteLength": 6496,
-      "target" : 34962
+      "byteLength": 6496
     },
     {
       "buffer": 0,
       "byteOffset": 14616,
-      "byteLength": 4872,
-      "target" : 34962
+      "byteLength": 4872
     },
     {
       "buffer": 0,
       "byteOffset": 19488,
-      "byteLength": 4092,
-      "target" : 34963
+      "byteLength": 4092
     }
   ],
   "buffers": [

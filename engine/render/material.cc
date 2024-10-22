@@ -22,6 +22,8 @@ namespace Resource {
 		s->UploadUniform1i("material.specular", 1);
 		specular.lock()->Bind(1);
 
+		s->UploadUniform4fv("material.ambient", ambient);
+		s->UploadUniform1f("material.roughness", roughness);
 		s->UploadUniform1f("material.shininess", shininess);
 	}
 
@@ -42,6 +44,8 @@ namespace Resource {
 		s->UploadUniform1i("material.normal", 2);
 		normal.lock()->Bind(2);
 
+		s->UploadUniform4fv("material.ambient", ambient);
+		s->UploadUniform1f("material.roughness", roughness);
 		s->UploadUniform1f("material.shininess", shininess);
 	}
 } // Resource

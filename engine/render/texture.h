@@ -35,6 +35,8 @@ namespace Resource {
 		Texture(const Texture& other);
 		~Texture() = default;
 
+		static Texture DummyTexture();
+
 		Texture& operator=(const Texture& other);
 
 		void Unload();

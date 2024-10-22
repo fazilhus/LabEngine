@@ -34,6 +34,7 @@ namespace Resource {
 		};
 
 		std::vector<Mesh> meshes;
+		std::shared_ptr<Texture> dummyTexture;
 		std::vector<std::shared_ptr<Texture>> textures;
 		std::vector<std::shared_ptr<Material>> materials;
 		std::vector<Buffer> buffers;

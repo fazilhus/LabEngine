@@ -14,10 +14,13 @@ void main()
 {
 	mat4 model = perspective * view * transform;
 	gl_Position = model * vec4(iPos, 1);
-
-	vec3 T = normalize(vec3(model * iTan));
+	vec3 T = normalize(vec3(model * vec4(iTan.rgb, 0.0)));
 	vec3 N = normalize(vec3(model * vec4(iNorm, 0.0)));
-	vec3 B = cross(N, T);
+	T = normalize(T - dot(T, N) * N);
+	vec3 B = cross(N, T) * iTan.w;
+	T = vec3(-T.r, T.g, -T.b);
+	B = vec3(B.r, -B.g, B.b);
+	N = vec3(-N.r, N.g, -N.b);
 	oTBN = mat3(T, B, N);
 
 	oPos = (transform * vec4(iPos, 1.0)).xyz;

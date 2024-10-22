@@ -41,6 +41,24 @@ namespace Resource {
 		: handle(other.handle) {
 	}
 
+	Texture Texture::DummyTexture() {
+		Texture t;
+		t.SetDefaultSampling();
+
+		glCreateTextures(GL_TEXTURE_2D, 1, &t.handle);
+		glBindTexture(GL_TEXTURE_2D, t.handle);
+
+		GLubyte data[3];
+		data[0] = 255;
+		data[1] = 255;
+		data[2] = 255;
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, 1, 1, 0,
+			GL_RGB, GL_UNSIGNED_BYTE, (GLvoid*)data);
+
+		glBindTexture(GL_TEXTURE_2D, 0);
+		return t;
+	}
+
 	Texture& Texture::operator=(const Texture& other) {
 		this->handle = other.handle;
 		return *this;

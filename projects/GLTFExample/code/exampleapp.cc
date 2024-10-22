@@ -85,14 +85,31 @@ namespace Example {
 			Resource::OBJMeshBuilder meshBuilder{ (resPath / "meshes/cube.obj").make_preferred() };
 			auto cubeMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh());
 
-			cube = Resource::Model(
-				resPath / std::filesystem::path("models/Cube/gltf/Cube.gltf").make_preferred(),
-				shaderManager);
-			cube.transform *= Math::translate({2.5f, 0.0f, 0.0f});
-			avocado = Resource::Model(
-				resPath / std::filesystem::path("models/Avocado/gltf/Avocado.gltf").make_preferred(),
-				shaderManager);
-			avocado.transform *= Math::scale(10.0f) * Math::rotationy(Math::toRad(180.0f));
+			//cube = Resource::Model(
+			//	resPath / std::filesystem::path("models/Cube/gltf/Cube.gltf").make_preferred(),
+			//	shaderManager);
+			//cube.transform *= Math::translate({2.5f, 0.0f, 0.0f});
+			//avocado = Resource::Model(
+			//	resPath / std::filesystem::path("models/Avocado/gltf/Avocado.gltf").make_preferred(),
+			//	shaderManager);
+			//avocado.transform *= Math::translate({-2.5f, 0.0f, 0.0f}) * Math::scale(15.0f)
+			//	* Math::rotationy(Math::toRad(180.0f));
+			//
+			//helmet = Resource::Model(
+			//	resPath / std::filesystem::path("models/FlightHelmet/gltf/FlightHelmet.gltf").make_preferred(),
+			//	shaderManager
+			//);
+			//helmet.transform *= Math::translate({ 0.0f, 0.0f, 2.5f }) * Math::scale(5.0f);
+			//
+			//test = Resource::Model(
+			//	resPath / std::filesystem::path(
+			//		"models/NormalTangentMirrorTest/gltf/NormalTangentMirrorTest.gltf").make_preferred(),
+			//	shaderManager);
+			sponza = Resource::Model(
+				resPath / std::filesystem::path("models/Sponza/gltf/Sponza.gltf").make_preferred(),
+				shaderManager
+			);
+			sponza.transform *= Math::scale(0.01f);
 
 			lightManager.PushLightingShader(shaderManager.Get("BlinnPhongShader"));
 			lightManager.PushLightingShader(shaderManager.Get("BlinnPhongNormalShader"));
@@ -100,29 +117,30 @@ namespace Example {
 			lightManager.SetMesh(cubeMesh);
 
 			Render::DirectionalLight dl;
-			dl.SetAmbient(Math::vec3(0.01f));
-			dl.SetDiffuse(Math::vec3(0.1f));
-			dl.SetSpecular(Math::vec3(0.4f));
+			dl.SetDirection({ 0, -1000, 0 });
+			dl.SetAmbient(Math::vec3(0.05f));
+			dl.SetDiffuse(Math::vec3(0.2f));
+			dl.SetSpecular(Math::vec3(0.5f));
 			lightManager.SetGlobalLight(dl);
 
 			Render::PointLight pl;
 			pl.SetPos({ 0.0f, 0.0f, 5.0f });
-			pl.SetAmbient(Math::vec3({0.05f, 0.0f, 0.05f}));
-			pl.SetDiffuse(Math::vec3({0.2f, 0.0f, 0.2f}));
-			pl.SetSpecular(Math::vec3({0.5f, 0.0f, 0.5f}));
+			pl.SetAmbient(Math::vec3(0.05f));
+			pl.SetDiffuse(Math::vec3(0.2f));
+			pl.SetSpecular(Math::vec3(0.5f));
 			pl.SetAttenuation({ 1.0f, 0.022f, 0.019f });
-			lightManager.PushPointLight(pl);
+			//lightManager.PushPointLight(pl);
 
 			Render::SpotLight sl;
 			sl.SetPos({ 2.5f, 2.5f, 2.5f });
 			sl.SetDirection(sl.GetPos() - Math::vec3{ 0.0f, 0.0f, 0.0f });
-			sl.SetAmbient(Math::vec3({ 0.0f, 0.05f, 0.05f }));
-			sl.SetDiffuse(Math::vec3({ 0.0f, 0.2f, 0.2f }));
-			sl.SetSpecular(Math::vec3({ 0.0f, 0.5f, 0.5f }));
+			sl.SetAmbient(Math::vec3(0.05f));
+			sl.SetDiffuse(Math::vec3(0.2f));
+			sl.SetSpecular(Math::vec3(0.5f));
 			sl.SetCutoffAngle(Math::toRad(15.0f));
 			sl.SetOuterCutoffAngle(Math::toRad(20.0f));
 			sl.SetAttenuation({ 1.0f, 0.09f, 0.032f });
-			lightManager.PushSpotLight(sl);
+			//lightManager.PushSpotLight(sl);
 
 			this->camera = new Render::Camera(0.5f, 4.0f / 3.0f, 0.01f, 100.0f);
 			this->camera->SetCameraPosition({ 0.0f, 0.0f, 10.0f });
@@ -147,7 +165,7 @@ namespace Example {
 	*/
 	void ImGuiExampleApp::Run() {
 		glEnable(GL_DEPTH_TEST);
-		glEnable(GL_CULL_FACE);
+		//glEnable(GL_CULL_FACE);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_FRAMEBUFFER_SRGB);
@@ -160,9 +178,9 @@ namespace Example {
 			HandleInput();
 
 			angle += dt;
-			auto& slight = this->lightManager.GetSpotLights()[0];
-			slight.SetPos({cosf(angle) * 2.5f, 1.0f, sinf(angle) * 2.5f});
-			slight.SetDirection(slight.GetPos() - Math::vec3{0.0f, 0.0f, 0.0f});
+			//auto& slight = this->lightManager.GetSpotLights()[0];
+			//slight.SetPos({cosf(angle) * 2.5f, 0.0f, sinf(angle) * 2.5f});
+			//slight.SetDirection(slight.GetPos() - Math::vec3{0.0f, 0.0f, 0.0f});
 
 			lightManager.SetLightUniforms();
 
@@ -170,8 +188,11 @@ namespace Example {
 			//this->obj2.Draw(*camera);
 			//this->obj3.Draw(*camera);
 
-			cube.Draw(*camera);
-			avocado.Draw(*camera);
+			//cube.Draw(*camera);
+			//avocado.Draw(*camera);
+			//helmet.Draw(*camera);
+			//test.Draw(*camera);
+			sponza.Draw(*camera);
 
 			lightManager.DrawLightSources(*camera);
 
