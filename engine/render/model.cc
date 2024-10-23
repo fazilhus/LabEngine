@@ -27,6 +27,7 @@ namespace Resource {
 		s->UploadUniformMat4fv("perspective", cam.GetPerspective());
 		s->UploadUniformMat4fv("view", cam.GetView());
 		s->UploadUniformMat4fv("transform", transform);
+		s->UploadUniform3fv("cam_pos", cam.GetCameraPos());
 		glDrawElements(mode, indices, indexType, (GLvoid*)offset);
 
 		

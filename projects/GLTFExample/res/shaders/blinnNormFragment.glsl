@@ -67,7 +67,8 @@ vec3 CalcSpotLight(SpotLight light, vec3 norm, vec3 cam_dir, vec3 frag_pos);
 void main()
 {
 	vec3 norm = texture(material.normal, iUV).rgb;
-	norm = normalize(iTBN * (norm * 2.0 - 1.0)); 
+	norm = normalize(iTBN * (norm * 2.0 - 1.0));
+	//norm = normalize(iNorm);
 	vec3 cam_dir = normalize(cam_pos - iPos);
 	// Global Light
 	vec3 tempCol = CalcDirectionalLight(dlight, norm, cam_dir);
@@ -75,7 +76,7 @@ void main()
 	// Point Lights
 	for (int i = 0; i < plights_count; i++)
 	{
-		tempCol += tempCol + CalcPointLight(plights[i], norm, cam_dir, iPos);
+		tempCol += CalcPointLight(plights[i], norm, cam_dir, iPos);
 	}
 
 	// Spot Lights
@@ -91,7 +92,7 @@ void main()
 
 vec3 CalcDirectionalLight(DirectionalLight light, vec3 norm, vec3 cam_dir)
 {
-	vec3 ambient = light.ambient * texture(material.diffuse, iUV).rgb;
+	vec3 ambient = light.ambient * material.ambient.rgb * texture(material.diffuse, iUV).rgb;
 
 	vec3 ldir = normalize(-light.dir);
 	float diff = max(dot(norm, ldir), 0.0);
@@ -107,7 +108,7 @@ vec3 CalcDirectionalLight(DirectionalLight light, vec3 norm, vec3 cam_dir)
 
 vec3 CalcPointLight(PointLight light, vec3 norm, vec3 cam_dir, vec3 frag_pos)
 {
-	vec3 ambient = light.ambient * texture(material.diffuse, iUV).rgb;
+	vec3 ambient = light.ambient * material.ambient.rgb * texture(material.diffuse, iUV).rgb;
 
 	vec3 ldir = normalize(light.pos - frag_pos);
 	float diff = max(dot(norm, ldir), 0.0);
@@ -125,7 +126,7 @@ vec3 CalcPointLight(PointLight light, vec3 norm, vec3 cam_dir, vec3 frag_pos)
 
 vec3 CalcSpotLight(SpotLight light, vec3 norm, vec3 cam_dir, vec3 frag_pos)
 {
-	vec3 ambient = light.ambient * texture(material.diffuse, iUV).rgb;
+	vec3 ambient = light.ambient * material.ambient.rgb * texture(material.diffuse, iUV).rgb;
 
 	vec3 ldir = normalize(light.pos - frag_pos);
 	float diff = max(dot(norm, ldir), 0.0);

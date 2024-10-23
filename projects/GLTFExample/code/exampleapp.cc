@@ -117,33 +117,45 @@ namespace Example {
 			lightManager.SetMesh(cubeMesh);
 
 			Render::DirectionalLight dl;
-			dl.SetDirection({ 0, -1000, 0 });
-			dl.SetAmbient(Math::vec3(0.05f));
-			dl.SetDiffuse(Math::vec3(0.2f));
-			dl.SetSpecular(Math::vec3(0.5f));
+			dl.SetDirection({ 0, -1, -1});
+			dl.SetAmbient(Math::vec3(0.01f));
+			dl.SetDiffuse(Math::vec3(0.05f));
+			dl.SetSpecular(Math::vec3(0.2f));
 			lightManager.SetGlobalLight(dl);
 
 			Render::PointLight pl;
-			pl.SetPos({ 0.0f, 0.0f, 5.0f });
+			pl.SetPos({ -6.25f, 1.25f, 1.4f });
 			pl.SetAmbient(Math::vec3(0.05f));
 			pl.SetDiffuse(Math::vec3(0.2f));
 			pl.SetSpecular(Math::vec3(0.5f));
 			pl.SetAttenuation({ 1.0f, 0.022f, 0.019f });
-			//lightManager.PushPointLight(pl);
+			lightManager.PushPointLight(pl);
+			pl.SetPos({ -6.25f, 1.25f, -2.2f });
+			lightManager.PushPointLight(pl);
+			pl.SetPos({ 4.9f, 1.25f, 1.4f });
+			lightManager.PushPointLight(pl);
+			pl.SetPos({ 4.9f, 1.25f, -2.2f });
+			lightManager.PushPointLight(pl);
 
 			Render::SpotLight sl;
-			sl.SetPos({ 2.5f, 2.5f, 2.5f });
-			sl.SetDirection(sl.GetPos() - Math::vec3{ 0.0f, 0.0f, 0.0f });
+			sl.SetPos({ -6.25f, 5.0f, 1.4f });
+			sl.SetDirection({ 0.0f, -1.0f, 0.0f });
 			sl.SetAmbient(Math::vec3(0.05f));
 			sl.SetDiffuse(Math::vec3(0.2f));
 			sl.SetSpecular(Math::vec3(0.5f));
 			sl.SetCutoffAngle(Math::toRad(15.0f));
 			sl.SetOuterCutoffAngle(Math::toRad(20.0f));
 			sl.SetAttenuation({ 1.0f, 0.09f, 0.032f });
-			//lightManager.PushSpotLight(sl);
+			lightManager.PushSpotLight(sl);
+			sl.SetPos({ -6.25f, 5.0f, -2.2f });
+			lightManager.PushSpotLight(sl);
+			sl.SetPos({ 4.9f, 5.0f, 1.4f });
+			lightManager.PushSpotLight(sl);
+			sl.SetPos({ 4.9f, 5.0f, -2.2f });
+			lightManager.PushSpotLight(sl);
 
 			this->camera = new Render::Camera(0.5f, 4.0f / 3.0f, 0.01f, 100.0f);
-			this->camera->SetCameraPosition({ 0.0f, 0.0f, 10.0f });
+			this->camera->SetCameraPosition({ -13.0f, 2.0f, -0.5f });
 			this->camera->SetSpeed(7.5f);
 			this->camera->SetSens(0.05f);
 
@@ -178,9 +190,6 @@ namespace Example {
 			HandleInput();
 
 			angle += dt;
-			//auto& slight = this->lightManager.GetSpotLights()[0];
-			//slight.SetPos({cosf(angle) * 2.5f, 0.0f, sinf(angle) * 2.5f});
-			//slight.SetDirection(slight.GetPos() - Math::vec3{0.0f, 0.0f, 0.0f});
 
 			lightManager.SetLightUniforms();
 
