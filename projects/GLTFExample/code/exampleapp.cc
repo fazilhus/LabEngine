@@ -94,17 +94,21 @@ namespace Example {
 			//	shaderManager);
 			//avocado.transform *= Math::translate({-2.5f, 0.0f, 0.0f}) * Math::scale(15.0f)
 			//	* Math::rotationy(Math::toRad(180.0f));
-			//
-			//helmet = Resource::Model(
-			//	resPath / std::filesystem::path("models/FlightHelmet/gltf/FlightHelmet.gltf").make_preferred(),
-			//	shaderManager
-			//);
-			//helmet.transform *= Math::translate({ 0.0f, 0.0f, 2.5f }) * Math::scale(5.0f);
-			//
-			//test = Resource::Model(
-			//	resPath / std::filesystem::path(
-			//		"models/NormalTangentMirrorTest/gltf/NormalTangentMirrorTest.gltf").make_preferred(),
-			//	shaderManager);
+			
+			helmet = Resource::Model(
+				resPath / std::filesystem::path("models/FlightHelmet/gltf/FlightHelmet.gltf").make_preferred(),
+				shaderManager
+			);
+			helmet.transform *= Math::translate({ 11.15f, 1.0f, 4.1f })
+				* Math::rotationy(Math::toRad(-90))
+				* Math::scale(2.0f);
+			
+			test = Resource::Model(
+				resPath / std::filesystem::path(
+					"models/NormalTangentMirrorTest/gltf/NormalTangentMirrorTest.gltf").make_preferred(),
+				shaderManager);
+			test.transform *= Math::translate({0.0f, 0.5f, 0.0f}) * Math::rotationy(Math::toRad(-90));
+
 			sponza = Resource::Model(
 				resPath / std::filesystem::path("models/Sponza/gltf/Sponza.gltf").make_preferred(),
 				shaderManager
@@ -199,8 +203,8 @@ namespace Example {
 
 			//cube.Draw(*camera);
 			//avocado.Draw(*camera);
-			//helmet.Draw(*camera);
-			//test.Draw(*camera);
+			helmet.Draw(*camera);
+			test.Draw(*camera);
 			sponza.Draw(*camera);
 
 			lightManager.DrawLightSources(*camera);
