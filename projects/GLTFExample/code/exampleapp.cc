@@ -37,12 +37,22 @@ namespace Example {
 	*/
 	void ImGuiExampleApp::Close() {
 		if (this->window->IsOpen()) {
+			helmetModel->UnLoad();
+			helmetModel.reset();
+			glDeleteFramebuffers(1, &gBuf);
+			glDeleteTextures(1, &gPos);
+			glDeleteTextures(1, &gDiffSpec);
+			glDeleteTextures(1, &gNorm);
+			glDeleteRenderbuffers(1, &rBuf);
+			glDeleteVertexArrays(1, &quadVAO);
+			glDeleteBuffers(1, &quadVBO);
+
 			this->window->Close();
 		}
 
 		Input::InputManager::Destroy();
 		Core::App::Close();
-		//this->obj1.DeInit();
+
 		delete this->camera;
 	}
 
@@ -66,97 +76,74 @@ namespace Example {
 			resPath.make_preferred();
 
 			shaderManager.Push(
-				"lightSourceShader", 
+				"lightSourceShader",
 				(resPath / "shaders/lightVert.glsl").make_preferred(),
 				(resPath / "shaders/lightFrag.glsl").make_preferred());
 			shaderManager.Push(
-				"defaultShader",
-				(resPath / "shaders/vertex.glsl").make_preferred(),
-				(resPath / "shaders/fragment.glsl").make_preferred());
+				"gPass",
+				(resPath / "shaders/gVert.glsl").make_preferred(),
+				(resPath / "shaders/gFrag.glsl").make_preferred());
 			shaderManager.Push(
-				"BlinnPhongShader",
-				(resPath / "shaders/blinnVertex.glsl").make_preferred(),
-				(resPath / "shaders/blinnFragment.glsl").make_preferred());
+				"gNormPass",
+				(resPath / "shaders/gNormVert.glsl").make_preferred(),
+				(resPath / "shaders/gNormFrag.glsl").make_preferred());
 			shaderManager.Push(
-				"BlinnPhongNormalShader",
-				(resPath / "shaders/blinnNormVertex.glsl").make_preferred(),
-				(resPath / "shaders/blinnNormFragment.glsl").make_preferred());
+				"lPass",
+				(resPath / "shaders/lVert.glsl").make_preferred(),
+				(resPath / "shaders/lFrag.glsl").make_preferred());
 
 			Resource::OBJMeshBuilder meshBuilder{ (resPath / "meshes/cube.obj").make_preferred() };
 			auto cubeMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh());
 
-			//cube = Resource::Model(
-			//	resPath / std::filesystem::path("models/Cube/gltf/Cube.gltf").make_preferred(),
-			//	shaderManager);
-			//cube.transform *= Math::translate({2.5f, 0.0f, 0.0f});
-			//avocado = Resource::Model(
-			//	resPath / std::filesystem::path("models/Avocado/gltf/Avocado.gltf").make_preferred(),
-			//	shaderManager);
-			//avocado.transform *= Math::translate({-2.5f, 0.0f, 0.0f}) * Math::scale(15.0f)
-			//	* Math::rotationy(Math::toRad(180.0f));
-			
-			helmet = Resource::Model(
+			helmetModel = std::make_shared<Resource::Model>(
 				resPath / std::filesystem::path("models/FlightHelmet/gltf/FlightHelmet.gltf").make_preferred(),
 				shaderManager
 			);
-			helmet.transform *= Math::translate({ 11.15f, 1.0f, 4.1f })
-				* Math::rotationy(Math::toRad(-90))
-				* Math::scale(2.0f);
-			
-			test = Resource::Model(
-				resPath / std::filesystem::path(
-					"models/NormalTangentMirrorTest/gltf/NormalTangentMirrorTest.gltf").make_preferred(),
-				shaderManager);
-			test.transform *= Math::translate({0.0f, 0.5f, 0.0f}) * Math::rotationy(Math::toRad(-90));
 
-			sponza = Resource::Model(
-				resPath / std::filesystem::path("models/Sponza/gltf/Sponza.gltf").make_preferred(),
-				shaderManager
-			);
-			sponza.transform *= Math::scale(0.01f);
+			for (std::size_t i = 0; i < 5; ++i) {
+				for (std::size_t j = 0; j < 5; ++j) {
+					Resource::GraphicsNode node{ helmetModel };
+					node.transform *= Math::translate({-2.5f + i * 1.0f, 0.0f, -2.5f + j * 1.0f})
+						* Math::rotationy(Math::toRad(Math::Random::rand_int(-180, 180)));
+					nodes.push_back(node);
+				}
+			}
 
-			lightManager.PushLightingShader(shaderManager.Get("BlinnPhongShader"));
-			lightManager.PushLightingShader(shaderManager.Get("BlinnPhongNormalShader"));
+
+			lightManager.PushLightingShader(shaderManager.Get("lPass"));
 			lightManager.SetLightSourceShader(shaderManager.Get("lightSourceShader"));
 			lightManager.SetMesh(cubeMesh);
 
 			Render::DirectionalLight dl;
 			dl.SetDirection({ 0, -1, -1});
-			dl.SetAmbient(Math::vec3(0.01f));
-			dl.SetDiffuse(Math::vec3(0.05f));
-			dl.SetSpecular(Math::vec3(0.2f));
+			dl.SetAmbient(Math::vec3(0));
+			dl.SetDiffuse(Math::vec3(0));
+			dl.SetSpecular(Math::vec3(0));
 			lightManager.SetGlobalLight(dl);
 
 			Render::PointLight pl;
-			pl.SetPos({ -6.25f, 1.25f, 1.4f });
-			pl.SetAmbient(Math::vec3(0.05f));
-			pl.SetDiffuse(Math::vec3(0.2f));
-			pl.SetSpecular(Math::vec3(0.5f));
 			pl.SetAttenuation({ 1.0f, 0.022f, 0.019f });
-			lightManager.PushPointLight(pl);
-			pl.SetPos({ -6.25f, 1.25f, -2.2f });
-			lightManager.PushPointLight(pl);
-			pl.SetPos({ 4.9f, 1.25f, 1.4f });
-			lightManager.PushPointLight(pl);
-			pl.SetPos({ 4.9f, 1.25f, -2.2f });
-			lightManager.PushPointLight(pl);
-
-			Render::SpotLight sl;
-			sl.SetPos({ -6.25f, 5.0f, 1.4f });
-			sl.SetDirection({ 0.0f, -1.0f, 0.0f });
-			sl.SetAmbient(Math::vec3(0.05f));
-			sl.SetDiffuse(Math::vec3(0.2f));
-			sl.SetSpecular(Math::vec3(0.5f));
-			sl.SetCutoffAngle(Math::toRad(15.0f));
-			sl.SetOuterCutoffAngle(Math::toRad(20.0f));
-			sl.SetAttenuation({ 1.0f, 0.09f, 0.032f });
-			lightManager.PushSpotLight(sl);
-			sl.SetPos({ -6.25f, 5.0f, -2.2f });
-			lightManager.PushSpotLight(sl);
-			sl.SetPos({ 4.9f, 5.0f, 1.4f });
-			lightManager.PushSpotLight(sl);
-			sl.SetPos({ 4.9f, 5.0f, -2.2f });
-			lightManager.PushSpotLight(sl);
+			//pl.SetPos({ -6.25f, 1.25f, 1.4f });
+			//lightManager.PushPointLight(pl);
+			//pl.SetPos({ -6.25f, 1.25f, -2.2f });
+			//lightManager.PushPointLight(pl);
+			//pl.SetPos({ 4.9f, 1.25f, 1.4f });
+			//lightManager.PushPointLight(pl);
+			//pl.SetPos({ 4.9f, 1.25f, -2.2f });
+			//lightManager.PushPointLight(pl);
+			for (std::size_t i = 0; i < Render::MAX_NUM_LIGHT_SOURCES; ++i) {
+				float x = Math::Random::rand_float(-2.5f, 2.5f);
+				float z = Math::Random::rand_float(-2.5f, 2.5f);
+				float r = Math::Random::rand_float();
+				float g = Math::Random::rand_float();
+				float b = Math::Random::rand_float();
+				Math::vec3 c{ r, g, b };
+				pl.SetPos({x, 0.5f, z});
+				pl.SetAmbient(c * 0.01f);
+				pl.SetDiffuse(c * 0.01f);
+				pl.SetSpecular(c * 0.3f);
+				lightManager.PushPointLight(pl);
+			}
 
 			this->camera = new Render::Camera(0.5f, 4.0f / 3.0f, 0.01f, 100.0f);
 			this->camera->SetCameraPosition({ -13.0f, 2.0f, -0.5f });
@@ -166,6 +153,56 @@ namespace Example {
 			time = (float)glfwGetTime();
 			prev_time = 0;
 			dt = time - prev_time;
+
+			glGenFramebuffers(1, &gBuf);
+			glBindFramebuffer(GL_FRAMEBUFFER, gBuf);
+
+			glGenTextures(1, &gPos);
+			glBindTexture(GL_TEXTURE_2D, gPos);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, S_WIDTH, S_HEIGHT,
+				0, GL_RGBA, GL_FLOAT, NULL);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+				GL_TEXTURE_2D, gPos, 0);
+
+			glGenTextures(1, &gDiffSpec);
+			glBindTexture(GL_TEXTURE_2D, gDiffSpec);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, S_WIDTH, S_HEIGHT,
+				0, GL_RGBA, GL_FLOAT, NULL);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1,
+				GL_TEXTURE_2D, gDiffSpec, 0);
+
+			glGenTextures(1, &gNorm);
+			glBindTexture(GL_TEXTURE_2D, gNorm);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, S_WIDTH, S_HEIGHT,
+				0, GL_RGBA, GL_FLOAT, NULL);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2,
+				GL_TEXTURE_2D, gNorm, 0);
+
+			GLuint att[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+			glDrawBuffers(3, att);
+
+			glGenRenderbuffers(1, &rBuf);
+			glBindRenderbuffer(GL_RENDERBUFFER, rBuf);
+			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, S_WIDTH, S_HEIGHT);
+			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, 
+				GL_RENDERBUFFER, rBuf);
+
+			if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+				std::cout << "Framebuffer not complete!" << '\n';
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+			const auto& s = shaderManager.Get("lPass").lock();
+			s->Use();
+			s->UploadUniform1i("gPos", 0);
+			s->UploadUniform1i("gDiffSpec", 1);
+			s->UploadUniform1i("gNorm", 2);
+			s->UnUse();
 
 			return true;
 		}
@@ -181,7 +218,7 @@ namespace Example {
 	*/
 	void ImGuiExampleApp::Run() {
 		glEnable(GL_DEPTH_TEST);
-		//glEnable(GL_CULL_FACE);
+		glEnable(GL_CULL_FACE);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_FRAMEBUFFER_SRGB);
@@ -189,25 +226,41 @@ namespace Example {
 		float angle = 0.0f;
 
 		while (this->window->IsOpen()) {
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			this->window->Update();
 			HandleInput();
 
 			angle += dt;
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, gBuf);
+
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			for (const auto& node : nodes) {
+				node.Draw(*camera);
+			}
+
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			const auto& s = shaderManager.Get("lPass").lock();
+			s->Use();
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, gPos);
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, gDiffSpec);
+			glActiveTexture(GL_TEXTURE2);
+			glBindTexture(GL_TEXTURE_2D, gNorm);
+			s->UploadUniform3fv("cam_pos", camera->GetCameraPos());
 			lightManager.SetLightUniforms();
 
-			//this->obj1.Draw(*camera);
-			//this->obj2.Draw(*camera);
-			//this->obj3.Draw(*camera);
+			s->Use();
+			renderQuad();
+			s->UnUse();
 
-			//cube.Draw(*camera);
-			//avocado.Draw(*camera);
-			helmet.Draw(*camera);
-			test.Draw(*camera);
-			sponza.Draw(*camera);
-
-			lightManager.DrawLightSources(*camera);
+			glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuf);
+			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+			glBlitFramebuffer(0, 0, S_WIDTH, S_HEIGHT, 0, 0, S_WIDTH, S_HEIGHT, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 			// transfer new frame to window
 			this->window->SwapBuffers();
@@ -240,6 +293,44 @@ namespace Example {
 		}
 
 		this->camera->UpdateCamera(dt);
+	}
+
+	void ImGuiExampleApp::renderQuad() {
+		if (quadVAO == 0) {
+			GLfloat quadVertices[] = {
+				// positions        // texture Coords
+				-1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+				-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+				 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+				 1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+			};
+
+			glGenVertexArrays(1, &quadVAO);
+			glGenBuffers(1, &quadVBO);
+			glBindVertexArray(quadVAO);
+			glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+			glEnableVertexAttribArray(0);
+			glVertexAttribPointer(
+				0,
+				3,
+				GL_FLOAT,
+				GL_FALSE,
+				5 * sizeof(GLfloat),
+				(GLvoid*)0);
+			glEnableVertexAttribArray(1);
+			glVertexAttribPointer(
+				1,
+				2,
+				GL_FLOAT,
+				GL_FALSE,
+				5 * sizeof(GLfloat),
+				(GLvoid*)(3 * sizeof(GLfloat)));
+			glBindVertexArray(0);
+		}
+		glBindVertexArray(quadVAO);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		glBindVertexArray(0);
 	}
 
 } // namespace Example

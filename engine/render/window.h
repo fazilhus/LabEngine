@@ -11,6 +11,9 @@
 #include <GLFW/glfw3.h>
 #include <string>
 
+constexpr int S_WIDTH = 1920;
+constexpr int S_HEIGHT = 1440;
+
 namespace Display
 {
 class Window

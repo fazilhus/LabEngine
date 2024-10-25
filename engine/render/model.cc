@@ -27,7 +27,6 @@ namespace Resource {
 		s->UploadUniformMat4fv("perspective", cam.GetPerspective());
 		s->UploadUniformMat4fv("view", cam.GetView());
 		s->UploadUniformMat4fv("transform", transform);
-		s->UploadUniform3fv("cam_pos", cam.GetCameraPos());
 		glDrawElements(mode, indices, indexType, (GLvoid*)offset);
 
 		
@@ -94,7 +93,7 @@ namespace Resource {
 				else {
 					m.SetSpecTex(textures[mat.pbrMetallicRoughness.metallicRoughnessTexture.index]);
 				}
-				m.SetShader(sm.Get("BlinnPhongShader"));
+				m.SetShader(sm.Get("gPass"));
 				materials.push_back(std::make_shared<Material>(m));
 			}
 			else {
@@ -120,7 +119,7 @@ namespace Resource {
 				else {
 					m.SetNormTex(textures[mat.normalTexture.index]);
 				}
-				m.SetShader(sm.Get("BlinnPhongNormalShader"));
+				m.SetShader(sm.Get("gNormPass"));
 				materials.push_back(std::make_shared<NormalMapMaterial>(m));
 			}
 		}
@@ -176,18 +175,33 @@ namespace Resource {
 
 				glBindBuffer(buffers[bv].target, buffers[bv].handle);
 
-				//glBindBuffer(GL_ARRAY_BUFFER, 0);
 				glBindVertexArray(0);
-				//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 			}
 			meshes.push_back(m);
 		}
 	}
 
-	void Model::Draw(const Render::Camera& cam) const {
+	void Model::UnLoad() {
+		for (auto& mesh : meshes) {
+			for (auto& group : mesh.groups) {
+				glDeleteVertexArrays(1, &group.vao);
+			}
+		}
+
+		for (auto& tex : textures) {
+			tex->Unload();
+			tex.reset();
+		}
+
+		for (auto& buf : buffers) {
+			glDeleteBuffers(1, &buf.handle);
+		}
+	}
+
+	void Model::Draw(const Render::Camera& cam, const Math::mat4& t) const {
 		for (const auto& mesh : meshes) {
 			for (const auto& group : mesh.groups) {
-				group.Draw(cam, transform);
+				group.Draw(cam, t);
 			}
 		}
 	}

@@ -34,20 +34,21 @@ namespace Example {
 	private:
 		Render::LightManager lightManager;
 		Resource::ShaderManager shaderManager;
-		Resource::TextureManager textureManager;
-		Resource::Model cube;
-		Resource::Model avocado;
-		Resource::Model helmet;
-		Resource::Model test;
-		Resource::Model sponza;
-		//Resource::GraphicsNode obj1;
-		//Resource::GraphicsNode obj2;
-		//Resource::GraphicsNode obj3;
+		std::shared_ptr<Resource::Model> helmetModel;
 		Render::Camera* camera;
 		Display::Window* window;
 		float time;
 		float prev_time;
 		float dt;
+
+		GLuint gBuf, rBuf;
+		GLuint gPos, gDiffSpec, gNorm;
+
+		std::vector<Resource::GraphicsNode> nodes;
+
+		GLuint quadVAO = 0, quadVBO = 0;
+
+		void renderQuad();
 	};
 
 } // namespace Example

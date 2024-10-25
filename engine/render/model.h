@@ -38,12 +38,13 @@ namespace Resource {
 		std::vector<std::shared_ptr<Texture>> textures;
 		std::vector<std::shared_ptr<Material>> materials;
 		std::vector<Buffer> buffers;
-		Math::mat4 transform;
 
 		Model() = default;
 		Model(const std::filesystem::path& filepath, const ShaderManager& sm);
 
-		void Draw(const Render::Camera& cam) const;
+		void UnLoad();
+
+		void Draw(const Render::Camera& cam, const Math::mat4& t) const;
 
 	private:
 		GLuint SlotFromGLTF(const std::string& attribute) const;

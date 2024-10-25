@@ -1,11 +1,11 @@
 #pragma once
 
-#include "render/mesh.h"
-#include "render/shader.h"
 #include "math/mat4.h"
 #include "render/camera.h"
 
 #include <memory>
+
+#include "model.h"
 
 namespace Resource {
 
@@ -14,24 +14,11 @@ namespace Resource {
 		Math::mat4 transform;
 
 	private:
-		std::shared_ptr<Mesh> mesh;
-		std::vector<std::shared_ptr<Material>> materials;
+		std::weak_ptr<Model> model;
 
 	public:
 		GraphicsNode() = default;
-		GraphicsNode(const GraphicsNode& other);
-		~GraphicsNode();
-
-		void DeInit();
-
-		void SetMesh(const std::shared_ptr<Mesh>& meshPtr) { mesh = meshPtr; }
-		void PushMaterial(const std::shared_ptr<Material>& mat);
-
-		const Mesh& GetMesh() const { return *mesh; }
-		const std::vector<std::shared_ptr<Material>>& GetMaterials() const { return materials; }
-
-		Mesh& GetMesh() { return *mesh; }
-		std::vector<std::shared_ptr<Material>>& GetMaterials() { return materials; }
+		GraphicsNode(const std::shared_ptr<Model>& model);
 
 		void Draw(const Render::Camera& cam) const;
 	};
