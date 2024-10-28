@@ -43,7 +43,7 @@ namespace Example {
 			glDeleteTextures(1, &gPos);
 			glDeleteTextures(1, &gDiffSpec);
 			glDeleteTextures(1, &gNorm);
-			glDeleteRenderbuffers(1, &rBuf);
+			glDeleteRenderbuffers(1, &gDepth);
 			glDeleteVertexArrays(1, &quadVAO);
 			glDeleteBuffers(1, &quadVBO);
 
@@ -91,6 +91,10 @@ namespace Example {
 				"lPass",
 				(resPath / "shaders/lVert.glsl").make_preferred(),
 				(resPath / "shaders/lFrag.glsl").make_preferred());
+			shaderManager.Push(
+				"nullShader",
+				(resPath / "shaders/nVert.glsl").make_preferred(),
+				(resPath / "shaders/nFrag.glsl").make_preferred());
 
 			Resource::OBJMeshBuilder meshBuilder{ (resPath / "meshes/cube.obj").make_preferred() };
 			auto cubeMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh());
@@ -123,14 +127,6 @@ namespace Example {
 
 			Render::PointLight pl;
 			pl.SetAttenuation({ 1.0f, 0.022f, 0.019f });
-			//pl.SetPos({ -6.25f, 1.25f, 1.4f });
-			//lightManager.PushPointLight(pl);
-			//pl.SetPos({ -6.25f, 1.25f, -2.2f });
-			//lightManager.PushPointLight(pl);
-			//pl.SetPos({ 4.9f, 1.25f, 1.4f });
-			//lightManager.PushPointLight(pl);
-			//pl.SetPos({ 4.9f, 1.25f, -2.2f });
-			//lightManager.PushPointLight(pl);
 			for (std::size_t i = 0; i < Render::MAX_NUM_LIGHT_SOURCES; ++i) {
 				float x = Math::Random::rand_float(-2.5f, 2.5f);
 				float z = Math::Random::rand_float(-2.5f, 2.5f);
@@ -139,9 +135,9 @@ namespace Example {
 				float b = Math::Random::rand_float();
 				Math::vec3 c{ r, g, b };
 				pl.SetPos({x, 0.5f, z});
-				pl.SetAmbient(c * 0.01f);
+				pl.SetAmbient(c * 0.005f);
 				pl.SetDiffuse(c * 0.01f);
-				pl.SetSpecular(c * 0.3f);
+				pl.SetSpecular(c * 0.15f);
 				lightManager.PushPointLight(pl);
 			}
 
@@ -154,55 +150,7 @@ namespace Example {
 			prev_time = 0;
 			dt = time - prev_time;
 
-			glGenFramebuffers(1, &gBuf);
-			glBindFramebuffer(GL_FRAMEBUFFER, gBuf);
-
-			glGenTextures(1, &gPos);
-			glBindTexture(GL_TEXTURE_2D, gPos);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, S_WIDTH, S_HEIGHT,
-				0, GL_RGBA, GL_FLOAT, NULL);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-				GL_TEXTURE_2D, gPos, 0);
-
-			glGenTextures(1, &gDiffSpec);
-			glBindTexture(GL_TEXTURE_2D, gDiffSpec);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, S_WIDTH, S_HEIGHT,
-				0, GL_RGBA, GL_FLOAT, NULL);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1,
-				GL_TEXTURE_2D, gDiffSpec, 0);
-
-			glGenTextures(1, &gNorm);
-			glBindTexture(GL_TEXTURE_2D, gNorm);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, S_WIDTH, S_HEIGHT,
-				0, GL_RGBA, GL_FLOAT, NULL);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2,
-				GL_TEXTURE_2D, gNorm, 0);
-
-			GLuint att[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
-			glDrawBuffers(3, att);
-
-			glGenRenderbuffers(1, &rBuf);
-			glBindRenderbuffer(GL_RENDERBUFFER, rBuf);
-			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, S_WIDTH, S_HEIGHT);
-			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, 
-				GL_RENDERBUFFER, rBuf);
-
-			if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-				std::cout << "Framebuffer not complete!" << '\n';
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-			const auto& s = shaderManager.Get("lPass").lock();
-			s->Use();
-			s->UploadUniform1i("gPos", 0);
-			s->UploadUniform1i("gDiffSpec", 1);
-			s->UploadUniform1i("gNorm", 2);
-			s->UnUse();
+			gbuf.Init(S_WIDTH, S_WIDTH);
 
 			return true;
 		}
@@ -217,10 +165,7 @@ namespace Example {
 	/**
 	*/
 	void ImGuiExampleApp::Run() {
-		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_CULL_FACE);
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_FRAMEBUFFER_SRGB);
 
 		float angle = 0.0f;
@@ -230,18 +175,16 @@ namespace Example {
 			HandleInput();
 
 			angle += dt;
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, gBuf);
+			gbuf.StartFrame();
+			
+			GeometryPass();
+			
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			for (const auto& node : nodes) {
-				node.Draw(*camera);
-			}
-
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+			glClear(GL_COLOR_BUFFER_BIT);
 			const auto& s = shaderManager.Get("lPass").lock();
 			s->Use();
 			glActiveTexture(GL_TEXTURE0);
@@ -261,6 +204,12 @@ namespace Example {
 			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 			glBlitFramebuffer(0, 0, S_WIDTH, S_HEIGHT, 0, 0, S_WIDTH, S_HEIGHT, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glEnable(GL_DEPTH_TEST);
+			glDepthMask()
+			lightManager.DrawLightSources(*camera);
 
 			// transfer new frame to window
 			this->window->SwapBuffers();
@@ -331,6 +280,49 @@ namespace Example {
 		glBindVertexArray(quadVAO);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		glBindVertexArray(0);
+	}
+
+	void ImGuiExampleApp::GeometryPass() {
+		const auto& s = shaderManager.Get("gNormPass").lock();
+		s->Use();
+
+		gbuf.BindForGeometryPass();
+
+		glDepthMask(GL_TRUE);
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		glEnable(GL_DEPTH_TEST);
+
+		for (const auto& node : nodes) {
+			node.Draw(*camera);
+		}
+
+		glDepthMask(GL_FALSE);
+
+		s->UnUse();
+	}
+
+	void ImGuiExampleApp::StencilPass() {
+		const auto& s = shaderManager.Get("nullShader").lock();
+		s->Use();
+
+		gbuf.BindForStencilPass();
+		glEnable(GL_DEPTH_TEST);
+		glDisable(GL_CULL_FACE);
+
+		glClear(GL_STENCIL_BUFFER_BIT);
+		glStencilFunc(GL_ALWAYS, 0, 0);
+		glStencilOpSeparate(GL_BACK, GL_KEEP, GL_INCR_WRAP, GL_KEEP);
+		glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_DECR_WRAP, GL_KEEP);
+
+
+
+		s->UnUse();
+	}
+
+	void ImGuiExampleApp::LightingPass() {
+		
 	}
 
 } // namespace Example

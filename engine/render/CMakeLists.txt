@@ -23,6 +23,8 @@ SET(files_render_display
 	material.cc
 	light.h
 	light.cc
+	gbuf.h
+	gbuf.cc
 	)
 SOURCE_GROUP("display" FILES ${files_render_display})
 

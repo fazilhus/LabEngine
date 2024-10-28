@@ -81,6 +81,7 @@ void main()
 	float gamma = 0.9;
 	tempCol = pow(tempCol, vec3(1.0 / gamma));
 	oColor = vec4(tempCol, 1.0);
+	//oColor = vec4(pos, 1.0);
 }
 
 vec3 CalcDirectionalLight(DirectionalLight light, vec3 norm, vec3 cam_dir, vec3 diff, float spec)

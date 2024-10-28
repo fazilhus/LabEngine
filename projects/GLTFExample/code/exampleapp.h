@@ -9,6 +9,7 @@
 #include "core/app.h"
 #include "render/window.h"
 #include "render/camera.h"
+#include "render/gbuf.h"
 #include "render/light.h"
 #include "render/model.h"
 #include "render/node.h"
@@ -41,14 +42,16 @@ namespace Example {
 		float prev_time;
 		float dt;
 
-		GLuint gBuf, rBuf;
-		GLuint gPos, gDiffSpec, gNorm;
+		Render::GBuffer gbuf;
 
 		std::vector<Resource::GraphicsNode> nodes;
 
 		GLuint quadVAO = 0, quadVBO = 0;
 
 		void renderQuad();
+		void GeometryPass();
+		void StencilPass();
+		void LightingPass();
 	};
 
 } // namespace Example

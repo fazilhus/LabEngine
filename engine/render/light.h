@@ -51,7 +51,7 @@ namespace Render {
 
 	class PointLight : public Light {
 		Math::vec3 pos;
-
+		float r;
 		Math::vec3 attenuation;
 
 		std::shared_ptr<Resource::Mesh> mesh;
@@ -73,6 +73,7 @@ namespace Render {
 
 	class SpotLight : public Light {
 		Math::vec3 pos;
+		float r;
 		Math::vec3 dir;
 		float32 cutoff;
 		float32 outerCutoff;
