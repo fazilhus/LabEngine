@@ -110,7 +110,7 @@ namespace Render {
 		}
 	}
 
-	void LightManager::DrawLightSources(const Render::Camera& cam) const {
+	void LightManager:: DrawLightSources(const Render::Camera& cam) const {
 		auto s = lightSourceShader.lock();
 		s->Use();
 
@@ -140,4 +140,28 @@ namespace Render {
 		s->UnUse();
 	}
 
+	void LightManager::DrawLightSourcesForStencil(const Render::Camera& cam, const std::shared_ptr<Resource::Shader>& s) const {
+		s->UploadUniformMat4fv("view", cam.GetView());
+		s->UploadUniformMat4fv("perspective", cam.GetPerspective());
+
+		for (std::size_t i = 0; i < pointLightsCount; ++i) {
+			auto transform = Math::translate(pointLights[i].GetPos()) * Math::scale(pointLights[i].GetRadius());
+			s->UploadUniformMat4fv("transform", transform);
+			s->UploadUniform3fv("light.ambient", pointLights[i].GetAmbient());
+			s->UploadUniform3fv("light.diffuse", pointLights[i].GetDiffuse());
+			s->UploadUniform3fv("light.specular", pointLights[i].GetSpecular());
+
+			mesh->Draw();
+		}
+
+		//for (std::size_t i = 0; i < spotLightsCount; ++i) {
+		//	auto transform = Math::translate(spotLights[i].GetPos()) * Math::scale(0.1f);
+		//	s->UploadUniformMat4fv("transform", transform);
+		//	s->UploadUniform3fv("light.ambient", spotLights[i].GetAmbient());
+		//	s->UploadUniform3fv("light.diffuse", spotLights[i].GetDiffuse());
+		//	s->UploadUniform3fv("light.specular", spotLights[i].GetSpecular());
+		//
+		//	mesh->Draw();
+		//}
+	}
 } // Render

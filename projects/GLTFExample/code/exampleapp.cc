@@ -39,11 +39,6 @@ namespace Example {
 		if (this->window->IsOpen()) {
 			helmetModel->UnLoad();
 			helmetModel.reset();
-			glDeleteFramebuffers(1, &gBuf);
-			glDeleteTextures(1, &gPos);
-			glDeleteTextures(1, &gDiffSpec);
-			glDeleteTextures(1, &gNorm);
-			glDeleteRenderbuffers(1, &gDepth);
 			glDeleteVertexArrays(1, &quadVAO);
 			glDeleteBuffers(1, &quadVBO);
 
@@ -70,7 +65,7 @@ namespace Example {
 		if (this->window->Open()) {
 			glfwSwapInterval(1);
 			// set clear color to gray
-			glClearColor(0.01f, 0.01f, 0.01f, 1.0f);
+			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 			std::filesystem::path resPath{ "../projects/GLTFExample/res" };
 			resPath.make_preferred();
@@ -88,16 +83,16 @@ namespace Example {
 				(resPath / "shaders/gNormVert.glsl").make_preferred(),
 				(resPath / "shaders/gNormFrag.glsl").make_preferred());
 			shaderManager.Push(
-				"lPass",
-				(resPath / "shaders/lVert.glsl").make_preferred(),
-				(resPath / "shaders/lFrag.glsl").make_preferred());
+				"PointLightPass",
+				(resPath / "shaders/PointLightVert.glsl").make_preferred(),
+				(resPath / "shaders/PointLightFrag.glsl").make_preferred());
 			shaderManager.Push(
 				"nullShader",
 				(resPath / "shaders/nVert.glsl").make_preferred(),
 				(resPath / "shaders/nFrag.glsl").make_preferred());
 
-			Resource::OBJMeshBuilder meshBuilder{ (resPath / "meshes/cube.obj").make_preferred() };
-			auto cubeMesh = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh());
+			Resource::OBJMeshBuilder meshBuilder{ (resPath / "meshes/sphere.obj").make_preferred() };
+			auto debugSphere = std::make_shared<Resource::Mesh>(meshBuilder.CreateMesh());
 
 			helmetModel = std::make_shared<Resource::Model>(
 				resPath / std::filesystem::path("models/FlightHelmet/gltf/FlightHelmet.gltf").make_preferred(),
@@ -114,9 +109,9 @@ namespace Example {
 			}
 
 
-			lightManager.PushLightingShader(shaderManager.Get("lPass"));
+			//lightManager.PushLightingShader(shaderManager.Get("PointLightPass"));
 			lightManager.SetLightSourceShader(shaderManager.Get("lightSourceShader"));
-			lightManager.SetMesh(cubeMesh);
+			lightManager.SetMesh(debugSphere);
 
 			Render::DirectionalLight dl;
 			dl.SetDirection({ 0, -1, -1});
@@ -126,8 +121,9 @@ namespace Example {
 			lightManager.SetGlobalLight(dl);
 
 			Render::PointLight pl;
-			pl.SetAttenuation({ 1.0f, 0.022f, 0.019f });
-			for (std::size_t i = 0; i < Render::MAX_NUM_LIGHT_SOURCES; ++i) {
+			pl.SetAttenuation({ 0.0f, 1.0f, 0.0f });
+			pl.SetRadius(0.5f);
+			for (std::size_t i = 0; i < 1/*Render::MAX_NUM_LIGHT_SOURCES*/; ++i) {
 				float x = Math::Random::rand_float(-2.5f, 2.5f);
 				float z = Math::Random::rand_float(-2.5f, 2.5f);
 				float r = Math::Random::rand_float();
@@ -150,7 +146,7 @@ namespace Example {
 			prev_time = 0;
 			dt = time - prev_time;
 
-			gbuf.Init(S_WIDTH, S_WIDTH);
+			gbuf.Init(S_WIDTH, S_HEIGHT);
 
 			return true;
 		}
@@ -177,39 +173,19 @@ namespace Example {
 			angle += dt;
 
 			gbuf.StartFrame();
-			
+
 			GeometryPass();
+
+			glEnable(GL_STENCIL_TEST);
+			for (const auto& [i, pl] : std::views::enumerate(lightManager.GetPointLights())) {
+				StencilPassPointLight(pl);
+				LightingPassPointLight(pl, i);
+			}
+			glDisable(GL_STENCIL_TEST);
 			
-			glEnable(GL_BLEND);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			//lightManager.DrawLightSources(*camera);
 
-			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-			glClear(GL_COLOR_BUFFER_BIT);
-			const auto& s = shaderManager.Get("lPass").lock();
-			s->Use();
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, gPos);
-			glActiveTexture(GL_TEXTURE1);
-			glBindTexture(GL_TEXTURE_2D, gDiffSpec);
-			glActiveTexture(GL_TEXTURE2);
-			glBindTexture(GL_TEXTURE_2D, gNorm);
-			s->UploadUniform3fv("cam_pos", camera->GetCameraPos());
-			lightManager.SetLightUniforms();
-
-			s->Use();
-			renderQuad();
-			s->UnUse();
-
-			glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuf);
-			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-			glBlitFramebuffer(0, 0, S_WIDTH, S_HEIGHT, 0, 0, S_WIDTH, S_HEIGHT, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-			glEnable(GL_BLEND);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			glEnable(GL_DEPTH_TEST);
-			glDepthMask()
-			lightManager.DrawLightSources(*camera);
+			FinalPass();
 
 			// transfer new frame to window
 			this->window->SwapBuffers();
@@ -303,7 +279,7 @@ namespace Example {
 		s->UnUse();
 	}
 
-	void ImGuiExampleApp::StencilPass() {
+	void ImGuiExampleApp::StencilPassPointLight(const Render::PointLight& pl) {
 		const auto& s = shaderManager.Get("nullShader").lock();
 		s->Use();
 
@@ -316,13 +292,58 @@ namespace Example {
 		glStencilOpSeparate(GL_BACK, GL_KEEP, GL_INCR_WRAP, GL_KEEP);
 		glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_DECR_WRAP, GL_KEEP);
 
+		s->UploadUniformMat4fv("view", camera->GetView());
+		s->UploadUniformMat4fv("perspective", camera->GetPerspective());
 
+		auto transform = Math::translate(pl.GetPos()) * Math::scale(pl.GetRadius());
+		s->UploadUniformMat4fv("transform", transform);
+
+		lightManager.GetMesh()->Draw();
 
 		s->UnUse();
 	}
 
-	void ImGuiExampleApp::LightingPass() {
-		
+	void ImGuiExampleApp::LightingPassPointLight(const Render::PointLight& pl, std::size_t i) {
+		const auto& s = shaderManager.Get("PointLightPass").lock();
+		s->Use();
+
+		gbuf.BindForLightingPass();
+
+		glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
+		glDisable(GL_DEPTH_TEST);
+
+		glEnable(GL_BLEND);
+		glBlendEquation(GL_FUNC_ADD);
+		glBlendFunc(GL_ONE, GL_ONE);
+
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_FRONT);
+
+		s->UploadUniform3fv("cam_pos", camera->GetCameraPos());
+		s->UploadUniform3fv("light.pos", pl.GetPos());
+		s->UploadUniform3fv("light.ambient", pl.GetAmbient());
+		s->UploadUniform3fv("light.diffuse", pl.GetDiffuse());
+		s->UploadUniform3fv("light.specular", pl.GetSpecular());
+		s->UploadUniform3fv("light.attenuation", pl.GetAttenuation());
+
+		s->UploadUniformMat4fv("view", camera->GetView());
+		s->UploadUniformMat4fv("perspective", camera->GetPerspective());
+
+		auto transform = Math::translate(pl.GetPos()) * Math::scale(pl.GetRadius());
+		s->UploadUniformMat4fv("transform", transform);
+		lightManager.GetMesh()->Draw();
+
+		glCullFace(GL_BACK);
+		glDisable(GL_BLEND);
+
+		s->UnUse();
+	}
+
+	void ImGuiExampleApp::FinalPass() {
+		gbuf.BindForFinalPass();
+		glBlitFramebuffer(
+			0, 0, S_WIDTH, S_HEIGHT,
+			0, 0, S_WIDTH, S_HEIGHT, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 	}
 
 } // namespace Example

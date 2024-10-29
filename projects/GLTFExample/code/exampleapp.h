@@ -50,8 +50,9 @@ namespace Example {
 
 		void renderQuad();
 		void GeometryPass();
-		void StencilPass();
-		void LightingPass();
+		void StencilPassPointLight(const Render::PointLight& pl);
+		void LightingPassPointLight(const Render::PointLight& pl, std::size_t i);
+		void FinalPass();
 	};
 
 } // namespace Example
