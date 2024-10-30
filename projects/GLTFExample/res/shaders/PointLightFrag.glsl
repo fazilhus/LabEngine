@@ -14,7 +14,7 @@ uniform sampler2D gNorm;
 // uniform DirectionalLight dlight;
 
 uniform vec2 screen_dim;
-uniform vec3 cam_pos;
+uniform vec3 camera_pos;
 
 struct PointLight {
 	vec3 pos;
@@ -58,11 +58,12 @@ void main()
 {
 	vec2 uv = CalcUV();
 	vec3 pos = texture(gPos, uv).xyz;
-	vec3 norm = texture(gNorm, uv).rgb;
-	vec3 diff = texture(gDiffSpec, uv).rgb;
-	float spec = texture(gDiffSpec, uv).a;
+	vec3 norm = texture(gNorm, uv).xyz;
+	vec4 temp = texture(gDiffSpec, uv);
+	vec3 diff = temp.rgb;
+	float spec = temp.a;
 
-	vec3 cam_dir = normalize(cam_pos - pos);
+	vec3 cam_dir = normalize(camera_pos - pos);
 
 	// Global Light
 	// vec3 tempCol = CalcDirectionalLight(dlight, norm, cam_dir, diff, spec);
@@ -79,6 +80,7 @@ void main()
 	float gamma = 0.9;
 	tempCol = pow(tempCol, vec3(1.0 / gamma));
 	oColor = vec4(tempCol, 1.0);
+	//oColor = vec4(norm, 1.0);
 }
 
 // vec3 CalcDirectionalLight(DirectionalLight light, vec3 norm, vec3 cam_dir, vec3 diff, float spec)

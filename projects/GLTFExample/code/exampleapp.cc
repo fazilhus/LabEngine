@@ -148,6 +148,13 @@ namespace Example {
 
 			gbuf.Init(S_WIDTH, S_HEIGHT);
 
+			const auto& s = shaderManager.Get("PointLightPass").lock();
+			s->Use();
+			s->UploadUniform1i("gPos", 0);
+			s->UploadUniform1i("gDiffSpec", 1);
+			s->UploadUniform1i("gNorm", 2);
+			s->UnUse();
+
 			return true;
 		}
 		return false;
