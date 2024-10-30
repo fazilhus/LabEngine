@@ -29,17 +29,17 @@ namespace Render {
 	}
 
 	PointLight::PointLight()
-		: Light(), pos(0.0f), attenuation({1.0f, 0.0f, 0.0f}) {
+		: Light(), pos(0.0f), r(1.0f), falloff(1.0f) {
 	}
 
 	PointLight::PointLight(const Math::vec3& pos, const Math::vec3& a,
-		const Math::vec3& d, const Math::vec3& s, const Math::vec3& attenuation)
-		: Light(a, d, s), pos(pos), attenuation(attenuation) {
+		const Math::vec3& d, const Math::vec3& s, float r, float falloff)
+		: Light(a, d, s), pos(pos), r(r), falloff(falloff) {
 	}
 
 	PointLight::PointLight(const PointLight& other)
 		: Light(other.GetAmbient(), other.GetDiffuse(), other.GetSpecular()),
-		pos(other.pos), attenuation(other.attenuation) {
+		pos(other.pos), r(other.r), falloff(other.falloff) {
 	}
 
 	SpotLight::SpotLight()
@@ -88,7 +88,8 @@ namespace Render {
 				s->UploadUniform3fv(temp + "].ambient", pointLights[i].GetAmbient());
 				s->UploadUniform3fv(temp + "].diffuse", pointLights[i].GetDiffuse());
 				s->UploadUniform3fv(temp + "].specular", pointLights[i].GetSpecular());
-				s->UploadUniform3fv(temp + "].attenuation", pointLights[i].GetAttenuation());
+				s->UploadUniform1f(temp + "].radius", pointLights[i].GetRadius());
+				s->UploadUniform1f(temp + "].falloff", pointLights[i].GetFalloff());
 			}
 			s->UploadUniform1i("plights_count", pointLightsCount);
 

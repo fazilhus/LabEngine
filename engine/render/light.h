@@ -52,23 +52,22 @@ namespace Render {
 	class PointLight : public Light {
 		Math::vec3 pos;
 		float r;
-		Math::vec3 attenuation;
+		float falloff;
 
 	public:
 		PointLight();
 		PointLight(const Math::vec3& pos, const Math::vec3& a,
-			const Math::vec3& d, const Math::vec3& s, const Math::vec3& attenuation);
+			const Math::vec3& d, const Math::vec3& s, float r, float attenuation);
 		PointLight(const PointLight& other);
 
 		void SetPos(const Math::vec3& pos) { this->pos = pos; }
 		void SetRadius(float r) { this->r = r; }
-		void SetAttenuation(const Math::vec3& attenuation) { this->attenuation = attenuation; }
+		void SetFalloff(float falloff) { this->falloff = falloff; }
 
 		const Math::vec3& GetPos() const { return pos; }
 		Math::vec3& GetPos() { return pos; }
 		float GetRadius() const { return r; }
-		const Math::vec3& GetAttenuation() const { return attenuation; }
-		Math::vec3& GetAttenuation() { return attenuation; }
+		float GetFalloff() const { return falloff; }
 	};
 
 	class SpotLight : public Light {

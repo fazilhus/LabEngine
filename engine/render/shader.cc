@@ -59,6 +59,11 @@ namespace Resource {
 		glUniform1f(loc, v);
 	}
 
+	void Shader::UploadUniform2fv(const std::string& name, const Math::vec2& v) {
+		GLuint loc = GetOrUpdateUniformLoc(name);
+		glUniform2fv(loc, 1, &v.x);
+	}
+
 	void Shader::UploadUniform3fv(const std::string& name, const Math::vec3& v) {
 		GLuint loc = GetOrUpdateUniformLoc(name);
 		glUniform3fv(loc, 1, &v.x);

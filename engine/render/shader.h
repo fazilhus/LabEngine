@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <memory>
 
-
+#include "math/vec2.h"
 #include "math/vec3.h"
 #include "math/vec4.h"
 #include "math/mat4.h"
@@ -43,6 +43,7 @@ namespace Resource {
 
 		void UploadUniform1i(const std::string& name, GLint v);
 		void UploadUniform1f(const std::string& name, float32 v);
+		void UploadUniform2fv(const std::string& name, const Math::vec2& v);
 		void UploadUniform3fv(const std::string& name, const Math::vec3& v);
 		void UploadUniform4fv(const std::string& name, const Math::vec4& v);
 		void UploadUniformMat4fv(const std::string& name, const Math::mat4& m);

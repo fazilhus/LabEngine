@@ -121,8 +121,8 @@ namespace Example {
 			lightManager.SetGlobalLight(dl);
 
 			Render::PointLight pl;
-			pl.SetAttenuation({ 0.0f, 1.0f, 0.0f });
-			pl.SetRadius(0.5f);
+			pl.SetFalloff(1.0f);
+			pl.SetRadius(2.0f);
 			for (std::size_t i = 0; i < 1/*Render::MAX_NUM_LIGHT_SOURCES*/; ++i) {
 				float x = Math::Random::rand_float(-2.5f, 2.5f);
 				float z = Math::Random::rand_float(-2.5f, 2.5f);
@@ -287,10 +287,10 @@ namespace Example {
 		glEnable(GL_DEPTH_TEST);
 		glDisable(GL_CULL_FACE);
 
+		glClearStencil(0);
 		glClear(GL_STENCIL_BUFFER_BIT);
-		glStencilFunc(GL_ALWAYS, 0, 0);
-		glStencilOpSeparate(GL_BACK, GL_KEEP, GL_INCR_WRAP, GL_KEEP);
-		glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_DECR_WRAP, GL_KEEP);
+		glStencilFunc(GL_ALWAYS, 0x01, 0xFF);
+		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
 		s->UploadUniformMat4fv("view", camera->GetView());
 		s->UploadUniformMat4fv("perspective", camera->GetPerspective());
@@ -309,7 +309,8 @@ namespace Example {
 
 		gbuf.BindForLightingPass();
 
-		glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
+		glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+		glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 		glDisable(GL_DEPTH_TEST);
 
 		glEnable(GL_BLEND);
@@ -319,12 +320,16 @@ namespace Example {
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_FRONT);
 
+		Math::vec2 dim{ S_WIDTH, S_HEIGHT };
+
+		s->UploadUniform2fv("screen_dim", dim);
 		s->UploadUniform3fv("cam_pos", camera->GetCameraPos());
 		s->UploadUniform3fv("light.pos", pl.GetPos());
 		s->UploadUniform3fv("light.ambient", pl.GetAmbient());
 		s->UploadUniform3fv("light.diffuse", pl.GetDiffuse());
 		s->UploadUniform3fv("light.specular", pl.GetSpecular());
-		s->UploadUniform3fv("light.attenuation", pl.GetAttenuation());
+		s->UploadUniform1f("light.radius", pl.GetRadius());
+		s->UploadUniform1f("light.falloff", pl.GetFalloff());
 
 		s->UploadUniformMat4fv("view", camera->GetView());
 		s->UploadUniformMat4fv("perspective", camera->GetPerspective());
