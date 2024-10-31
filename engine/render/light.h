@@ -73,6 +73,7 @@ namespace Render {
 		Math::vec3 vel;
 	};
 
+	// TODO add support for spot lights for deferred shading pipeline
 	class SpotLight : public Light {
 		Math::vec3 pos;
 		float r;
