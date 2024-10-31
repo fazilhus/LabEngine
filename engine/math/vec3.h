@@ -8,7 +8,7 @@ namespace Math {
 	public:
 		float x, y, z;
 
-		vec3(const float x, const float y, const float z) : x(x), y(y), z(z) {}
+		vec3(float x, float y, float z) : x(x), y(y), z(z) {}
 
 		vec3() : vec3(0, 0, 0) {}
 
@@ -23,7 +23,7 @@ namespace Math {
 			return *this;
 		}
 
-		const vec3 operator+(const vec3& rhs) const {
+		vec3 operator+(const vec3& rhs) const {
 			vec3 res{ *this };
 			return res += rhs;
 		}
@@ -35,7 +35,7 @@ namespace Math {
 			return *this;
 		}
 
-		const vec3 operator-() const {
+		vec3 operator-() const {
 			vec3 res{ *this };
 			res.x = -res.x;
 			res.y = -res.y;
@@ -43,7 +43,7 @@ namespace Math {
 			return res;
 		}
 
-		const vec3 operator-(const vec3& rhs) const {
+		vec3 operator-(const vec3& rhs) const {
 			vec3 res{ *this };
 			return res -= rhs;
 		}
@@ -55,27 +55,39 @@ namespace Math {
 			return *this;
 		}
 
-		const vec3 operator*(const float scalar) const {
+		vec3 operator*(float scalar) const {
 			vec3 res{ *this };
 			return res *= scalar;
 		}
 
-		vec3& operator*=(const float scalar) {
+		vec3& operator*=(float scalar) {
 			this->x *= scalar;
 			this->y *= scalar;
 			this->z *= scalar;
 			return *this;
 		}
 
-		const bool operator==(const vec3& rhs) const {
+		vec3 operator*(const vec3& rhs) const {
+			vec3 res{ *this };
+			return res *= rhs;
+		}
+
+		vec3& operator*=(const vec3& rhs) {
+			this->x *= rhs.x;
+			this->y *= rhs.y;
+			this->z *= rhs.z;
+			return *this;
+		}
+
+		bool operator==(const vec3& rhs) const {
 			return (this->x == rhs.x) && (this->y == rhs.y) && (this->z == rhs.z);
 		}
 
-		const bool operator!=(const vec3& rhs) const {
+		bool operator!=(const vec3& rhs) const {
 			return !(*this == rhs);
 		}
 
-		float& operator[](const std::size_t i) {
+		float& operator[](std::size_t i) {
 			switch (i) {
 			case 0: return this->x;
 			case 1: return this->y;
@@ -84,7 +96,7 @@ namespace Math {
 			}
 		}
 
-		const float operator[](const std::size_t i) const {
+		float operator[](std::size_t i) const {
 			switch (i) {
 			case 0: return this->x;
 			case 1: return this->y;

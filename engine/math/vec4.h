@@ -74,6 +74,19 @@ namespace Math {
 			return *this;
 		}
 
+		vec4 operator*(const vec4& rhs) const {
+			vec4 res{ *this };
+			return res *= rhs;
+		}
+
+		vec4& operator*=(const vec4& rhs) {
+			this->x *= rhs.x;
+			this->y *= rhs.y;
+			this->z *= rhs.z;
+			this->w *= rhs.w;
+			return *this;
+		}
+
 		bool operator==(const vec4& rhs) const {
 			return (this->x == rhs.x) && (this->y == rhs.y)
 				&& (this->z == rhs.z) && (this->w == rhs.w);

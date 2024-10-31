@@ -8,7 +8,7 @@ namespace Math {
 	public:
 		float x, y;
 
-		vec2(const float x, const float y) : x(x), y(y) {}
+		vec2(float x, float y) : x(x), y(y) {}
 
 		vec2() : vec2(0, 0) {}
 
@@ -22,7 +22,7 @@ namespace Math {
 			return *this;
 		}
 
-		const vec2 operator+(const vec2& rhs) const {
+		vec2 operator+(const vec2& rhs) const {
 			vec2 res{ *this };
 			return res += rhs;
 		}
@@ -33,14 +33,14 @@ namespace Math {
 			return *this;
 		}
 
-		const vec2 operator-() const {
+		vec2 operator-() const {
 			vec2 res{ *this };
 			res.x = -res.x;
 			res.y = -res.y;
 			return res;
 		}
 
-		const vec2 operator-(const vec2& rhs) const {
+		vec2 operator-(const vec2& rhs) const {
 			vec2 res{ *this };
 			return res -= rhs;
 		}
@@ -51,26 +51,37 @@ namespace Math {
 			return *this;
 		}
 
-		const vec2 operator*(const float scalar) const {
+		vec2 operator*(float scalar) const {
 			vec2 res{ *this };
 			return res *= scalar;
 		}
 
-		vec2& operator*=(const float scalar) {
+		vec2& operator*=(float scalar) {
 			this->x *= scalar;
 			this->y *= scalar;
 			return *this;
 		}
 
-		const bool operator==(const vec2& rhs) const {
+		vec2 operator*(const vec2& rhs) const {
+			vec2 res{ *this };
+			return res *= rhs;
+		}
+
+		vec2& operator*=(const vec2& rhs) {
+			this->x *= rhs.x;
+			this->y *= rhs.y;
+			return *this;
+		}
+
+		bool operator==(const vec2& rhs) const {
 			return (this->x == rhs.x) && (this->y == rhs.y);
 		}
 
-		const bool operator!=(const vec2& rhs) const {
+		bool operator!=(const vec2& rhs) const {
 			return !(*this == rhs);
 		}
 
-		float& operator[](const std::size_t i) {
+		float& operator[](std::size_t i) {
 			switch (i) {
 			case 0: return this->x;
 			case 1: return this->y;
@@ -78,7 +89,7 @@ namespace Math {
 			}
 		}
 
-		const float operator[](const std::size_t i) const {
+		float operator[](std::size_t i) const {
 			switch (i) {
 			case 0: return this->x;
 			case 1: return this->y;
