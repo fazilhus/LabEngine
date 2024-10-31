@@ -34,12 +34,12 @@ namespace Render {
 
 	PointLight::PointLight(const Math::vec3& pos, const Math::vec3& a,
 		const Math::vec3& d, const Math::vec3& s, float r, float falloff)
-		: Light(a, d, s), pos(pos), r(r), falloff(falloff) {
+		: Light(a, d, s), pos(pos), r(r), falloff(falloff), vel({}) {
 	}
 
 	PointLight::PointLight(const PointLight& other)
 		: Light(other.GetAmbient(), other.GetDiffuse(), other.GetSpecular()),
-		pos(other.pos), r(other.r), falloff(other.falloff) {
+		pos(other.pos), r(other.r), falloff(other.falloff), vel(other.vel) {
 	}
 
 	SpotLight::SpotLight()

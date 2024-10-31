@@ -55,6 +55,8 @@ namespace Example {
 		void LightingPassPointLight(const Render::PointLight& pl, std::size_t i);
 		void LightingPassGlobalLight();
 		void FinalPass();
+
+		void UpdateLights();
 	};
 
 } // namespace Example

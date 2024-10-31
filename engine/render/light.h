@@ -57,7 +57,7 @@ namespace Render {
 	public:
 		PointLight();
 		PointLight(const Math::vec3& pos, const Math::vec3& a,
-			const Math::vec3& d, const Math::vec3& s, float r, float attenuation);
+			const Math::vec3& d, const Math::vec3& s, float r, float falloff);
 		PointLight(const PointLight& other);
 
 		void SetPos(const Math::vec3& pos) { this->pos = pos; }
@@ -68,6 +68,9 @@ namespace Render {
 		Math::vec3& GetPos() { return pos; }
 		float GetRadius() const { return r; }
 		float GetFalloff() const { return falloff; }
+
+		// For Presentation
+		Math::vec3 vel;
 	};
 
 	class SpotLight : public Light {
@@ -104,7 +107,7 @@ namespace Render {
 		Math::vec3& GetAttenuation() { return attenuation; }
 	};
 
-	constexpr int MAX_NUM_LIGHT_SOURCES = 64;
+	constexpr int MAX_NUM_LIGHT_SOURCES = 128;
 
 	class LightManager {
 		DirectionalLight globalLight;

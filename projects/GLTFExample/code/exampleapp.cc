@@ -142,22 +142,26 @@ namespace Example {
 				float r = Math::Random::rand_float();
 				float g = Math::Random::rand_float();
 				float b = Math::Random::rand_float();
+				float speed = Math::Random::rand_float(-5, 5);
 				Math::vec3 c{ r, g, b };
 				pl.SetPos({x, y, z});
 				pl.SetAmbient(c * 0.005f);
 				pl.SetDiffuse(c * 0.01f);
 				pl.SetSpecular(c * 0.25f);
+				pl.vel = { 0, 0, speed };
 				lightManager.PushPointLight(pl);
 			}
 
-			this->camera = new Render::Camera(0.5f, 4.0f / 3.0f, 0.01f, 100.0f);
+			this->camera = new Render::Camera(
+				Math::toRad(65.0f), 4.0f / 3.0f, 0.01f, 100.0f
+			);
 			this->camera->SetCameraPosition({ -13.0f, 2.0f, -0.5f });
 			this->camera->SetSpeed(7.5f);
 			this->camera->SetSens(0.05f);
 
 			time = (float)glfwGetTime();
 			prev_time = 0;
-			dt = time - prev_time;
+			dt = (time - prev_time) / 1000.0f;
 
 			gbuf.Init(S_WIDTH, S_HEIGHT);
 
@@ -200,6 +204,7 @@ namespace Example {
 		while (this->window->IsOpen()) {
 			this->window->Update();
 			HandleInput();
+			UpdateLights();
 
 			angle += dt;
 
@@ -419,4 +424,14 @@ namespace Example {
 			0, 0, S_WIDTH, S_HEIGHT, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 	}
 
+	void ImGuiExampleApp::UpdateLights() {
+		for (auto& l : lightManager.GetPointLights()) {
+			const auto& p = l.GetPos();
+			if (p.z < -11.0f || p.z > 9.0f) {
+				l.vel *= -1;
+			}
+
+			l.SetPos(p + l.vel * dt);
+		}
+	}
 } // namespace Example
