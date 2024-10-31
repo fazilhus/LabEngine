@@ -133,7 +133,7 @@ namespace Example {
 			lightManager.SetGlobalLight(dl);
 
 			Render::PointLight pl;
-			pl.SetFalloff(200.0f);
+			pl.SetFalloff(75.0f);
 			pl.SetRadius(45.0f);
 			for (std::size_t i = 0; i < Render::MAX_NUM_LIGHT_SOURCES; ++i) {
 				float x = Math::Random::rand_float(-19.0f, 24.0f);
