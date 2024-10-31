@@ -4,7 +4,7 @@ layout(location=1) in vec3 iNorm;
 layout(location=2) in vec2 iUV;
 
 layout(location=0) out vec3 gPos;
-layout(location=1) out vec4 gDiffSpec;
+layout(location=1) out vec4 gCol;
 layout(location=2) out vec3 gNorm;
 
 struct Material {
@@ -20,8 +20,12 @@ uniform Material material;
 
 void main()
 {
+	vec4 col = texture(material.diffuse, iUV);
+	if (col.a < 0.5)
+		discard;
+
 	gPos = iPos;
-	gDiffSpec.rgb = texture(material.diffuse, iUV).rgb;
-	gDiffSpec.a = texture(material.specular, iUV).g;
+	gCol.rgb = texture(material.diffuse, iUV).rgb;
+	gCol.a = texture(material.specular, iUV).g;
 	gNorm = normalize(iNorm);
 }

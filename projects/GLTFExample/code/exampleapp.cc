@@ -39,6 +39,8 @@ namespace Example {
 		if (this->window->IsOpen()) {
 			helmetModel->UnLoad();
 			helmetModel.reset();
+			sponzaModel->UnLoad();
+			sponzaModel.reset();
 			glDeleteVertexArrays(1, &quadVAO);
 			glDeleteBuffers(1, &quadVBO);
 
@@ -72,8 +74,8 @@ namespace Example {
 
 			shaderManager.Push(
 				"lightSourceShader",
-				(resPath / "shaders/lightVert.glsl").make_preferred(),
-				(resPath / "shaders/lightFrag.glsl").make_preferred());
+				(resPath / "shaders/debugVert.glsl").make_preferred(),
+				(resPath / "shaders/debugFrag.glsl").make_preferred());
 			shaderManager.Push(
 				"gPass",
 				(resPath / "shaders/gVert.glsl").make_preferred(),
@@ -84,8 +86,12 @@ namespace Example {
 				(resPath / "shaders/gNormFrag.glsl").make_preferred());
 			shaderManager.Push(
 				"PointLightPass",
-				(resPath / "shaders/PointLightVert.glsl").make_preferred(),
+				(resPath / "shaders/LightVert.glsl").make_preferred(),
 				(resPath / "shaders/PointLightFrag.glsl").make_preferred());
+			shaderManager.Push(
+				"DirLightPass",
+				(resPath / "shaders/LightVert.glsl").make_preferred(),
+				(resPath / "shaders/DirLightFrag.glsl").make_preferred());
 			shaderManager.Push(
 				"nullShader",
 				(resPath / "shaders/nVert.glsl").make_preferred(),
@@ -98,6 +104,10 @@ namespace Example {
 				resPath / std::filesystem::path("models/FlightHelmet/gltf/FlightHelmet.gltf").make_preferred(),
 				shaderManager
 			);
+			sponzaModel = std::make_shared<Resource::Model>(
+				resPath / std::filesystem::path("models/Sponza/gltf/Sponza.gltf").make_preferred(),
+				shaderManager
+			);
 
 			for (std::size_t i = 0; i < 5; ++i) {
 				for (std::size_t j = 0; j < 5; ++j) {
@@ -107,6 +117,8 @@ namespace Example {
 					nodes.push_back(node);
 				}
 			}
+			nodes.emplace_back(sponzaModel);
+			nodes.back().transform *= Math::scale(0.015f);
 
 
 			//lightManager.PushLightingShader(shaderManager.Get("PointLightPass"));
@@ -115,25 +127,26 @@ namespace Example {
 
 			Render::DirectionalLight dl;
 			dl.SetDirection({ 0, -1, -1});
-			dl.SetAmbient(Math::vec3(0));
-			dl.SetDiffuse(Math::vec3(0));
-			dl.SetSpecular(Math::vec3(0));
+			dl.SetAmbient(Math::vec3(0.05f));
+			dl.SetDiffuse(Math::vec3(0.1f));
+			dl.SetSpecular(Math::vec3(0.3f));
 			lightManager.SetGlobalLight(dl);
 
 			Render::PointLight pl;
-			pl.SetFalloff(1.0f);
-			pl.SetRadius(2.0f);
-			for (std::size_t i = 0; i < 1/*Render::MAX_NUM_LIGHT_SOURCES*/; ++i) {
-				float x = Math::Random::rand_float(-2.5f, 2.5f);
-				float z = Math::Random::rand_float(-2.5f, 2.5f);
+			pl.SetFalloff(200.0f);
+			pl.SetRadius(45.0f);
+			for (std::size_t i = 0; i < Render::MAX_NUM_LIGHT_SOURCES; ++i) {
+				float x = Math::Random::rand_float(-19.0f, 24.0f);
+				float y = Math::Random::rand_float(0.5f, 12.5f);
+				float z = Math::Random::rand_float(-11.0f, 9.0f);
 				float r = Math::Random::rand_float();
 				float g = Math::Random::rand_float();
 				float b = Math::Random::rand_float();
 				Math::vec3 c{ r, g, b };
-				pl.SetPos({x, 0.5f, z});
+				pl.SetPos({x, y, z});
 				pl.SetAmbient(c * 0.005f);
 				pl.SetDiffuse(c * 0.01f);
-				pl.SetSpecular(c * 0.15f);
+				pl.SetSpecular(c * 0.25f);
 				lightManager.PushPointLight(pl);
 			}
 
@@ -148,12 +161,23 @@ namespace Example {
 
 			gbuf.Init(S_WIDTH, S_HEIGHT);
 
-			const auto& s = shaderManager.Get("PointLightPass").lock();
-			s->Use();
-			s->UploadUniform1i("gPos", 0);
-			s->UploadUniform1i("gDiffSpec", 1);
-			s->UploadUniform1i("gNorm", 2);
-			s->UnUse();
+			{
+				const auto& s = shaderManager.Get("PointLightPass").lock();
+				s->Use();
+				s->UploadUniform1i("gPos", 0);
+				s->UploadUniform1i("gCol", 1);
+				s->UploadUniform1i("gNorm", 2);
+				s->UnUse();
+			}
+
+			{
+				const auto& s = shaderManager.Get("DirLightPass").lock();
+				s->Use();
+				s->UploadUniform1i("gPos", 0);
+				s->UploadUniform1i("gCol", 1);
+				s->UploadUniform1i("gNorm", 2);
+				s->UnUse();
+			}
 
 			return true;
 		}
@@ -189,8 +213,13 @@ namespace Example {
 				LightingPassPointLight(pl, i);
 			}
 			glDisable(GL_STENCIL_TEST);
-			
-			//lightManager.DrawLightSources(*camera);
+
+			LightingPassGlobalLight();
+
+			gbuf.BindForDebugPass();
+			glEnable(GL_DEPTH_TEST);
+			glDisable(GL_BLEND);
+			lightManager.DrawLightSources(*camera);
 
 			FinalPass();
 
@@ -233,8 +262,8 @@ namespace Example {
 				// positions        // texture Coords
 				-1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
 				-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-				 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-				 1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+				1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+				1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
 			};
 
 			glGenVertexArrays(1, &quadVAO);
@@ -338,14 +367,46 @@ namespace Example {
 		s->UploadUniform1f("light.radius", pl.GetRadius());
 		s->UploadUniform1f("light.falloff", pl.GetFalloff());
 
-		s->UploadUniformMat4fv("view", camera->GetView());
-		s->UploadUniformMat4fv("perspective", camera->GetPerspective());
+		//s->UploadUniformMat4fv("view", camera->GetView());
+		//s->UploadUniformMat4fv("perspective", camera->GetPerspective());
 
 		auto transform = Math::translate(pl.GetPos()) * Math::scale(pl.GetRadius());
-		s->UploadUniformMat4fv("transform", transform);
+		s->UploadUniformMat4fv("mvp", camera->GetPerspective() * camera->GetView() * transform);
 		lightManager.GetMesh()->Draw();
 
 		glCullFace(GL_BACK);
+		glDisable(GL_BLEND);
+
+		s->UnUse();
+	}
+
+	void ImGuiExampleApp::LightingPassGlobalLight() {
+		const auto& s = shaderManager.Get("DirLightPass").lock();
+		s->Use();
+
+		gbuf.BindForLightingPass();
+
+		glDisable(GL_DEPTH_TEST);
+		glEnable(GL_BLEND);
+		glBlendEquation(GL_FUNC_ADD);
+		glBlendFunc(GL_ONE, GL_ONE);
+
+		Math::vec2 dim{ S_WIDTH, S_HEIGHT };
+		const auto& l = lightManager.GetGlobalLight();
+
+		s->UploadUniform2fv("screen_dim", dim);
+		s->UploadUniform3fv("cam_pos", camera->GetCameraPos());
+		s->UploadUniform3fv("light.dir", l.GetDirection());
+		s->UploadUniform3fv("light.ambient", l.GetAmbient());
+		s->UploadUniform3fv("light.diffuse", l.GetDiffuse());
+		s->UploadUniform3fv("light.specular", l.GetSpecular());
+
+		//s->UploadUniformMat4fv("view", camera->GetView());
+		//s->UploadUniformMat4fv("perspective", camera->GetPerspective());
+
+		s->UploadUniformMat4fv("mvp", Math::mat4::identity());
+
+		renderQuad();
 		glDisable(GL_BLEND);
 
 		s->UnUse();

@@ -88,7 +88,7 @@ namespace Resource {
 
 		int w, h, comp;
 		stbi_set_flip_vertically_on_load(flip);
-		uchar* image = stbi_load(path.string().c_str(), &w, &h, &comp, STBI_rgb);
+		uchar* image = stbi_load(path.string().c_str(), &w, &h, &comp, STBI_rgb_alpha);
 
 		if (image == nullptr) {
 			return;
@@ -106,8 +106,8 @@ namespace Resource {
 		glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &maxAniso);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY, maxAniso);
 
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, w, h, 0,
-			GL_RGB, GL_UNSIGNED_BYTE, (GLvoid*)image);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, w, h, 0,
+			GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*)image);
 
 		GenerateMipMapifNeeded();
 

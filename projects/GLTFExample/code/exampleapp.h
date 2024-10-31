@@ -36,6 +36,7 @@ namespace Example {
 		Render::LightManager lightManager;
 		Resource::ShaderManager shaderManager;
 		std::shared_ptr<Resource::Model> helmetModel;
+		std::shared_ptr<Resource::Model> sponzaModel;
 		Render::Camera* camera;
 		Display::Window* window;
 		float time;
@@ -52,6 +53,7 @@ namespace Example {
 		void GeometryPass();
 		void StencilPassPointLight(const Render::PointLight& pl);
 		void LightingPassPointLight(const Render::PointLight& pl, std::size_t i);
+		void LightingPassGlobalLight();
 		void FinalPass();
 	};
 

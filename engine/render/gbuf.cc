@@ -70,17 +70,17 @@ namespace Render {
 		glClear(GL_COLOR_BUFFER_BIT);
 	}
 
-	void GBuffer::BindForGeometryPass() {
+	void GBuffer::BindForGeometryPass() const {
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, gBuf);
 		GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
 		glDrawBuffers(3, bufs);
 	}
 
-	void GBuffer::BindForStencilPass() {
+	void GBuffer::BindForStencilPass() const {
 		glDrawBuffer(GL_NONE);
 	}
 
-	void GBuffer::BindForLightingPass() {
+	void GBuffer::BindForLightingPass() const {
 		glDrawBuffer(GL_COLOR_ATTACHMENT4);
 		for (unsigned int i = 0; i < GBUF_NUM_TEXTURES; ++i) {
 			glActiveTexture(GL_TEXTURE0 + i);
@@ -88,7 +88,11 @@ namespace Render {
 		}
 	}
 
-	void GBuffer::BindForFinalPass() {
+	void GBuffer::BindForDebugPass() const {
+		glDrawBuffer(GL_COLOR_ATTACHMENT4);
+	}
+
+	void GBuffer::BindForFinalPass() const {
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuf);
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 		glReadBuffer(GL_COLOR_ATTACHMENT4);

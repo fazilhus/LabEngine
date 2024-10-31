@@ -8,7 +8,7 @@ namespace Render {
 	public:
 		enum GBUF_TEXTURE_TYPE {
 			GBUF_POS,
-			GBUF_DIFFSPEC,
+			GBUF_COL,
 			GBUF_NORM,
 			GBUF_NUM_TEXTURES
 		};
@@ -25,10 +25,11 @@ namespace Render {
 
 		void Init(unsigned int w, unsigned int h);
 		void StartFrame() const;
-		void BindForGeometryPass();
-		void BindForStencilPass();
-		void BindForLightingPass();
-		void BindForFinalPass();
+		void BindForGeometryPass() const;
+		void BindForStencilPass() const;
+		void BindForLightingPass() const;
+		void BindForDebugPass() const;
+		void BindForFinalPass() const;
 	};
 
 } // Render

@@ -1,20 +1,10 @@
 #version 460 core
 uniform sampler2D gPos;
-uniform sampler2D gDiffSpec;
+uniform sampler2D gCol;
 uniform sampler2D gNorm;
 
-// struct DirectionalLight {
-// 	vec3 dir;
-
-// 	vec3 ambient;
-// 	vec3 diffuse;
-// 	vec3 specular;
-// };
-
-// uniform DirectionalLight dlight;
-
 uniform vec2 screen_dim;
-uniform vec3 camera_pos;
+uniform vec3 cam_pos;
 
 struct PointLight {
 	vec3 pos;
@@ -47,11 +37,10 @@ uniform PointLight light;
 
 layout(location=0) out vec4 oColor;
 
-// vec3 CalcDirectionalLight(DirectionalLight light, vec3 norm, vec3 cam_dir, vec3 diff, float spec);
 vec3 CalcPointLight(vec3 norm, vec3 cam_dir, vec3 frag_pos, vec3 diff, float spec);
 // vec3 CalcSpotLight(SpotLight light, vec3 norm, vec3 cam_dir, vec3 frag_pos, vec3 diff, float spec);
 
-float CalcAttenuationCusp(float dist, float rad, float falloff);
+float CalcAttenuation(float dist, float rad, float falloff);
 vec2 CalcUV();
 
 void main()
@@ -59,16 +48,13 @@ void main()
 	vec2 uv = CalcUV();
 	vec3 pos = texture(gPos, uv).xyz;
 	vec3 norm = texture(gNorm, uv).xyz;
-	vec4 temp = texture(gDiffSpec, uv);
+	vec4 temp = texture(gCol, uv);
 	vec3 diff = temp.rgb;
 	float spec = temp.a;
 
-	vec3 cam_dir = normalize(camera_pos - pos);
+	vec3 cam_dir = normalize(cam_pos - pos);
 
-	// Global Light
-	// vec3 tempCol = CalcDirectionalLight(dlight, norm, cam_dir, diff, spec);
-
-	// Point Lights
+	// Point Light
 	vec3 tempCol = CalcPointLight(norm, cam_dir, pos, diff, spec);
 
 	// Spot Lights
@@ -80,23 +66,7 @@ void main()
 	float gamma = 0.9;
 	tempCol = pow(tempCol, vec3(1.0 / gamma));
 	oColor = vec4(tempCol, 1.0);
-	//oColor = vec4(norm, 1.0);
 }
-
-// vec3 CalcDirectionalLight(DirectionalLight light, vec3 norm, vec3 cam_dir, vec3 diff, float spec)
-// {
-// 	vec3 ambient = light.ambient * diff;
-
-// 	vec3 ldir = normalize(-light.dir);
-// 	float d = max(dot(norm, ldir), 0.0);
-// 	vec3 diffuse = light.diffuse * d * diff;
-
-// 	vec3 halfwaydir = normalize(ldir + cam_dir);
-// 	float s = pow(max(dot(norm, -halfwaydir), d), spec * 128.0);
-// 	vec3 specular = light.specular * spec * diff;
-
-// 	return ambient + diffuse + specular;
-// }
 
 vec3 CalcPointLight(vec3 norm, vec3 cam_dir, vec3 frag_pos, vec3 diff, float spec)
 {
@@ -108,11 +78,10 @@ vec3 CalcPointLight(vec3 norm, vec3 cam_dir, vec3 frag_pos, vec3 diff, float spe
 
 	vec3 halfwaydir = normalize(ldir + cam_dir);
 	float s = pow(max(dot(norm, -halfwaydir), d), spec * 128.0);
-	vec3 specular = light.specular * spec * diff;
+	vec3 specular = light.specular * s * diff;
 
 	float dist = length(light.pos - frag_pos);
-	//float attenuation = 1.0 / (light.attenuation.x + light.attenuation.y * dist + light.attenuation.z * (dist * dist));
-	float attenuation = CalcAttenuationCusp(dist, light.radius, light.falloff);
+	float attenuation = CalcAttenuation(dist, light.radius, light.falloff);
 	return (ambient + diffuse + specular) * attenuation;
 }
 
@@ -137,14 +106,14 @@ vec3 CalcPointLight(vec3 norm, vec3 cam_dir, vec3 frag_pos, vec3 diff, float spe
 // 	return (ambient + (diffuse + specular) * intensity) * attenuation;
 // }
 
-float CalcAttenuationCusp(float dist, float rad, float falloff)
+float CalcAttenuation(float dist, float rad, float falloff)
 {
 	float s = dist / rad;
 	if (s >= 1.0)
 		return 0.0;
 
 	float s2 = s * s;
-	return (1 - s2) * (1 - s2) / (1 + falloff * s);
+	return 2 * (1 - s2) * (1 - s2) / (1 + falloff * s2);
 }
 
 vec2 CalcUV() {
