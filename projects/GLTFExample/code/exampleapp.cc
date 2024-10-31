@@ -153,7 +153,8 @@ namespace Example {
 			}
 
 			this->camera = new Render::Camera(
-				Math::toRad(65.0f), 4.0f / 3.0f, 0.01f, 100.0f
+				Math::toRad(50.0f), 
+				(float)S_WIDTH / (float)S_HEIGHT, 0.01f, 100.0f
 			);
 			this->camera->SetCameraPosition({ -13.0f, 2.0f, -0.5f });
 			this->camera->SetSpeed(7.5f);
