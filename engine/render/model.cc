@@ -46,7 +46,8 @@ namespace Resource {
 		for (std::size_t i = 0; i < buffers.size(); ++i)
 			glGenBuffers(1, &buffers[i].handle);
 
-		for (const auto& [i, buf] : std::views::enumerate(doc.bufferViews)) {
+		std::size_t i = 0;
+		for (const auto& buf : doc.bufferViews) {
 			GLenum target;
 			if (buf.target == fx::gltf::BufferView::TargetType::None) {
 				for (const auto& mesh : doc.meshes) {
@@ -68,10 +69,13 @@ namespace Resource {
 			glBindBuffer(target, buffers[i].handle);
 			const auto dataPtr = reinterpret_cast<GLbyte*>(doc.buffers[buf.buffer].data.data()) + buf.byteOffset;
 			glBufferData(target, buf.byteLength, dataPtr, GL_STATIC_DRAW);
+			i++;
 		}
 
-		for (const auto& [i, tex] : std::views::enumerate(doc.textures)) {
+		i = 0;
+		for (const auto& tex : doc.textures) {
 			textures.push_back(std::make_shared<Texture>(filepath.parent_path(), doc, i));
+			i++;
 		}
 		dummyTexture = std::make_shared<Texture>(Texture::DummyTexture());
 

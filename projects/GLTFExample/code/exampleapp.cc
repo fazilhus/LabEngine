@@ -214,9 +214,11 @@ namespace Example {
 			GeometryPass();
 
 			glEnable(GL_STENCIL_TEST);
-			for (const auto& [i, pl] : std::views::enumerate(lightManager.GetPointLights())) {
+			std::size_t i = 0;
+			for (const auto& pl : lightManager.GetPointLights()) {
 				StencilPassPointLight(pl);
 				LightingPassPointLight(pl, i);
+				i++;
 			}
 			glDisable(GL_STENCIL_TEST);
 
